@@ -4,7 +4,7 @@ import logo from '../assets/logo.jpg';
 const Home = () => {
   return (
     <div id="home">
-        <div className="hero bg-base-200 min-h-screen">
+        <div className="hero py-32 mt-16">
   <div className="hero-content flex-col lg:flex-row-reverse gap-40 items-center justify-center">
     <img
       src={logo}

@@ -6,19 +6,19 @@ const Navbar = () => {
     return (
         <div>
             <div>
-                <div className="navbar bg-base-100 shadow-sm justify-between">
+                <div className="navbar shadow-sm justify-between bg-neutral p-4 fixed top-0 w-full z-10">
                     <div className="flex flex-row ml-5 items-center justify-center gap-5">
                         <a href='/' className="text-2xl font-extrabold font-serif">IZOLE</a>
                         <div>
                             <a href="#home" className="btn btn-ghost">Home</a>
-                            <a href="#about" className="btn btn-ghost">About</a>
                             <a href="#products" className="btn btn-ghost">Products</a>
+                            <a href="#about" className="btn btn-ghost">About</a>
                             <a href="#contact" className="btn btn-ghost">Contact</a>
                         </div>
                     </div>
                     <div className="flex">
                         <div className='flex flex-row gap-5'>
-                        <input type="text" placeholder="Search" className="input input-bordered w-32 md:w-auto" />
+                        {/* <input type="text" placeholder="Search" className="input input-bordered w-32 md:w-auto" /> */}
                         <div className="dropdown dropdown-end">
                            {login==="customer" && <div tabIndex={0} role="button" className="btn btn-ghost btn-circle">
                                 <div className="indicator">
