@@ -1,122 +1,104 @@
 const express = require('express');
-const session = require('express-session');
-const { Issuer, generators } = require('openid-client');
 const AWS = require('aws-sdk');
-require('dotenv').config()
+
+const crypto = require('crypto');
 const app = express();
+require('dotenv').config();
+
+const cognito = new AWS.CognitoIdentityServiceProvider();
+
+const secretKey = process.env.SECRET_KEY;
+if (!secretKey) {
+    throw new Error('SECRET_KEY environment variable is not set');
+}
+
 app.use(express.json());
 
-let client;
-
-// Initialize OpenID Client for Cognito Authentication
-async function initializeClient() {
-    const issuer = await Issuer.discover('https://cognito-idp.ap-south-1.amazonaws.com/ap-south-1_LfOyhjQgS');
-    client = new issuer.Client({
-        client_id: process.env.APP_CLIENT_ID,
-        client_secret: process.env.APP_CLIENT_SECRET,
-        redirect_uris: ['https://d84l1y8p4kdic.cloudfront.net/callback'],
-        response_types: ['code']
-    });
-};
-initializeClient().catch(console.error);
-
-// Configure session middleware
-app.use(session({
-    secret: 'some secret',
-    resave: false,
-    saveUninitialized: false
-}));
-
-// Middleware to check authentication
-const checkAuth = (req, res, next) => {
-    req.isAuthenticated = !!req.session.userInfo;
+app.use((req, res, next) => {
+    const hmac = crypto.createHmac('sha256', secretKey);
     next();
+});
+const generateSecretHash = (username) => {
+    return crypto.createHmac('sha256', process.env.APP_CLIENT_SECRET)
+                 .update(username + process.env.APP_CLIENT_ID)
+                 .digest('base64');
 };
 
-// Protected Home Route
-app.get('/', checkAuth, (req, res) => {
-    res.json({
-        message: "Welcome to Home",
-        isAuthenticated: req.isAuthenticated,
-        user: req.session.userInfo || null
-    });
+app.post('/sign-up', async (req, res) => {
+    const { username, password, email, phoneNumber } = req.body;
+    console.log('Sign-up request received:', { username, email, phoneNumber });
+    try {
+        const formattedPhoneNumber = phoneNumber.startsWith('+') ? phoneNumber : `+91${phoneNumber}`;
+        console.log('Formatted phone number:', formattedPhoneNumber);
+        const params = {
+            ClientId: process.env.APP_CLIENT_ID,
+            SecretHash: generateSecretHash(username),
+            Username: username,
+            Password: password,
+            UserAttributes: [
+                { Name: 'email', Value: email },
+                { Name: 'phone_number', Value: formattedPhoneNumber },
+                { Name: 'preferred_username', Value: username }
+            ]
+        };
+        const data = await cognito.signUp(params).promise();
+        console.log('Sign-up successful:', data);
+        res.json(data);
+    } catch (err) {
+        console.error('Sign-up error:', err);
+        res.status(500).json(err);
+    }
 });
 
-// Signup Route (Registers a User in Cognito)
-app.post('/signup', async (req, res) => {
-    const { email, password, name } = req.body;
-    
-    const cognito = new AWS.CognitoIdentityServiceProvider({
-        region: 'ap-south-1'
-    });
+app.post('/confirm', async (req, res) => {
+    const { username, code } = req.body;
+    console.log('Confirm request received:', { username, code });
+    try {
+        const params = {
+            ClientId: process.env.APP_CLIENT_ID,
+            SecretHash: generateSecretHash(username),
+            ConfirmationCode: code,
+            Username: username
+        };
+        const data = await cognito.confirmSignUp(params).promise();
+        console.log('Confirm successful:', data);
+        res.json(data);
+    } catch (err) {
+        console.error('Confirm error:', err);
+        if (err.code === 'CodeMismatchException') {
+            res.status(400).json({ message: 'Invalid verification code provided, please try again.' });
+        } else {
+            res.status(500).json(err);
+        }
+    }
+});
 
+app.post('/login', async (req, res) => {
+    const { username, password } = req.body;
     const params = {
+        AuthFlow: 'USER_PASSWORD_AUTH',
         ClientId: process.env.APP_CLIENT_ID,
-        Username: email,
-        Password: password,
-        UserAttributes: [
-            { Name: "email", Value: email },
-            { Name: "name", Value: name }
-        ]
+        AuthParameters: {
+            'USERNAME': username,
+            'PASSWORD': password,
+            'SECRET_HASH': generateSecretHash(username)
+        }
     };
-
     try {
-        await cognito.signUp(params).promise();
-        res.json({ message: "User signed up successfully! Please confirm your email." });
+        const data = await cognito.initiateAuth(params).promise();
+        const token = data.AuthenticationResult.AccessToken;
+        res.json({ token });
     } catch (err) {
-        res.status(400).json({ error: err.message });
+        res.json(err);
     }
 });
 
-// Login Route (Redirects to Cognito Login)
-app.get('/login', (req, res) => {
-    const nonce = generators.nonce();
-    const state = generators.state();
-
-    req.session.nonce = nonce;
-    req.session.state = state;
-
-    const authUrl = client.authorizationUrl({
-        scope: 'email openid phone',
-        state,
-        nonce
-    });
-
-    res.redirect(authUrl);
-});
-
-// Callback Route (Handles Cognito Authentication Response)
-app.get('/callback', async (req, res) => {
-    try {
-        const params = client.callbackParams(req);
-        const tokenSet = await client.callback(
-            'https://d84l1y8p4kdic.cloudfront.net/callback',
-            params,
-            {
-                nonce: req.session.nonce,
-                state: req.session.state
-            }
-        );
-
-        const userInfo = await client.userinfo(tokenSet.access_token);
-        req.session.userInfo = userInfo;
-
-        res.redirect('/');
-    } catch (err) {
-        console.error('Callback error:', err);
-        res.redirect('/');
-    }
-});
-
-// Logout Route
-app.get('/logout', (req, res) => {
-    req.session.destroy();
-    const logoutUrl = `https://ap-south-1lfoyhjqgs.auth.ap-south-1.amazoncognito.com/logout?client_id=12viv8c66r463np0b06lfn3cmb&logout_uri=https://d84l1y8p4kdic.cloudfront.net`;
-    res.redirect(logoutUrl);
-});
-
-// Start the server
 const PORT = process.env.PORT || 3000;
+
+app.get("/demoPage", authenticateJWT, (req, res) => {
+    res.json(req.user);
+});
+
 app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+    console.log(`Server is running in port http://localhost:${PORT}`);
 });
