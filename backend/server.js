@@ -1,6 +1,6 @@
 const express = require('express');
 const AWS = require('aws-sdk');
-
+const { authenticateJWT } = require('./middlewares/customer.middleware');
 const crypto = require('crypto');
 const app = express();
 require('dotenv').config();
@@ -18,6 +18,7 @@ app.use((req, res, next) => {
     const hmac = crypto.createHmac('sha256', secretKey);
     next();
 });
+
 const generateSecretHash = (username) => {
     return crypto.createHmac('sha256', process.env.APP_CLIENT_SECRET)
                  .update(username + process.env.APP_CLIENT_ID)
@@ -89,7 +90,8 @@ app.post('/login', async (req, res) => {
         const token = data.AuthenticationResult.AccessToken;
         res.json({ token });
     } catch (err) {
-        res.json(err);
+        console.error('Login error:', err);
+        res.status(500).json(err);
     }
 });
 
