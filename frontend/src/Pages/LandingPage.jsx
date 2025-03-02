@@ -11,8 +11,8 @@ const LandingPage = () => {
     <>
     <Navbar/>
     <Home/>
-    <About/>
     <ProductPreview/>
+    <About/>
     <Contact/>
     <Footer/>
     </>

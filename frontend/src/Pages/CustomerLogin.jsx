@@ -7,8 +7,8 @@ const CustomerLogin = () => {
             <h1>Customer Login</h1>
             <form>
                 <div>
-                    <label>Phone Number</label>
-                    <input type="number" placeholder="Enter phone number" />
+                    <label>Email</label>
+                    <input type="email" placeholder="Enter email" />
                 </div>
                 <div>
                     <label>Password</label>
