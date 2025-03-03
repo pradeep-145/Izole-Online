@@ -4,6 +4,8 @@ const { authenticateJWT } = require('./middlewares/customer.middleware');
 const crypto = require('crypto');
 const app = express();
 require('dotenv').config();
+const cors=require('cors');
+app.use(cors());
 
 const cognito = new AWS.CognitoIdentityServiceProvider();
 
@@ -76,6 +78,7 @@ app.post('/confirm', async (req, res) => {
 
 app.post('/login', async (req, res) => {
     const { username, password } = req.body;
+    console.log('Login request received:', { username });
     const params = {
         AuthFlow: 'USER_PASSWORD_AUTH',
         ClientId: process.env.APP_CLIENT_ID,

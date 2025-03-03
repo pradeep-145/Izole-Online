@@ -4,6 +4,7 @@ import LandingPage from './Pages/LandingPage'
 import CustomerSignUp from './Pages/CustomerSignUp'
 import CustomerLogin from './Pages/CustomerLogin'
 import AdminLogin from './Pages/AdminLogin'
+import OtpVerification from './Pages/otpVerification'
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
         <Route path="/customerSignup" element={<CustomerSignUp />} />
         <Route path="/customerLogin" element={<CustomerLogin />} />
         <Route path="/adminLogin" element={<AdminLogin />} />
+        <Route path="/otpVerification" element={<OtpVerification/>} />
       </Routes>
     </Router>
   )
