@@ -131,10 +131,12 @@ const AdminDashboard = () => {
               
               {/* Preview Images */}
               <div className="flex">
-                {image.image.map((imgSrc, i) => (
+                {image.image.map((imgSrc, i) => 
+                 
+                  (
                   <img
                     key={i}
-                    src={imgSrc}
+                    src={URL.createObjectURL(imgSrc)}
                     alt={`Preview ${i}`}
                     className="w-20 h-20 object-cover m-2"
                   />
