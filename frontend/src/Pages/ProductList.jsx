@@ -19,7 +19,7 @@ const ProductList = () => {
             desc: "A perfect blend of warmth and style with this olive green jacket.",
         },
         {
-            img: "https://getketchadmin.getketch.com/product/8905040937373/660/HLZ4000072_6.jpg",
+            img: "https://getketchadmin.getketch.com/product/h=300,w=250,q=85,fit=cover/8905040937373/660/HLZ4000072_6.jpg",
             title: "Trendy Joggers",
             desc: "Comfortable and stylish joggers for your active lifestyle.",
         },
@@ -39,6 +39,7 @@ const ProductList = () => {
             desc: "Iconic blue denim jacket for a timeless look.",
         },
     ];
+ 
     return (
         <div>
             <Navbar />
@@ -52,14 +53,14 @@ const ProductList = () => {
             </div>
 
             
-            <div>
+            <div className='grid lg:grid-cols-3 mx-28'>
                 {products.map((product, index) => (
-                    <div key={index} className="card bg-base-100 w-96 shadow-sm border border-zinc-400">
+                    <div key={index} className="card bg-base-100 w-96 shadow-sm border border-zinc-400 my-10">
                         <figure>
-                            <img src={product.img} />
+                            <img src={product.img} alt={product.title} className="w-72 h-72 object-cover rounded-lg mt-5" />
                         </figure>
                         <div className="card-body">
-                            <h2 className="card-title">{product.name}</h2>
+                            <h2 className="card-title">{product.title}</h2>
                             <p>{product.desc}</p>
                             <div className="card-actions justify-end">
                                 <button className="btn btn-primary">Buy Now</button>

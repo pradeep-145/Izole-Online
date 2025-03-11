@@ -6,6 +6,7 @@ import CustomerLogin from './Pages/CustomerLogin'
 import AdminLogin from './Pages/AdminLogin'
 import OtpVerification from './Pages/otpVerification'
 import AdminDashboard from './Pages/Admin.dashboard'
+import ProductList from './Pages/ProductList'
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
         <Route path="/adminLogin" element={<AdminLogin />} />
         <Route path="/otpVerification" element={<OtpVerification/>} />
         <Route path='/admin' element={<AdminDashboard/>}></Route>
+        <Route path="/productList" element={<ProductList/>}/>
       </Routes>
     </Router>
   )
