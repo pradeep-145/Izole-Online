@@ -4,8 +4,8 @@ import LandingPage from './Pages/LandingPage'
 import CustomerSignUp from './Pages/CustomerSignUp'
 import CustomerLogin from './Pages/CustomerLogin'
 import AdminLogin from './Pages/AdminLogin'
-import ProductList from './Pages/ProductList';
-
+import OtpVerification from './Pages/otpVerification'
+import AdminDashboard from './Pages/Admin.dashboard'
 
 function App() {
   return (
@@ -15,7 +15,8 @@ function App() {
         <Route path="/customerSignup" element={<CustomerSignUp />} />
         <Route path="/customerLogin" element={<CustomerLogin />} />
         <Route path="/adminLogin" element={<AdminLogin />} />
-        <Route path='/productList' element={<ProductList/>}/>
+        <Route path="/otpVerification" element={<OtpVerification/>} />
+        <Route path='/admin' element={<AdminDashboard/>}></Route>
       </Routes>
     </Router>
   )

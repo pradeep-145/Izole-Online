@@ -11,7 +11,9 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "aws-sdk": "^2.1692.0",
+    "@aws-sdk/client-cognito-identity-provider": "^3.760.0",
+    "@aws-sdk/client-s3": "^3.758.0",
+    "@vendia/serverless-express": "^4.12.6",
     "backend": "file:",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
@@ -21,6 +23,8 @@
     "express-session": "^1.18.1",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.11.0",
+    "multer": "^1.4.5-lts.1",
+    "multer-storage-cloudinary": "^4.0.0",
     "nodemon": "^3.1.9",
     "openid-client": "^5.7.0",
     "serverless-http": "^3.2.0"

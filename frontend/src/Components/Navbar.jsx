@@ -2,7 +2,7 @@ import React from 'react'
 import { useState } from 'react'
 
 const Navbar = () => {
-    const [login, setLogin] = useState("null")
+    const [login, setLogin] = useState(localStorage.getItem("token")||null)
     return (
         <div>
             <div>
@@ -40,7 +40,7 @@ const Navbar = () => {
                         </div>
                                     </div>
                         
-                       {login==-"cutomer" && <div className="dropdown dropdown-end">
+                       {login && <div className="dropdown dropdown-end">
                             <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
                                 <div className="w-10 rounded-full">
                                     <img
@@ -57,11 +57,16 @@ const Navbar = () => {
                                         <span className="badge">New</span>
                                     </a>
                                 </li>
-                                <li><a>Logout</a></li>
+                                <li><a onClick={()=>
+                                {
+                                    localStorage.removeItem("token")
+                                    setLogin(null)
+                                }
+                                }>Logout</a></li>
                             </ul>
                         </div>}
 
-                        {login==="null" && <a href='/customerLogin' className="btn btn-primary rounded-2xl">Login/SignUp</a>}
+                        {login===null && <a href='/customerLogin' className="btn btn-primary rounded-2xl">Login/SignUp</a>}
                     </div>
                 </div>
             </div>
