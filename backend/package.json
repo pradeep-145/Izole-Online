@@ -15,7 +15,6 @@
     "@aws-sdk/client-s3": "^3.758.0",
     "@vendia/serverless-express": "^4.12.6",
     "backend": "file:",
-    "cloudinary": "^1.41.3",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "crypto": "^1.0.1",

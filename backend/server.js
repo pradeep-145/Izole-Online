@@ -12,7 +12,7 @@ app.use(cookieParser());
 app.use(express.json());
 app.use("/api/auth", authRoute);
 app.use("/api/products", productRoute);
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 1220;
 
 app.get("/demoPage", authenticateJWT, (req, res) => {
   res.json(req.user);
