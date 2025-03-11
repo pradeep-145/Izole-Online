@@ -1,14 +1,9 @@
-const AWS = require('aws-sdk');
-const cognito = new AWS.CognitoIdentityServiceProvider();
+const { CognitoIdentityProviderClient } = require('@aws-sdk/client-cognito-identity-provider');
+const cognito = new CognitoIdentityProviderClient({ region: 'your-region' });
 
 const authenticateJWT = (req, res, next) => {
-    const authHeader = req.header('Authorization');
-    if (!authHeader) {
-        console.error('Authorization header missing');
-        return res.sendStatus(401);
-    }
-
-    const token = authHeader.split(' ')[1];
+    
+    const token = req.cookies.jwt;
     if (!token) {
         console.error('Token missing in Authorization header');
         return res.sendStatus(401);
