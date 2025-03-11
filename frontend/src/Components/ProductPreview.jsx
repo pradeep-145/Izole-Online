@@ -44,7 +44,7 @@ const ProductPreview = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentIndex((prevIndex) => (prevIndex + 1) % products.length);
-    }, 3000); // Auto-slide every 3 seconds
+    }, 3000); 
 
     return () => clearInterval(interval);
   }, []);
@@ -89,7 +89,7 @@ const ProductPreview = () => {
       </div>
       <div>
         <p className="text-xl font-semibold">Here are some of our top rated products by our customers <br/>that symbolise our authenticity and quality.</p>
-        <button className="btn btn-primary btn-md mt-10 ">View All Products</button>
+        <a href="/productList" className="btn btn-primary btn-md mt-10 ">View All Products</a>
       </div>
       </div>
     </div>
