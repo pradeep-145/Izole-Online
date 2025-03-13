@@ -22,6 +22,15 @@ const ProductController = {
       res.status(500).json("Internal server Error");
     }
   },
+  getProducts:async(req,res)=>{
+    try{
+      const response =await Product.find({})
+      res.status(200).json({result:response});
+    }catch(error){
+      console.log("Error ar getProducts",error);
+      res.status(500).json("Internal server Error")
+    }
+  }
 };
 
 module.exports = ProductController;
