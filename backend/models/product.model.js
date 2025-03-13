@@ -24,6 +24,10 @@ const Product = mongoose.Schema({
     required: true,
     default: 0,
   },
+  category:{
+    type:String,
+    required:true
+  },
   orderCount: {
     type: Number,
     default: 0,
