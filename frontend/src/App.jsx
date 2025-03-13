@@ -9,6 +9,7 @@ import OtpVerification from "./Pages/customer/OtpVerification";
 import ProductList from "./Pages/customer/ProductList";
 import CustomerLayout from "./Pages/customer/CustomerLayout";
 import AdminLayout from "./Pages/Admin/AdminLayout";
+import Product from "./Pages/customer/Product";
 
 
 function App() {
@@ -25,6 +26,8 @@ function App() {
           <Route path="login" element={<CustomerLogin />} />
           <Route path="otp-verification" element={<OtpVerification />} />
           <Route path="products" element={<ProductList />} />
+          <Route path="product" element={<Product />} />
+          
         </Route>
 
         {/* Admin Routes */}
