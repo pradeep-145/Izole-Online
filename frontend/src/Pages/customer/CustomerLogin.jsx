@@ -1,6 +1,7 @@
 import axios from "axios";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+
 const CustomerLogin = () => {
   const [formData, setFormData] = useState({
     username: "",
@@ -68,7 +69,7 @@ const CustomerLogin = () => {
           </button>
           <p className="text-sm text-center mt-2">
             Don't have an account?{" "}
-            <a href="/customerSignup" className="link link-hover text-primary">
+            <a href="/customer/sign-up" className="link link-hover text-primary">
               Sign Up
             </a>
           </p>

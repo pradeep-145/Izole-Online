@@ -66,7 +66,7 @@ const Navbar = () => {
                             </ul>
                         </div>}
 
-                        {login===null && <a href='/customerLogin' className="btn btn-primary rounded-2xl">Login/SignUp</a>}
+                        {login===null && <a href='/customer/login' className="btn btn-primary rounded-2xl">Login/SignUp</a>}
                     </div>
                 </div>
             </div>
