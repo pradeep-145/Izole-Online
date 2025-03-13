@@ -53,7 +53,7 @@ const ProductList = () => {
             </div>
 
             
-            <div className='grid lg:grid-cols-3 mx-28'>
+            <div className='grid lg:grid-cols-3 lg:mx-28'>
                 {products.map((product, index) => (
                     <div key={index} className="card bg-base-100 w-96 shadow-sm border border-zinc-400 my-10">
                         <figure>

@@ -52,8 +52,8 @@ const AdminDashboard = () => {
 
   return (
     <>
-      <h1>Admin Dashboard</h1>
-      <form className="flex flex-col">
+      <h1 className="text-4xl font-bold text-center font-serif my-8">Admin Dashboard</h1>
+      <form className="flex flex-col justify-center border w-fit mx-auto p-5 gap-4">
         <input
           type="text"
           name="name"
@@ -128,8 +128,7 @@ const AdminDashboard = () => {
                   );
                 }}
               />
-              
-              {/* Preview Images */}
+    
               <div className="flex">
                 {image.image.map((imgSrc, i) => 
                  
