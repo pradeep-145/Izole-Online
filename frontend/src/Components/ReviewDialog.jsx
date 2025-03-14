@@ -1,80 +1,103 @@
-import React from "react";
+import React, { useState } from "react";
 
-const ReviewDialog = ({open, setOpen}) => {
-    
+const ReviewDialog = ({ open, setOpen, productName, onSubmit }) => {
+  const [rating, setRating] = useState(0);
+  const [reviewText, setReviewText] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-    return (
-        <div>
-            <div
-                className={`${open?"fixed":"hidden"} z-10 inset-0 overflow-y-auto`}
-                aria-labelledby="modal-title"
-                role="dialog"
-                aria-modal="true"
-            >
-                <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                    <div
-                        className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
-                        aria-hidden="true"
-                    ></div>
-                    <span
-                        className="hidden sm:inline-block sm:align-middle sm:h-screen"
-                        aria-hidden="true"
-                    >
-                        &#8203;
-                    </span>
-                    <div
-                        className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
-                        role="dialog"
-                        aria-modal="true"
-                        aria-labelledby="modal-title"
-                    >
-                        <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                            <div className="sm:flex sm:items-start">
-                                <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                                    <h3
-                                        className="text-lg leading-6 font-medium text-gray-900"
-                                        id="modal-title"
-                                    >
-                                        Review
-                                    </h3>
-                                    <div className="mt-2">
-                                        <p className="text-sm text-gray-500">
-                                            Your review will be posted publicly on the web. Please
-                                            don't share any personal information.
-                                        </p>
-                                        <textarea
-                                            className="mt-2 w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                                            rows="4"
-                                            placeholder="Write your review here..."
-                                        ></textarea>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                            <button
-                                type="button"
-                                className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm"
-                                onClick={() => {
-                                    setOpen(false);
-                                }}>
-                                   Post Review 
-                                </button>
+  const handleSubmit = () => {
+    if (!reviewText.trim() || rating === 0) {
+      alert("Please provide a rating and review text.");
+      return;
+    }
 
+    setIsSubmitting(true);
 
-                            <button
-                                type="button"
-                                className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto
-                                sm:text-sm" onClick={() => {
-                                    setOpen(false);
-                                }}>
-                                Cancel
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    // Simulate an API call
+    setTimeout(() => {
+      const reviewData = {
+        productName,
+        rating,
+        reviewText,
+      };
+      onSubmit(reviewData);
+      setIsSubmitting(false);
+      setOpen(false);
+    }, 1000);
+  };
+
+  if (!open) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-lg p-6">
+        <h2 className="text-2xl font-bold mb-4">Review {productName}</h2>
+        <p className="text-sm text-gray-500 mb-4">
+          Your review will be posted publicly on the web. Please don't share any
+          personal information.
+        </p>
+
+        {/* Rating System */}
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Rating
+          </label>
+          <div className="flex space-x-1">
+            {[1, 2, 3, 4, 5].map((star) => (
+              <button
+                key={star}
+                onClick={() => setRating(star)}
+                className={`text-2xl ${
+                  star <= rating ? "text-yellow-500" : "text-gray-300"
+                }`}
+              >
+                ★
+              </button>
+            ))}
+          </div>
         </div>
-    );
-}
+
+        {/* Review Textarea */}
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Review
+          </label>
+          <textarea
+            className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+            rows="4"
+            placeholder="Write your review here..."
+            value={reviewText}
+            onChange={(e) => setReviewText(e.target.value)}
+          />
+        </div>
+
+        {/* Buttons */}
+        <div className="flex justify-end space-x-3">
+          <button
+            className="btn btn-ghost"
+            onClick={() => setOpen(false)}
+            disabled={isSubmitting}
+          >
+            Cancel
+          </button>
+          <button
+            className="btn btn-primary"
+            onClick={handleSubmit}
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? (
+              <>
+                <span className="loading loading-spinner"></span>
+                Submitting...
+              </>
+            ) : (
+              "Post Review"
+            )}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export default ReviewDialog;

@@ -10,10 +10,10 @@ const Navbar = () => {
                     <div className="flex flex-row ml-5 items-center justify-center gap-5">
                         <a href='/' className="text-2xl font-extrabold font-serif">IZOLE</a>
                         <div>
-                            <a href="#home" className="btn btn-ghost">Home</a>
-                            <a href="#products" className="btn btn-ghost">Products</a>
-                            <a href="#about" className="btn btn-ghost">About</a>
-                            <a href="#contact" className="btn btn-ghost">Contact</a>
+                            <a href="/customer" className="btn btn-ghost">Home</a>
+                            <a href="/customer/products" className="btn btn-ghost">Products</a>
+                            <a href="/customer#about" className="btn btn-ghost">About</a>
+                            <a href="/customer#contact" className="btn btn-ghost">Contact</a>
                         </div>
                     </div>
                     <div className="flex">
