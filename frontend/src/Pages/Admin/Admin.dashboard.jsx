@@ -1,15 +1,17 @@
 import axios from "axios";
 import React, { useState } from "react";
-
+import ReviewDialog from "../../Components/ReviewDialog";
 const AdminDashboard = () => {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
     price: "",
-    quantity: "",
+    
   });
   
   const [images, setImages] = useState([]);
+  const [color , setColor]=useState('')
+  const [quantity, setQuantity] = useState(0);
   const getImageLink = async (image) => {
 
     const formData = new FormData();
@@ -76,26 +78,31 @@ const AdminDashboard = () => {
             setFormData({ ...formData, price: e.target.value })
           }
         />
+
+        <div>
+          <input type="text" name="colors" id="colors"
+          onChange={(e)=>{
+            setColor(e.target.value)
+          }}
+          placeholder="color" />
         <input
           type="number"
           name="quant"
           id="quant"
           placeholder="quant"
           onChange={(e) =>
-            setFormData({ ...formData, quantity: e.target.value })
+            setQuantity(e.target.value)
           }
         />
-
-        <div>
-          <input type="text" name="colors" id="colors" placeholder="color" />
           <button
             className="btn"
+            disabled={color!=""&&formData.quantity!=""?false:true}
             onClick={(e) => {
               e.preventDefault();
-              const color = document.getElementById("colors").value.trim();
-              if (!color) return; // Prevent empty color addition
+              
+              if (!color|| !quantity) return; // Prevent empty color addition
 
-              setImages((prev) => [...prev, { color, image: [] }]);
+              setImages((prev) => [...prev, { color,quantity, image: [] }]);
               document.getElementById("colors").value = ""; // Clear input
             }}
           >
@@ -105,7 +112,7 @@ const AdminDashboard = () => {
           {images.map((image, index) => (
             <div key={index}>
               <p>{image.color}</p>
-
+              <p>{image.quantity}</p>
               <label htmlFor={`images-${index}`} className="custom-file-upload">
                 +
               </label>
