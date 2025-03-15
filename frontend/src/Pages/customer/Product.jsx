@@ -443,7 +443,7 @@ const Product = () => {
                   </button>
                   <input
                     type="text"
-                    className="w-full text-center text-gray-900 border-0 focus:ring-0"
+                    className="w-full text-center  border-0 focus:ring-0"
                     value={itemCount}
                     readOnly
                   />

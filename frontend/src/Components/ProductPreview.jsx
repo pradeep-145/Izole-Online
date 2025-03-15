@@ -88,7 +88,7 @@ const ProductPreview = () => {
       </div>
       </div>
       <div>
-        <p className="text-xl font-semibold">Here are some of our top rated products by our customers <br/>that symbolise our authenticity and quality.</p>
+        <p className="text-xl font-semibold">Here are some of our top rated products by our customers <br/>that symbolize our authenticity and quality.</p>
         <a href="/productList" className="btn btn-primary btn-md mt-10 ">View All Products</a>
       </div>
       </div>

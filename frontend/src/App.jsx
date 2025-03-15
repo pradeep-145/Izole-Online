@@ -1,6 +1,5 @@
 import React from "react";
 import { Navigate, Route, BrowserRouter as Router, Routes } from "react-router-dom";
-import AdminDashboard from "./Pages/Admin/Admin.dashboard";
 import AdminLogin from "./Pages/Admin/AdminLogin";
 import CustomerLogin from "./Pages/customer/CustomerLogin";
 import CustomerSignUp from "./Pages/customer/CustomerSignUp";
@@ -10,7 +9,8 @@ import ProductList from "./Pages/customer/ProductList";
 import CustomerLayout from "./Pages/customer/CustomerLayout";
 import AdminLayout from "./Pages/Admin/AdminLayout";
 import Product from "./Pages/customer/Product";
-
+import AdminDashboard from "./Pages/Admin/AdminDashboard";
+import Cart from "./Pages/customer/cart";
 
 function App() {
   return (
@@ -27,6 +27,7 @@ function App() {
           <Route path="otp-verification" element={<OtpVerification />} />
           <Route path="products" element={<ProductList />} />
           <Route path="product" element={<Product />} />
+          <Route path='cart' element={<Cart/>}/>
           
         </Route>
 
