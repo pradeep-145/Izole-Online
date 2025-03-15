@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     BarChart3,
     ShoppingBag,
@@ -20,15 +20,17 @@ import {
     Eye,
     Edit,
     Trash2,
-    
+
 } from 'lucide-react';
 import AdminProductForm from './ProductForm';
+import OrderManagement from '../../Components/admin/Ordermanagement';
 
 const AdminDashboard = () => {
     const [activeTab, setActiveTab] = useState('dashboard');
     const [showProductForm, setShowProductForm] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-
+    const [notificationOpen, setNotificationOpen] = useState(false);
+const [profileOpen, setProfileOpen] = useState(false);
     // Sample data
     const recentOrders = [
         { id: '#ORD-7462', customer: 'Emma Wilson', date: '15 Mar 2025', status: 'Delivered', total: '$129.99' },
@@ -54,7 +56,24 @@ const AdminDashboard = () => {
             default: return 'bg-gray-100 text-gray-800';
         }
     };
-
+    // Add this useEffect to handle closing dropdowns when clicking outside
+useEffect(() => {
+    function handleClickOutside(event) {
+        // Close notifications and profile dropdowns when clicking outside
+        if (notificationOpen || profileOpen) {
+            setNotificationOpen(false);
+            setProfileOpen(false);
+        }
+    }
+    
+    // Add event listener to document
+    document.addEventListener('mousedown', handleClickOutside);
+    
+    // Clean up the event listener
+    return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+    };
+}, [notificationOpen, profileOpen]);
     // Sample analytics data
     const salesData = {
         today: '$3,245',
@@ -86,64 +105,79 @@ const AdminDashboard = () => {
                     <h1 className="text-xl font-bold text-gray-800">FASHION ADMIN</h1>
                 </div>
                 <div className="flex flex-col flex-1 overflow-y-auto">
-                    <nav className="flex-1 px-2 py-4 space-y-1">
-                        <button
-                            onClick={() => setActiveTab('dashboard')}
-                            className={`flex items-center w-full px-4 py-2 text-sm rounded-lg ${activeTab === 'dashboard' ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-gray-100'}`}
-                        >
-                            <BarChart3 className="w-5 h-5 mr-3" />
-                            Dashboard
-                        </button>
-                        <button
-                            onClick={() => setActiveTab('orders')}
-                            className={`flex items-center w-full px-4 py-2 text-sm rounded-lg ${activeTab === 'orders' ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-gray-100'}`}
-                        >
-                            <ShoppingBag className="w-5 h-5 mr-3" />
-                            Orders
-                        </button>
-                        <button
-                            onClick={() => setActiveTab('products')}
-                            className={`flex items-center w-full px-4 py-2 text-sm rounded-lg ${activeTab === 'products' ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-gray-100'}`}
-                        >
-                            <Package className="w-5 h-5 mr-3" />
-                            Products
-                        </button>
-                        <button
-                            onClick={() => setActiveTab('customers')}
-                            className={`flex items-center w-full px-4 py-2 text-sm rounded-lg ${activeTab === 'customers' ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-gray-100'}`}
-                        >
-                            <Users className="w-5 h-5 mr-3" />
-                            Customers
-                        </button>
-                        <button
-                            onClick={() => setActiveTab('inventory')}
-                            className={`flex items-center w-full px-4 py-2 text-sm rounded-lg ${activeTab === 'inventory' ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-gray-100'}`}
-                        >
-                            <Layers className="w-5 h-5 mr-3" />
-                            Inventory
-                        </button>
-                        <button
-                            onClick={() => setActiveTab('categories')}
-                            className={`flex items-center w-full px-4 py-2 text-sm rounded-lg ${activeTab === 'categories' ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-gray-100'}`}
-                        >
-                            <Tag className="w-5 h-5 mr-3" />
-                            Categories
-                        </button>
-                        <button
-                            onClick={() => setActiveTab('shipping')}
-                            className={`flex items-center w-full px-4 py-2 text-sm rounded-lg ${activeTab === 'shipping' ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-gray-100'}`}
-                        >
-                            <Truck className="w-5 h-5 mr-3" />
-                            Shipping
-                        </button>
-                        <button
-                            onClick={() => setActiveTab('settings')}
-                            className={`flex items-center w-full px-4 py-2 text-sm rounded-lg ${activeTab === 'settings' ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-gray-100'}`}
-                        >
-                            <Settings className="w-5 h-5 mr-3" />
-                            Settings
-                        </button>
-                    </nav>
+                <nav className="flex-1 px-2 py-4 space-y-1">
+    <button
+        onClick={() => setActiveTab('dashboard')}
+        className={`flex items-center w-full px-4 py-2 text-sm rounded-lg ${activeTab === 'dashboard' ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-gray-100'}`}
+    >
+        <BarChart3 className="w-5 h-5 mr-3" />
+        Dashboard
+    </button>
+    <button
+        onClick={() => setActiveTab('orders')}
+        className={`flex items-center w-full px-4 py-2 text-sm rounded-lg ${activeTab === 'orders' ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-gray-100'}`}
+    >
+        <ShoppingBag className="w-5 h-5 mr-3" />
+        Orders
+        {notifications > 0 && (
+            <span className="ml-auto bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                {notifications}
+            </span>
+        )}
+    </button>
+    <button
+        onClick={() => setActiveTab('products')}
+        className={`flex items-center w-full px-4 py-2 text-sm rounded-lg ${activeTab === 'products' ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-gray-100'}`}
+    >
+        <Package className="w-5 h-5 mr-3" />
+        Products
+        {lowStockItems > 0 && (
+            <span className="ml-auto bg-yellow-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                {lowStockItems}
+            </span>
+        )}
+    </button>
+    <button
+        onClick={() => setActiveTab('customers')}
+        className={`flex items-center w-full px-4 py-2 text-sm rounded-lg ${activeTab === 'customers' ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-gray-100'}`}
+    >
+        <Users className="w-5 h-5 mr-3" />
+        Customers
+    </button>
+    <button
+        onClick={() => setActiveTab('inventory')}
+        className={`flex items-center w-full px-4 py-2 text-sm rounded-lg ${activeTab === 'inventory' ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-gray-100'}`}
+    >
+        <Layers className="w-5 h-5 mr-3" />
+        Inventory
+    </button>
+    <button
+        onClick={() => setActiveTab('categories')}
+        className={`flex items-center w-full px-4 py-2 text-sm rounded-lg ${activeTab === 'categories' ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-gray-100'}`}
+    >
+        <Tag className="w-5 h-5 mr-3" />
+        Categories
+    </button>
+    <button
+        onClick={() => setActiveTab('shipping')}
+        className={`flex items-center w-full px-4 py-2 text-sm rounded-lg ${activeTab === 'shipping' ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-gray-100'}`}
+    >
+        <Truck className="w-5 h-5 mr-3" />
+        Shipping
+        {pendingReturns > 0 && (
+            <span className="ml-auto bg-purple-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                {pendingReturns}
+            </span>
+        )}
+    </button>
+    <button
+        onClick={() => setActiveTab('settings')}
+        className={`flex items-center w-full px-4 py-2 text-sm rounded-lg ${activeTab === 'settings' ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-gray-100'}`}
+    >
+        <Settings className="w-5 h-5 mr-3" />
+        Settings
+    </button>
+</nav>
                     <div className="px-4 py-2 mt-auto border-t border-gray-200">
                         <button className="flex items-center w-full px-4 py-2 text-sm rounded-lg text-red-600 hover:bg-red-50">
                             <LogOut className="w-5 h-5 mr-3" />
@@ -206,34 +240,119 @@ const AdminDashboard = () => {
             <div className="flex-1 flex flex-col overflow-hidden">
                 {/* Top Bar */}
                 <header className="flex items-center justify-between h-16 px-6 bg-white border-b border-gray-200">
-                    <h2 className="text-lg font-medium md:hidden">FASHION ADMIN</h2>
-                    <div className="relative w-full max-w-md hidden md:block">
-                        <div className="absolute inset-y-0 left-0 flex items-center pl-3">
-                            <Search className="w-5 h-5 text-gray-400" />
-                        </div>
-                        <input
-                            type="text"
-                            placeholder="Search..."
-                            className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                        />
+    <h2 className="text-lg font-medium md:hidden">FASHION ADMIN</h2>
+    <div className="relative w-full max-w-md hidden md:block">
+        <div className="absolute inset-y-0 left-0 flex items-center pl-3">
+            <Search className="w-5 h-5 text-gray-400" />
+        </div>
+        <input
+            type="text"
+            placeholder="Search..."
+            className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+        />
+    </div>
+    <div className="flex items-center space-x-4">
+        {/* Notification Dropdown */}
+        <div className="relative">
+            <button 
+                onClick={() => setNotificationOpen(!notificationOpen)}
+                className="p-1 text-gray-400 hover:text-gray-500 relative"
+            >
+                <Bell className="w-6 h-6" />
+                {notifications > 0 && (
+                    <span className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full">
+                        {notifications}
+                    </span>
+                )}
+            </button>
+            
+            {/* Notification Dropdown Panel */}
+            {notificationOpen && (
+                <div className="absolute right-0 mt-2 w-80 bg-white rounded-md shadow-lg overflow-hidden z-50 border border-gray-200">
+                    <div className="px-4 py-3 border-b border-gray-200 flex justify-between items-center">
+                        <h3 className="text-sm font-medium text-gray-900">Notifications</h3>
+                        <button className="text-xs text-blue-600 hover:text-blue-800">Mark all as read</button>
                     </div>
-                    <div className="flex items-center space-x-4">
-                        <div className="relative">
-                            <button className="p-1 text-gray-400 hover:text-gray-500">
-                                <Bell className="w-6 h-6" />
-                                <span className="absolute top-0 right-0 block w-2 h-2 bg-red-500 rounded-full"></span>
-                            </button>
+                    <div className="max-h-72 overflow-y-auto">
+                        <div className="px-4 py-3 border-b border-gray-100 bg-blue-50">
+                            <div className="flex items-start">
+                                <ShoppingBag className="w-5 h-5 text-blue-600 mr-3 mt-0.5" />
+                                <div>
+                                    <p className="text-sm font-medium text-gray-900">New order received</p>
+                                    <p className="text-xs text-gray-500">Order #ORD-7462 from Emma Wilson</p>
+                                    <p className="text-xs text-gray-400 mt-1">2 minutes ago</p>
+                                </div>
+                            </div>
                         </div>
-                        <div className="flex items-center">
-                            <img
-                                src="/api/placeholder/32/32"
-                                alt="User avatar"
-                                className="w-8 h-8 rounded-full bg-gray-300"
-                            />
-                            <span className="ml-2 text-sm font-medium text-gray-700 hidden md:block">Admin User</span>
+                        <div className="px-4 py-3 border-b border-gray-100">
+                            <div className="flex items-start">
+                                <Layers className="w-5 h-5 text-yellow-600 mr-3 mt-0.5" />
+                                <div>
+                                    <p className="text-sm font-medium text-gray-900">Low stock alert</p>
+                                    <p className="text-xs text-gray-500">Casual Linen Blazer is running low</p>
+                                    <p className="text-xs text-gray-400 mt-1">1 hour ago</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="px-4 py-3 border-b border-gray-100">
+                            <div className="flex items-start">
+                                <Package className="w-5 h-5 text-purple-600 mr-3 mt-0.5" />
+                                <div>
+                                    <p className="text-sm font-medium text-gray-900">Return request</p>
+                                    <p className="text-xs text-gray-500">Jason Brown requested a return</p>
+                                    <p className="text-xs text-gray-400 mt-1">3 hours ago</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </header>
+                    <div className="px-4 py-2 text-center bg-gray-50">
+                        <button className="text-sm text-blue-600 hover:text-blue-800">View all notifications</button>
+                    </div>
+                </div>
+            )}
+        </div>
+        
+        {/* Profile Dropdown */}
+        <div className="relative">
+            <button 
+                onClick={() => setProfileOpen(!profileOpen)}
+                className="flex items-center space-x-2 focus:outline-none"
+            >
+                <img
+                    src="/api/placeholder/32/32"
+                    alt="User avatar"
+                    className="w-8 h-8 rounded-full bg-gray-300 border-2 border-gray-200"
+                />
+                <span className="ml-2 text-sm font-medium text-gray-700 hidden md:block">Admin User</span>
+                <ChevronDown className="w-4 h-4 text-gray-500 hidden md:block" />
+            </button>
+            
+            {/* Profile Dropdown Panel */}
+            {profileOpen && (
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg overflow-hidden z-50 border border-gray-200">
+                    <div className="px-4 py-3 border-b border-gray-200">
+                        <p className="text-sm font-medium text-gray-900">Admin User</p>
+                        <p className="text-xs text-gray-500 truncate">admin@fashionstore.com</p>
+                    </div>
+                    <div className="py-1">
+                        <button className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
+                            <Users className="w-4 h-4 mr-3 text-gray-500" />
+                            My Profile
+                        </button>
+                        <button className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
+                            <Settings className="w-4 h-4 mr-3 text-gray-500" />
+                            Account Settings
+                        </button>
+                        <button className="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 w-full text-left">
+                            <LogOut className="w-4 h-4 mr-3 text-red-500" />
+                            Logout
+                        </button>
+                    </div>
+                </div>
+            )}
+        </div>
+    </div>
+</header>
 
                 {/* Dashboard Content */}
                 <main className="flex-1 overflow-y-auto p-6 bg-gray-50">
@@ -449,16 +568,7 @@ const AdminDashboard = () => {
                     )}           
                             {/* Other tabs content would go here */}
                             {activeTab === 'orders' && (
-                                <div>
-                                    <h1 className="text-2xl font-bold text-gray-900 mb-6">Orders Management</h1>
-                                    {/* Orders tab content */}
-                                    <div className="bg-white rounded-lg shadow">
-                                        {/* Orders content would go here */}
-                                        <div className="p-10 text-center text-gray-500">
-                                            Orders content would be displayed here
-                                        </div>
-                                    </div>
-                                </div>
+                                <OrderManagement/>
                             )}
 
 {activeTab === 'products' && (

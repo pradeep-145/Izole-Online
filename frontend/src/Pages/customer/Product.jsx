@@ -9,8 +9,8 @@ import {
 } from "lucide-react";
 import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import Navbar from "../../Components/Navbar";
-import ReviewDialog from "../../Components/ReviewDialog";
+import Navbar from "../../Components/customer/Navbar";
+import ReviewDialog from "../../Components/customer/ReviewDialog";
 
 const Product = () => {
   const location = useLocation();

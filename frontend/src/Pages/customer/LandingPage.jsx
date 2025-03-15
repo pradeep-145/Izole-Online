@@ -1,10 +1,10 @@
 import React from "react";
-import About from "../../Components/About";
-import Contact from "../../Components/Contact";
-import Footer from "../../Components/Footer";
-import Home from "../../Components/Home";
-import Navbar from "../../Components/Navbar";
-import ProductPreview from "../../Components/ProductPreview";
+import ProductPreview from "../../Components/admin/ProductPreview";
+import About from "../../Components/customer/About";
+import Contact from "../../Components/customer/Contact";
+import Footer from "../../Components/customer/Footer";
+import Home from "../../Components/customer/Home";
+import Navbar from "../../Components/customer/Navbar";
 
 const LandingPage = () => {
   return (
