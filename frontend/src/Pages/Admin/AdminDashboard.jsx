@@ -17,6 +17,7 @@ import {
     Truck,
     Layers
 } from 'lucide-react';
+import AdminProductForm from './ProductForm';
 
 const AdminDashboard = () => {
     const [activeTab, setActiveTab] = useState('dashboard');
@@ -438,7 +439,8 @@ const AdminDashboard = () => {
                                     </div>
                                 </div>
                             </div>
-
+                        </div>
+                    )}           
                             {/* Other tabs content would go here */}
                             {activeTab === 'orders' && (
                                 <div>
@@ -454,17 +456,11 @@ const AdminDashboard = () => {
                             )}
 
                             {activeTab === 'products' && (
-                                <div>
-                                    <h1 className="text-2xl font-bold text-gray-900 mb-6">Products Management</h1>
-                                    {/* Products tab content */}
-                                    <div className="bg-white rounded-lg shadow">
-                                        {/* Products content would go here */}
-                                        <div className="p-10 text-center text-gray-500">
-                                            Products content would be displayed here
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
+
+                                <AdminProductForm/>
+                                
+                            )
+                            }
 
                             {activeTab === 'customers' && (
                                 <div>
@@ -530,13 +526,12 @@ const AdminDashboard = () => {
                                     </div>
                                 </div>
                             )}
-                        </div>
-                    )}
-
+                        
+                            
                         </main>
-</div>
-        </div>
-    );
+                    </div>
+                    </div>
+    )
 };
 
 export default AdminDashboard;

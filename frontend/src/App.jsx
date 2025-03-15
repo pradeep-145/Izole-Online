@@ -11,6 +11,7 @@ import AdminLayout from "./Pages/Admin/AdminLayout";
 import Product from "./Pages/customer/Product";
 import AdminDashboard from "./Pages/Admin/AdminDashboard";
 import Cart from "./Pages/customer/cart";
+import AdminProductForm from "./Pages/Admin/ProductForm";
 
 function App() {
   return (
@@ -35,7 +36,7 @@ function App() {
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<AdminDashboard />} /> {/* Default Admin Page */}
           <Route path="login" element={<AdminLogin />} />
-          <Route path="dashboard" element={<AdminDashboard />} />
+          <Route path="product-input" element={<AdminProductForm />} />
         </Route>
       </Routes>
     </Router>

@@ -4,7 +4,6 @@ const { CognitoIdentityProviderClient } = require('@aws-sdk/client-cognito-ident
 
 const cognito = new CognitoIdentityProviderClient({ region: 'ap-south-1' });
 
-
 const generateSecretHash = (username) => {
   return crypto
     .createHmac("sha256", process.env.APP_CLIENT_SECRET)

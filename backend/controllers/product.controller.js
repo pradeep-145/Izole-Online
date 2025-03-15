@@ -1,4 +1,5 @@
 const Product = require("../models/product.model.js");
+const reviewModel = require("../models/review.model.js");
 const ProductController = {
   saveProduct: async (req, res) => {
     try {
@@ -30,7 +31,27 @@ const ProductController = {
       console.log("Error ar getProducts",error);
       res.status(500).json("Internal server Error")
     }
-  }
+  },
+  addReview: async (req, res) => {
+    try {
+      const { productId, review } = req.body;
+      const product = await Product.findById(productId);
+      const response=await reviewModel.create(req.body);
+      if(response){3
+        product.review.push(response._id);                                                                                                          
+        await product.save();
+      }
+      else
+      {
+        throw new Error("Review not added")
+      }
+      res.status(200).json({ message: "Review added successfully" });
+    } catch (error) {
+      console.log("Error at addReview", error);
+      res.status(500).json("Internal server Error");
+    }
+  },
+  
 };
 
 module.exports = ProductController;
