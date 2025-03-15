@@ -15,12 +15,18 @@ import {
     ChevronUp,
     AlertCircle,
     Truck,
-    Layers
+    Layers,
+    Plus,
+    Eye,
+    Edit,
+    Trash2,
+    
 } from 'lucide-react';
 import AdminProductForm from './ProductForm';
 
 const AdminDashboard = () => {
     const [activeTab, setActiveTab] = useState('dashboard');
+    const [showProductForm, setShowProductForm] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     // Sample data
@@ -455,12 +461,108 @@ const AdminDashboard = () => {
                                 </div>
                             )}
 
-                            {activeTab === 'products' && (
-
-                                <AdminProductForm/>
-                                
-                            )
-                            }
+{activeTab === 'products' && (
+  <div>
+    <div className="flex items-center justify-between mb-6">
+      <h1 className="text-2xl font-bold text-gray-900">Products</h1>
+      <button 
+        onClick={() => setShowProductForm(true)} 
+        className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center"
+      >
+        <Plus className="w-4 h-4 mr-2" /> Add Product
+      </button>
+    </div>
+    
+    {showProductForm ? (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-screen overflow-y-auto">
+          <div className="p-4 border-b border-gray-200 flex justify-between items-center">
+            <h2 className="text-xl font-bold">Add New Product</h2>
+            <button 
+              onClick={() => setShowProductForm(false)}
+              className="text-gray-500 hover:text-gray-700"
+            >
+              <ChevronUp className="w-6 h-6" />
+            </button>
+          </div>
+          <div className="p-4">
+            <AdminProductForm />
+          </div>
+        </div>
+      </div>
+    ) : (
+      <div className="bg-white shadow-md rounded-lg overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Product
+                </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Price
+                </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Inventory
+                </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Status
+                </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {topProducts.map((product, index) => (
+                <tr key={index}>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="flex items-center">
+                      <div className="flex-shrink-0 h-10 w-10 bg-gray-200 rounded-md"></div>
+                      <div className="ml-4">
+                        <div className="text-sm font-medium text-gray-900">{product.name}</div>
+                        <div className="text-sm text-gray-500">ID: PROD-{1000 + index}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-900">{product.price}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-900">{product.stock} in stock</div>
+                    <div className="text-sm text-gray-500">{product.sold} sold</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                      ${product.stock > 50 ? 'bg-green-100 text-green-800' : 
+                        product.stock > 10 ? 'bg-yellow-100 text-yellow-800' : 
+                        'bg-red-100 text-red-800'}`}>
+                      {product.stock > 50 ? 'In Stock' : 
+                        product.stock > 10 ? 'Low Stock' : 'Out of Stock'}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <div className="flex space-x-2">
+                      <button className="text-blue-600 hover:text-blue-900">
+                        <Eye className="w-4 h-4" />
+                      </button>
+                      <button className="text-green-600 hover:text-green-900">
+                        <Edit className="w-4 h-4" />
+                      </button>
+                      <button className="text-red-600 hover:text-red-900">
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    )}
+  </div>
+)}
 
                             {activeTab === 'customers' && (
                                 <div>
