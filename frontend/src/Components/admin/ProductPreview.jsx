@@ -1,96 +1,137 @@
 import React, { useEffect, useState } from "react";
+import { ShoppingBag, Heart, ArrowLeft, ArrowRight } from "lucide-react";
 
 const ProductPreview = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [autoplay, setAutoplay] = useState(true);
 
   const products = [
     {
-      img: "https://media.landmarkshops.in/cdn-cgi/image/h=300,w=250,q=85,fit=cover/max-new/1000014664185-Purple-WINE-1000014664185_01-2100.jpg",
+      img: "https://media.landmarkshops.in/cdn-cgi/image/h=250,w=200,q=85,fit=cover/max-new/1000014664185-Purple-WINE-1000014664185_01-2100.jpg",
       title: "Casual T-Shirt",
-      desc: "Premium quality cotton t-shirt for a stylish and comfortable look.",
+      badge: "New",
     },
     {
-      img: "https://media-us.landmarkshops.in/cdn-cgi/image/h=300,w=250,q=85,fit=cover/max-new/1000013589469-Black-BLACK-1000013589469_01-2100.jpg",
+      img: "https://media-us.landmarkshops.in/cdn-cgi/image/h=250,w=200,q=85,fit=cover/max-new/1000013589469-Black-BLACK-1000013589469_01-2100.jpg",
       title: "Classic Black Shirt",
-      desc: "Elegant black shirt designed for all occasions.",
+      badge: "Best Seller",
     },
     {
-      img: "https://media-uk.landmarkshops.in/cdn-cgi/image/h=300,w=250,q=85,fit=cover/max-new/1000012552677-Green-OLIVEGREEN-1000012552677_02-2100.jpg",
+      img: "https://media-uk.landmarkshops.in/cdn-cgi/image/h=250,w=200,q=85,fit=cover/max-new/1000012552677-Green-OLIVEGREEN-1000012552677_02-2100.jpg",
       title: "Olive Green Jacket",
-      desc: "A perfect blend of warmth and style with this olive green jacket.",
-    },
-    {
-      img: "https://getketchadmin.getketch.com/product/8905040937373/660/HLZ4000072_6.jpg",
-      title: "Trendy Joggers",
-      desc: "Comfortable and stylish joggers for your active lifestyle.",
-    },
-    {
-      img: "https://media.landmarkshops.in/cdn-cgi/image/h=300,w=250,q=85,fit=cover/max-new/1000014100555-Black-BLACK-1000014100555_04-2100.jpg",
-      title: "Athleisure Pants",
-      desc: "Soft and flexible athleisure pants for everyday wear.",
-    },
-    {
-      img: "https://media.landmarkshops.in/cdn-cgi/image/h=300,w=250,q=85,fit=cover/max-new/1000014715091-Black-BLACK-1000014715091_01-2100.jpg",
-      title: "Slim Fit Jeans",
-      desc: "Classic slim-fit jeans with a modern touch.",
-    },
-    {
-      img: "https://media.landmarkshops.in/cdn-cgi/image/h=300,w=250,q=85,fit=cover/max-new/1000014787101-Blue-BLUE-1000014787101_02-2100.jpg",
-      title: "Blue Denim Jacket",
-      desc: "Iconic blue denim jacket for a timeless look.",
+      badge: "",
     },
   ];
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentIndex((prevIndex) => (prevIndex + 1) % products.length);
-    }, 3000); 
-
+    let interval;
+    if (autoplay) {
+      interval = setInterval(() => {
+        setCurrentIndex((prevIndex) => (prevIndex + 1) % products.length);
+      }, 4000);
+    }
     return () => clearInterval(interval);
-  }, []);
+  }, [autoplay, products.length]);
+
+  const nextSlide = () => {
+    setCurrentIndex((prevIndex) => (prevIndex + 1) % products.length);
+    setAutoplay(false);
+    setTimeout(() => setAutoplay(true), 10000);
+  };
+
+  const prevSlide = () => {
+    setCurrentIndex((prevIndex) => (prevIndex - 1 + products.length) % products.length);
+    setAutoplay(false);
+    setTimeout(() => setAutoplay(true), 10000);
+  };
 
   return (
-    <div id="products" className="flex flex-col items-center py-28">
-      <h1 className="text-5xl font-bold mb-16">Featured Products</h1>
-      <div className="flex items-center gap-40">
-      <div>
-      <div className="carousel w-full rounded-box p-4 flex justify-center">
-        {products.map((product, index) => (
-          <div
-            key={index}
-            className={`carousel-item w-80 ${currentIndex === index ? "block" : "hidden"}`}
-          >
+    <div id="products" className="bg-wineRed text-mustard py-24">
+      <div className="container mx-auto px-4">
+        <div className="text-center mb-16">
+          <h2 className="text-5xl font-bold font-serif mb-4">Featured Products</h2>
+        </div>
 
-            <div className="card bg-neutral w-80 shadow-md">
-              <figure className="p-4">
-                <img src={product.img} alt={product.title} className="w-60 h-60 object-cover rounded-lg" />
-              </figure>
-              <div className="card-body">
-                <h2 className="card-title text-lg">{product.title}</h2>
-                <p className="text-sm">{product.desc}</p>
-                <div className="card-actions justify-end">
-                  <button className="btn btn-primary btn-sm">Buy Now</button>
-                </div>
+        <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
+          {/* Image Slider Section */}
+          <div className="w-full lg:w-1/2 relative">
+            <div className="relative max-w-md mx-auto rounded-xl shadow-lg overflow-hidden">
+              <div className="relative aspect-square">
+                {products.map((product, index) => (
+                  <div
+                    key={index}
+                    className={`absolute inset-0 transition-opacity duration-500 ${
+                      currentIndex === index ? "opacity-100" : "opacity-0 pointer-events-none"
+                    }`}
+                  >
+                    <img
+                      src={product.img}
+                      alt={product.title}
+                      className="w-full h-auto object-cover rounded-md"
+                    />
+                    {product.badge && (
+                      <span className="absolute top-4 left-4 bg-mustard text-wineRed px-3 py-1 rounded-full text-sm font-bold">
+                        {product.badge}
+                      </span>
+                    )}
+                  </div>
+                ))}
               </div>
             </div>
-          </div>
-        ))}
-      </div>
 
-      <div className="flex justify-center gap-2 py-2">
-        {products.map((_, index) => (
-          <button
-            key={index}
-            onClick={() => setCurrentIndex(index)}
-            className={`w-3 h-3 rounded-full ${currentIndex === index ? "bg-primary" : "bg-gray-400"}`}
-          />
-        ))}
-      </div>
-      </div>
-      <div>
-        <p className="text-xl font-semibold">Here are some of our top rated products by our customers <br/>that symbolize our authenticity and quality.</p>
-        <a href="/productList" className="btn btn-primary btn-md mt-10 ">View All Products</a>
-      </div>
+            {/* Navigation Buttons */}
+            <div className="flex justify-center mt-6 gap-6 items-center">
+              <button
+                onClick={prevSlide}
+                className="p-2 rounded-full text-mustard bg-wineRed hover:bg-opacity-80 transition"
+              >
+                <ArrowLeft className="h-5 w-5" />
+              </button>
+
+              {/* Indicator Dots */}
+              <div className="flex gap-2">
+                {products.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setCurrentIndex(index)}
+                    className={`w-3 h-3 rounded-full transition ${
+                      currentIndex === index ? "bg-mustard" : "bg-gray-500"
+                    }`}
+                  />
+                ))}
+              </div>
+
+              <button
+                onClick={nextSlide}
+                className="p-2 rounded-full text-mustard bg-wineRed hover:bg-opacity-80 transition"
+              >
+                <ArrowRight className="h-5 w-5" />
+              </button>
+            </div>
+          </div>
+
+          {/* Why Choose Us Section */}
+          <div className="w-full lg:w-1/2 space-y-6">
+            <h3 className="text-3xl font-bold">Why Choose Us?</h3>
+            <ul className="space-y-4">
+              {[
+                "Premium quality materials",
+                "Designed for everyday wear",
+                "Timeless styles",
+                "Attention to detail",
+              ].map((point, index) => (
+                <li key={index} className="flex items-start gap-3">
+                  <span className="text-lg">{point}</span>
+                </li>
+              ))}
+            </ul>
+            <div className="pt-4">
+              <a href="/customer/products" className="btn bg-mustard text-wineRed px-6 py-2 rounded-lg">
+                Browse All Products
+              </a>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
