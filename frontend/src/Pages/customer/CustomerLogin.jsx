@@ -29,19 +29,19 @@ const CustomerLogin = () => {
 
   return (
     <div className="hero bg-wineRed min-h-screen flex justify-center items-center">
-      <div className="card bg-wineRed w-full max-w-md shadow-2xl p-6 border border-mustard">
-        <h1 className="text-3xl font-bold text-center text-mustard mb-4">
+      <div className="card bg-mustard w-full max-w-md shadow-2xl shadow-mustard/45 p-6 border border-mustard">
+        <h1 className="text-3xl font-bold text-center text-wineRed mb-4">
           Login
         </h1>
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div className="form-control">
             <label className="label">
-              <span className="text-lg font-medium text-mustard">Username</span>
+              <span className="text-lg font-medium text-wineRed">Username</span>
             </label>
             <input
               type="text"
               placeholder="Enter username"
-              className="input input-bordered w-full bg-wineRed border border-mustard text-mustard placeholder:text-mustard"
+              className="input input-bordered w-full bg-mustard border border-wineRed text-wineRed placeholder:text-wineRed"
               onChange={(e) =>
                 setFormData({ ...formData, username: e.target.value })
               }
@@ -50,12 +50,12 @@ const CustomerLogin = () => {
           </div>
           <div className="form-control">
             <label className="label">
-              <span className="text-lg font-medium text-mustard">Password</span>
+              <span className="text-lg font-medium text-wineRed">Password</span>
             </label>
             <input
               type="password"
               placeholder="Enter password"
-              className="input input-bordered w-full bg-wineRed border border-mustard text-mustard placeholder:text-mustard"
+              className="input input-bordered w-full bg-mustard border border-wineRed text-wineRed placeholder:text-wineRed"
               onChange={(e) =>
                 setFormData({ ...formData, password: e.target.value })
               }
@@ -63,19 +63,19 @@ const CustomerLogin = () => {
             />
           </div>
           <div className="flex justify-between items-center">
-            <a className="link link-hover text-sm text-mustard">
+            <a className="link link-hover text-sm text-wineRed">
               Forgot password?
             </a>
           </div>
           <button
             type="submit"
-            className="btn w-full mt-2 bg-mustard text-wineRed font-bold hover:bg-opacity-90"
+            className="btn w-full mt-2 bg-wineRed text-mustard font-bold hover:bg-opacity-90"
           >
             Login
           </button>
-          <p className="text-sm text-center mt-2 text-mustard">
+          <p className="text-sm text-center mt-2 text-wineRed">
             Don't have an account?{" "}
-            <a href="/customer/sign-up" className="link link-hover text-mustard underline">
+            <a href="/customer/sign-up" className="link link-hover text-wineRed underline">
               Sign Up
             </a>
           </p>
