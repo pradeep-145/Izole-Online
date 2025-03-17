@@ -138,7 +138,7 @@ const Contact = () => {
                   ></textarea>
                 </div>
                 
-                <button type="submit" className="btn btn-mustard btn-lg gap-2">
+                <button type="submit" className="btn bg-mustard text-wineRed hover:bg-mustard/90 btn-lg gap-2">
                   Send Message <Send className="h-5 w-5" />
                 </button>
               </form>
@@ -161,7 +161,7 @@ const Contact = () => {
                     href="https://maps.google.com/?q=60/A,+Sournapuri+Layout,+Kombai+Thottam,+Tirupur-4,+Tamil+Nadu,+India" 
                     target="_blank" 
                     rel="noopener noreferrer" 
-                    className="btn btn-mustard btn-md"
+                    className="btn bg-mustard text-wineRed hover:bg-mustard/90"
                   >
                     Get Directions
                   </a>

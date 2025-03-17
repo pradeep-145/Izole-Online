@@ -90,59 +90,36 @@ const Navbar = () => {
           </Link>
           
           {/* Desktop navigation */}
-          <div className="hidden lg:flex items-center ml-8 space-x-1">
+          <div className="hidden lg:flex items-center ml-12 space-x-10">
             <Link 
               to="/customer" 
-              className={`btn btn-ghost ${isActive('/customer') && !isActive('/customer/products') ? 'text-primary font-bold' : ''}`}
+              className={`font-semibold ${isActive('/customer') && !isActive('/customer/products') ? ' font-bold' : ''}`}
             >
               Home
             </Link>
             
-            {/* Products dropdown */}
-            <div className="dropdown dropdown-hover">
-              <div 
-                tabIndex={0} 
-                role="button" 
-                className={`btn btn-ghost flex items-center ${isActive('/customer/products') ? 'text-primary font-bold' : ''}`}
-                onMouseEnter={() => setCategoryDropdownOpen(true)}
-                onMouseLeave={() => setCategoryDropdownOpen(false)}
-              >
-                Products <ChevronDown className="h-4 w-4 ml-1" />
-              </div>
-              <ul 
-                tabIndex={0} 
-                className={`dropdown-content z-30 menu p-2 shadow bg-base-100 rounded-box w-52 ${categoryDropdownOpen ? 'block' : ''}`}
-                onMouseEnter={() => setCategoryDropdownOpen(true)}
-                onMouseLeave={() => setCategoryDropdownOpen(false)}
-              >
-                {categories.map((category) => (
-                  <li key={category.name}>
-                    <Link to={category.path}>{category.name}</Link>
-                  </li>
-                ))}
-                <li className="divider my-1"></li>
-                <li>
-                  <Link to="/customer/products" className="font-medium">View All</Link>
-                </li>
-              </ul>
-            </div>
-            
+            <Link 
+              to="/customer/products" 
+              className={`font-semibold ${isActive('/customer/products') ? ' font-bold' : ''}`}
+            >
+              Products
+            </Link>
+
             <Link 
               to="/customer/about" 
-              className={`btn btn-ghost ${isActive('/customer/about') ? 'text-primary font-bold' : ''}`}
+              className={` font-semibold ${isActive('/customer/about') ? ' font-bold' : ''}`}
             >
               About
             </Link>
             <Link 
               to="/customer/contact" 
-              className={`btn btn-ghost ${isActive('/customer/contact') ? 'text-primary font-bold' : ''}`}
+              className={`font-semibold ${isActive('/customer/contact') ? ' font-bold' : ''}`}
             >
               Contact
             </Link>
+            </div>
           </div>
-        </div>
 
-        {/* Mobile menu dropdown */}
         {isMobileMenuOpen && (
           <div className="lg:hidden fixed inset-0 top-16 z-20 bg-base-100 p-4 overflow-y-auto">
             <div className="flex flex-col space-y-2">
