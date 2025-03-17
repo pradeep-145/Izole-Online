@@ -69,7 +69,7 @@ const Navbar = () => {
   ];
 
   return (
-    <div className={`navbar justify-between fixed top-0 w-full z-30 transition-all duration-300 ${scrolled ? 'py-2 shadow-md bg-mustard text-wineRed' : 'py-4 bg-mustard/70 backdrop-blur-sm'}`}>
+    <div className={`navbar justify-between fixed top-0 w-full z-30 transition-all duration-300 ${scrolled ? 'py-2 shadow-md bg-mustard text-wineRed' : 'py-4 bg-mustard backdrop-blur-sm text-wineRed'}`}>
       <div className="container mx-auto px-4 flex justify-between items-center">
         {/* Mobile menu button */}
         <div className="lg:hidden flex items-center">
