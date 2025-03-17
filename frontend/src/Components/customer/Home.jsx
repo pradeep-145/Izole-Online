@@ -1,23 +1,24 @@
 import React from "react";
 import { ArrowRight, TrendingUp, Shield, Star } from "lucide-react";
 import logo from "../../assets/logo.jpg";
+import image from "../../assets/image.png";
 
 const Home = () => {
   return (
     <div id="home">
       {/* Hero Section */}
-      <div className="relative min-h-screen py-16 md:py-20 mt-16 overflow-hidden bg-wineRed text-mustard">
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="flex flex-col lg:flex-row-reverse lg:gap-16 items-center justify-center">
+      <div className="relative min-h-screen md:py-20  overflow-hidden bg-wineRed text-mustard">
+        <div className="container mx-auto relative z-10">
+          <div className="flex flex-col lg:flex-row-reverse lg:gap-16 items-center justify-between">
             {/* Image Section */}
-            <div className="relative w-full max-w-sm lg:max-w-md mx-auto lg:mx-0 mb-12 lg:mb-0">
-              <div className="relative overflow-hidden rounded-2xl shadow-2xl border-8 border-mustard">
-                <img src={logo} className="w-full h-auto object-cover" alt="Izole Fashion" />
+            <div className="relative w-full max-w-sm lg:max-w-md mx-auto lg:mx-0 mb-12 lg:mb-0 ">
+              <div className="relative overflow-hidden rounded-2xl">
+                <img src={image} className="w-full h-auto object-cover" alt="Izole Fashion" />
               </div>
             </div>
 
             {/* Content Section */}
-            <div className="w-full max-w-md text-center lg:text-left">
+            <div className="w-full max-w-md text-center lg:text-left lg:ml-40">
               <h1 className="text-5xl md:text-7xl font-bold font-serif tracking-tight mb-2">IZOLE</h1>
               <div className="w-24 h-1 bg-mustard mb-6 mx-auto lg:mx-0"></div>
               <p className="py-4 md:py-6 text-lg md:text-xl leading-relaxed">
