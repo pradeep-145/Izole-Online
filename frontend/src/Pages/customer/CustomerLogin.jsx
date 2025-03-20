@@ -13,7 +13,7 @@ const CustomerLogin = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     await axios
-      .post("http://localhost:3000/login", {
+      .post("/api/auth/sign-in", {
         username: formData.username,
         password: formData.password,
       })

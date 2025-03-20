@@ -21,10 +21,12 @@
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "express-session": "^1.18.1",
+    "groq-sdk": "^0.16.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.11.0",
     "multer": "^1.4.5-lts.1",
     "multer-storage-cloudinary": "^4.0.0",
+    "nodemailer": "^6.10.0",
     "nodemon": "^3.1.9",
     "openid-client": "^5.7.0",
     "serverless-http": "^3.2.0"

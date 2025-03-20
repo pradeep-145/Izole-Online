@@ -25,6 +25,7 @@ const ProductController = {
   },
   getProducts:async(req,res)=>{
     try{
+      
       const response =await Product.find({})
       res.status(200).json({result:response});
     }catch(error){
@@ -37,7 +38,7 @@ const ProductController = {
       const { productId, review } = req.body;
       const product = await Product.findById(productId);
       const response=await reviewModel.create(req.body);
-      if(response){3
+      if(response){
         product.review.push(response._id);                                                                                                          
         await product.save();
       }

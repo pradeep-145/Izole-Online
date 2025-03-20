@@ -1,22 +1,23 @@
-const { CognitoIdentityProviderClient } = require('@aws-sdk/client-cognito-identity-provider');
-const cognito = new CognitoIdentityProviderClient({ region: 'your-region' });
+const {JwtService} = require('../services/jwt.service.js')
 
-const authenticateJWT = (req, res, next) => {
-    
-    const token = req.cookies.jwt;
-    if (!token) {
-        console.error('Token missing in Authorization header');
-        return res.sendStatus(401);
-    }
-
-    cognito.getUser({ AccessToken: token }, (err, data) => {
-        if (err) {
-            console.error('Error validating token:', err);
-            return res.sendStatus(403);
+const authenticateJWT=async (req,res,next)=>{
+    const token=req.cookies.jwt;
+    try {
+        if(!token){
+            throw new "token Not found"
         }
-        req.user = data;
-        next();
-    });
-};
+        const decoded =JwtService.verifyToken(token);
+        if(!decoded){
+            throw new "Token Expired"
+        }
+        const user= await customerModel.findByID(decoded.userId);
+        if(!user){
+            throw new "User Not found";
+        }
 
-module.exports = { authenticateJWT };
+        req.user=user;
+        next();
+    } catch (error) {
+        res.status(401).json(error)
+    }
+}

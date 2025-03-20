@@ -34,14 +34,7 @@ const ProductSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  rating: {
-    type: Number,
-    default: 0, // To store the average rating
-  },
-  reviewCount: {
-    type: Number,
-    default: 0, // To store the count of reviews
-  },
+
   orderCount: {
     type: Number,
     default: 0,

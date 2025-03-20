@@ -1,38 +1,22 @@
-
 const crypto = require("crypto");
-const { CognitoIdentityProviderClient } = require('@aws-sdk/client-cognito-identity-provider');
+const customerModel = require("../models/customer.model.js");
+const { JwtService } = require("../services/jwt.service.js");
 
-const cognito = new CognitoIdentityProviderClient({ region: 'ap-south-1' });
-
-const generateSecretHash = (username) => {
-  return crypto
-    .createHmac("sha256", process.env.APP_CLIENT_SECRET)
-    .update(username + process.env.APP_CLIENT_ID)
-    .digest("base64");
-};
 const AuthController = {
   signUp: async (req, res) => {
-    const { username, password, email, phoneNumber } = req.body;
+    const { username, password, email, phoneNumber, name } = req.body;
     console.log("Sign-up request received:", { username, email, phoneNumber });
+
     try {
-      const formattedPhoneNumber = phoneNumber.startsWith("+")
-        ? phoneNumber
-        : `+91${phoneNumber}`;
-      console.log("Formatted phone number:", formattedPhoneNumber);
-      const params = {
-        ClientId: process.env.APP_CLIENT_ID,
-        SecretHash: generateSecretHash(username),
-        Username: username,
-        Password: password,
-        UserAttributes: [
-          { Name: "email", Value: email },
-          { Name: "phone_number", Value: formattedPhoneNumber },
-          { Name: "preferred_username", Value: username },
-        ],
-      };
-      const data = await cognito.signUp(params).promise();
-      console.log("Sign-up successful:", data);
-      res.json(data);
+      const response = await customerModel.create(
+        username,
+        password,
+        email,
+        phoneNumber,
+        name
+      );
+      console.log("Sign-up successful:", response);
+      res.json(response);
     } catch (err) {
       console.error("Sign-up error:", err);
       res.status(500).json(err);
@@ -42,53 +26,66 @@ const AuthController = {
   signIn: async (req, res) => {
     const { username, password } = req.body;
     console.log("Login request received:", { username });
-    const params = {
-      AuthFlow: "USER_PASSWORD_AUTH",
-      ClientId: process.env.APP_CLIENT_ID,
-      AuthParameters: {
-        USERNAME: username,
-        PASSWORD: password,
-        SECRET_HASH: generateSecretHash(username),
-      },
-    };
+
     try {
-      const data = await cognito.initiateAuth(params).promise();
-      const token = data.AuthenticationResult.AccessToken;
-      res.cookie("jwt", token, {
-        maxAge: 30 * 24 * 60 * 60 * 1000,
-        httpOnly: true,
-        secure: true,
-      });
+      const response = await customerModel.findOne(username);
+      if (response) {
+        if (response.password == password) {
+          const payload = {
+            userId: response._id,
+            name: response.username,
+            email: response.email,
+          };
+          const token = await JwtService.generateToken(payload);
+          const { password: _, ...userWithoutPassword } = response.toObject();
+
+          res.cookie("jwt", token, {
+            maxAge: 150 * 24 * 60 * 60 * 1000,
+            httpOnly: true,
+            secure: true,
+          });
+
+          res.json({
+            message: "Login successful",
+            authUser: userWithoutPassword,
+          });
+        } else {
+          res.status(400).json("Invalid Password");
+        }
+      } else {
+        res.status(404).json("User Not Found");
+      }
     } catch (err) {
       console.error("Login error:", err);
       res.status(500).json(err);
     }
   },
+  sendMail: async (req, res) => {
+    const { email } = req.body;
+    const otp = crypto.randomInt(10 ** 5, 10 ** 6);
+    await customerModel.storeOTP(otp);
+    //nodemailer code
+
+    res.status(200).json(`Email Sent to ${email}`);
+  },
 
   confirmUser: async (req, res) => {
+    console.log("Confirm User");
     const { username, code } = req.body;
     console.log("Confirm request received:", { username, code });
+
     try {
-      const params = {
-        ClientId: process.env.APP_CLIENT_ID,
-        SecretHash: generateSecretHash(username),
-        ConfirmationCode: code,
-        Username: username,
-      };
-      const data = await cognito.confirmSignUp(params).promise();
-      console.log("Confirm successful:", data);
-      res.json(data);
+      const user = await customerModel.verifyOTP(username, code);
+      if (user) {
+        res.status(200).json("User verified");
+      } else {
+        res.status(400).json("Re-Enter OTP");
+      }
     } catch (err) {
       console.error("Confirm error:", err);
-      if (err.code === "CodeMismatchException") {
-        res.status(400).json({
-          message: "Invalid verification code provided, please try again.",
-        });
-      } else {
-        res.status(500).json(err);
-      }
+      res.status(500).json("Internal server Error");
     }
   },
 };
 
-module.exports=AuthController
+module.exports = AuthController;
