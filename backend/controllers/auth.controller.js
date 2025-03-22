@@ -27,7 +27,7 @@ const AuthController = {
 
   signIn: async (req, res) => {
     const { username, password } = req.body;
-    console.log("Login request received:", { username });
+    console.log("Login request received:", req.body);
 
     try {
       const response = await customerModel.findOne(username);

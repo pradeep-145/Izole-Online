@@ -29,6 +29,7 @@
     "nodemailer": "^6.10.0",
     "nodemon": "^3.1.9",
     "openid-client": "^5.7.0",
+    "path": "^0.12.7",
     "serverless-http": "^3.2.0"
   }
 }
