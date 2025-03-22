@@ -30,51 +30,33 @@ const customerSchema = mongoose.Schema(
       default: false,
       required: true,
     },
-    createdAt: {
+    expiresAt: {
       type: Date,
       default: Date.now,
-      expires: 10 * 24 * 60 * 60,
-    },
-    otp: {
-      code: Number,
-      createdAt: {
-        type: Date,
-        default: Date.now,
-        expires: 600, // 10 minutes in seconds
-      },
+      expires:10*24*60*60,
     },
   },
-  { timestamps: true }
+  { timestamps: true,
+  }
 );
 
-customerSchema.index({ "otp.createdAt": 1 }, { expireAfterSeconds: 600 });
 
-customerSchema.statics.storeOTP = async function (username, otpCode) {
-  return this.findOneAndUpdate(
-    { username },
-    {
-      otp: {
-        code: otpCode,
-        createdAt: new Date(),
-      },
-    },
-    { new: true }
-  );
-};
 
-customerSchema.statics.verifyOTP = async function (username, otpCode) {
-  const user = await this.findOne({ username, "otp.code": otpCode });
+customerSchema.statics.updateVerify = async function (customerId) {
+  const user = await this.findOne({_id:customerId });
   if (!user) return false;
 
-  await this.findOneAndUpdate(
-    { username },
+  await this.findByIdAndUpdate(
+    { _id:customerId },
     {
       isVerified: true,
-      $unset: { otp: "" },
+      '$unset':{expiresAt:""}
     }
   );
 
   return true;
 };
 
-module.exports = mongoose.model("Customer", customerSchema);
+module.exports=mongoose.model("Customer",customerSchema);
+
+

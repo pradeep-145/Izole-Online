@@ -1,6 +1,7 @@
 const crypto = require("crypto");
 const customerModel = require("../models/customer.model.js");
 const { JwtService } = require("../services/jwt.service.js");
+const otpModel=require('../models/otp.model.js')
 
 const AuthController = {
   signUp: async (req, res) => {
@@ -8,12 +9,13 @@ const AuthController = {
     console.log("Sign-up request received:", { username, email, phoneNumber });
 
     try {
-      const response = await customerModel.create(
+      const response = await customerModel.create({
         username,
         password,
         email,
         phoneNumber,
         name
+      }
       );
       console.log("Sign-up successful:", response);
       res.json(response);
@@ -61,9 +63,9 @@ const AuthController = {
     }
   },
   sendMail: async (req, res) => {
-    const { email } = req.body;
+    const { customerId,email } = req.body;
     const otp = crypto.randomInt(10 ** 5, 10 ** 6);
-    await customerModel.storeOTP(otp);
+    await otpModel.storeOTP(customerId,otp);
     //nodemailer code
 
     res.status(200).json(`Email Sent to ${email}`);
@@ -71,11 +73,11 @@ const AuthController = {
 
   confirmUser: async (req, res) => {
     console.log("Confirm User");
-    const { username, code } = req.body;
-    console.log("Confirm request received:", { username, code });
+    const { customerId, code } = req.body;
+    console.log("Confirm request received:", { customerId, code });
 
     try {
-      const user = await customerModel.verifyOTP(username, code);
+      const user = await otpModel.verifyOTP(customerId, code);
       if (user) {
         res.status(200).json("User verified");
       } else {
@@ -86,6 +88,32 @@ const AuthController = {
       res.status(500).json("Internal server Error");
     }
   },
+  verifyOTP:async(req,res)=>{
+    const {customerId, code }= req.body;
+    try{
+      const verified=await otpModel.passwordResetVerification(customerId, code);
+      if(verified){
+        res.status(200).json("user verified");
+
+      }
+      else{
+        res.status(400).json("Re-Enter OTP");
+      }
+    }catch(error){
+      console.log("verifyOtp error",error);
+      res.status(500).json("Internal server Error");
+    }
+  },
+  resetPassword:async(req,res)=>{
+    const {email, password}=req.body;
+    try {
+      await customerModel.findOneAndUpdate({email},{password});
+      res.status(200).json("Password updated successfully");
+    } catch (error) {
+      console.log("Error at reset Password", error);
+      res.status(500).json("Internal server error");
+    }
+  }
 };
 
 module.exports = AuthController;

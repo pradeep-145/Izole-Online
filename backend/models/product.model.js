@@ -11,6 +11,15 @@ const ProductSchema = new mongoose.Schema({
         required: true,
         default: 0,
       },
+      details: [{ type: String }], // Added details from sample data
+      price: {
+        type: Number,
+        required: true,
+      },
+      originalPrice: {
+        type: Number,
+        required: true, // Included to match the sample data
+      },
     },
   ],
   name: {
@@ -20,15 +29,6 @@ const ProductSchema = new mongoose.Schema({
   description: {
     type: String,
     required: true,
-  },
-  details: [{ type: String }], // Added details from sample data
-  price: {
-    type: Number,
-    required: true,
-  },
-  originalPrice: {
-    type: Number,
-    required: true, // Included to match the sample data
   },
   category: {
     type: String,
