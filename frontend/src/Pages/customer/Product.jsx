@@ -419,7 +419,7 @@ const Product = () => {
                       onClick={() => handleSizeSelect(size)}
                       className={`py-2 px-4 text-sm font-medium rounded-md border ${
                         selectedSize === size
-                          ? "bg-blue-600 text-white border-transparent"
+                          ? "bg-wineRed text-mustard border-transparent"
                           : "bg-white text-gray-900 border-gray-300 hover:bg-gray-50"
                       }`}
                     >
@@ -443,7 +443,7 @@ const Product = () => {
                   </button>
                   <input
                     type="text"
-                    className="w-full text-center  border-0 focus:ring-0"
+                    className="w-full text-center border-0 focus:ring-0"
                     value={itemCount}
                     readOnly
                   />
@@ -464,7 +464,7 @@ const Product = () => {
                   type="button"
                   onClick={handleAddToCart}
                   disabled={quantity === 0}
-                  className="flex-1 flex items-center justify-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300"
+                  className="flex-1 flex items-center justify-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-wineRed bg-mustard hover:bg-mustard/50 disabled:bg-gray-300"
                 >
                   <ShoppingCart className="mr-2 h-5 w-5" />
                   Add to Cart
@@ -473,7 +473,7 @@ const Product = () => {
                   type="button"
                   onClick={handleBuyNow}
                   disabled={quantity === 0}
-                  className="flex-1 flex items-center justify-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-green-600 hover:bg-green-700 disabled:bg-gray-300"
+                  className="flex-1 flex items-center justify-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-wineRed bg-mustard hover:bg-mustard/50 disabled:bg-gray-300"
                 >
                   Buy Now
                 </button>

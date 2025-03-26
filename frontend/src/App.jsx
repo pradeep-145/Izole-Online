@@ -10,8 +10,8 @@ import CustomerLayout from "./Pages/customer/CustomerLayout";
 import AdminLayout from "./Pages/Admin/AdminLayout";
 import Product from "./Pages/customer/Product";
 import AdminDashboard from "./Pages/Admin/AdminDashboard";
-import Cart from "./Pages/customer/cart";
 import AdminProductForm from "./Pages/Admin/ProductForm";
+import CartPage from "./Pages/customer/CartPage";
 
 function App() {
   return (
@@ -22,19 +22,19 @@ function App() {
 
         {/* Customer Routes */}
         <Route path="/customer" element={<CustomerLayout />}>
-          <Route index element={<LandingPage />} /> {/* Default child route */}
+          <Route index element={<LandingPage />} /> 
           <Route path="sign-up" element={<CustomerSignUp />} />
           <Route path="login" element={<CustomerLogin />} />
           <Route path="otp-verification" element={<OtpVerification />} />
           <Route path="products" element={<ProductList />} />
           <Route path="product" element={<Product />} />
-          <Route path='cart' element={<Cart/>}/>
+          <Route path='cart' element={<CartPage/>}/>
           
         </Route>
 
         {/* Admin Routes */}
         <Route path="/admin" element={<AdminLayout />}>
-          <Route index element={<AdminDashboard />} /> {/* Default Admin Page */}
+          <Route index element={<AdminDashboard />} /> 
           <Route path="login" element={<AdminLogin />} />
           <Route path="product-input" element={<AdminProductForm />} />
         </Route>

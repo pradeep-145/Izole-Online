@@ -148,12 +148,12 @@ const Contact = () => {
 
         {/* Map Section */}
         <div className="mt-16">
-          <div className="bg-wineRed rounded-xl shadow-lg p-4">
-            <div className="aspect-video w-full rounded-lg bg-gray-300 flex items-center justify-center">
+          <div className="bg-wineRed rounded-xl p-4">
+            <div className=" w-80 h-80 rounded-lg bg-gray-300 flex items-center justify-center">
               <div className="text-center p-8">
-                <MapPin className="h-12 w-12 mx-auto mb-4 text-mustard" />
+                <MapPin className="h-6 w-6 mx-auto mb-4 text-mustard" />
                 <h4 className="text-2xl font-bold mb-2">Visit Our Store</h4>
-                <p className="text-lg max-w-md mx-auto">
+                <p className="text-lg max-w-md mx-auto text-wineRed">
                   Come visit our store at Sournapuri Layout, Tirupur. We're conveniently located near Kombai Thottam with ample parking space.
                 </p>
                 <div className="mt-6">
