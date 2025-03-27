@@ -1,5 +1,5 @@
-import React, { useState } from "react";
 import axios from "axios";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const CustomerSignUp = () => {
@@ -9,6 +9,7 @@ const CustomerSignUp = () => {
 
   const [formData, setFormData] = useState({
     name: "",
+    username: "",
     email: "",
     phone: "",
     password: "",
@@ -37,7 +38,8 @@ const CustomerSignUp = () => {
     e.preventDefault();
     await axios
       .post("http://localhost:3000/sign-up", {
-        username: formData.name,
+        username: formData.username,
+        name: formData.name,
         email: formData.email,
         phoneNumber: formData.phone,
         password: formData.password,
@@ -54,8 +56,8 @@ const CustomerSignUp = () => {
   return (
     <div className="hero bg-wineRed min-h-screen flex justify-center items-center">
       <div className="card bg-mustard w-full max-w-md shadow-2xl shadow-mustard/45 p-6 border border-mustard">
-      <h1 className="text-3xl font-bold text-center text-wineRed mb-4">
-      Sign Up
+        <h1 className="text-3xl font-bold text-center text-wineRed mb-4">
+          Sign Up
         </h1>
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div className="form-control">
@@ -66,7 +68,23 @@ const CustomerSignUp = () => {
               type="text"
               placeholder="Enter name"
               className="input input-bordered w-full bg-mustard border border-wineRed text-wineRed placeholder:text-wineRed"
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, name: e.target.value })
+              }
+              required
+            />
+          </div>
+          <div className="form-control">
+            <label className="label">
+              <span className="text-lg font-medium text-wineRed">Username</span>
+            </label>
+            <input
+              type="text"
+              placeholder="Enter username"
+              className="input input-bordered w-full bg-mustard border border-wineRed text-wineRed placeholder:text-wineRed"
+              onChange={(e) =>
+                setFormData({ ...formData, username: e.target.value })
+              }
               required
             />
           </div>
@@ -78,19 +96,25 @@ const CustomerSignUp = () => {
               type="email"
               placeholder="Enter email"
               className="input input-bordered w-full bg-mustard border border-wineRed text-wineRed placeholder:text-wineRed"
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, email: e.target.value })
+              }
               required
             />
           </div>
           <div className="form-control">
             <label className="label">
-              <span className="text-lg font-medium text-wineRed">Phone Number</span>
+              <span className="text-lg font-medium text-wineRed">
+                Phone Number
+              </span>
             </label>
             <input
               type="number"
               placeholder="Enter phone number"
               className="input input-bordered w-full bg-mustard border border-wineRed text-wineRed placeholder:text-wineRed"
-              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, phone: e.target.value })
+              }
               required
             />
           </div>
@@ -102,7 +126,9 @@ const CustomerSignUp = () => {
               type="password"
               placeholder="Enter password"
               className="input input-bordered w-full bg-mustard border border-wineRed text-wineRed placeholder:text-wineRed"
-              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, password: e.target.value })
+              }
               required
             />
           </div>
@@ -115,7 +141,10 @@ const CustomerSignUp = () => {
           </button>
           <p className="text-sm text-center mt-2 text-wineRed">
             Already have an account?{" "}
-            <a href="/customer/login" className="link link-hover text-wineRed underline">
+            <a
+              href="/customer/login"
+              className="link link-hover text-wineRed underline"
+            >
               Login
             </a>
           </p>
