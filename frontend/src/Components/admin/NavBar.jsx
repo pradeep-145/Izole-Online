@@ -36,7 +36,6 @@ const Navbar = () => {
 
   const toggleDarkMode = () => {
     setIsDarkMode(!isDarkMode);
-    // In a real app, you would apply dark mode classes to the document here
   };
 
   return (

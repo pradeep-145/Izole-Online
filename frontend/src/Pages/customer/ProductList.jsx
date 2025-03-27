@@ -129,11 +129,11 @@ const ProductList = () => {
       <Navbar />
       
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-16">
-        <div className="container mx-auto px-4">
-          <h1 className="text-4xl font-bold mb-4">Spring Collection 2025</h1>
+      <div className="bg-wineRed text-white py-28">
+        <div className="container mx-auto px-4 text-mustard">
+          <h1 className="text-4xl font-bold mb-4">IZOLE</h1>
           <p className="text-xl mb-6">Discover the latest trends in fashion with our new arrivals</p>
-          <button className="btn btn-outline btn-accent">Shop Now</button>
+          <button className="btn bg-mustard text-wineRed">Shop Now</button>
         </div>
       </div>
       
@@ -256,7 +256,7 @@ const ProductList = () => {
         {/* Product Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {filteredProducts.map((product) => (
-            <div key={product.id} className="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow duration-300">
+            <div key={product.id} className="card bg-wineRed shadow-xl hover:shadow-2xl transition-shadow duration-300">
               <figure className="relative h-64 bg-gray-100">
                 <img src={product.img} alt={product.title} className="object-cover w-full h-full" />
                 {!product.inStock && (
@@ -273,7 +273,7 @@ const ProductList = () => {
                   <h2 className="card-title text-lg">{product.title}</h2>
                   <div className="badge badge-outline">${product.price.toFixed(2)}</div>
                 </div>
-                <p className="text-sm text-gray-600 mb-2">{product.desc}</p>
+                <p className="text-sm text-mustard mb-2">{product.desc}</p>
                 <div className="flex items-center mb-4">
                   <div className="rating rating-sm">
                     {[...Array(5)].map((_, i) => (
@@ -287,11 +287,11 @@ const ProductList = () => {
                       />
                     ))}
                   </div>
-                  <span className="text-sm text-gray-500 ml-2">{product.rating}</span>
+                  <span className="text-sm text-mustard ml-2">{product.rating}</span>
                 </div>
                 <div className="card-actions">
                   <button 
-                    className="btn btn-primary btn-block" 
+                    className="btn bg-mustard text-wineRed btn-block" 
                     disabled={!product.inStock}
                     onClick={() => handleAddToCart(product)}
                   >
