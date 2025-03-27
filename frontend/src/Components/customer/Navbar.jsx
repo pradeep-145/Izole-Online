@@ -98,25 +98,25 @@ const Navbar = () => {
               Home
             </Link>
             
-            <Link 
-              to="/customer/products" 
+            <a href  
+              ="/customer/products" 
               className={`font-semibold ${isActive('/customer/products') ? ' font-bold' : ''}`}
             >
               Products
-            </Link>
+            </a>
 
-            <Link 
-              to="/customer/about" 
+            <a href  
+              ="/customer#about" 
               className={` font-semibold ${isActive('/customer/about') ? ' font-bold' : ''}`}
             >
               About
-            </Link>
-            <Link 
-              to="/customer/contact" 
+            </a>
+            <a href  
+              ="/customer#contact" 
               className={`font-semibold ${isActive('/customer/contact') ? ' font-bold' : ''}`}
             >
               Contact
-            </Link>
+            </a>
             </div>
           </div>
 
@@ -150,32 +150,32 @@ const Navbar = () => {
                       </li>
                     ))}
                     <li>
-                      <Link 
-                        to="/customer/products" 
+                      <a href 
+                        ="/customer/products" 
                         className="font-medium"
                         onClick={() => setIsMobileMenuOpen(false)}
                       >
                         View All Products
-                      </Link>
+                      </a>
                     </li>
                   </ul>
                 </div>
               </div>
               
-              <Link 
-                to="/customer/about" 
+              <a href  
+                to="/customer#about" 
                 className="btn btn-ghost justify-start" 
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 About
-              </Link>
-              <Link 
-                to="/customer/contact" 
+              </a>
+              <a href  
+                to="/customer#contact" 
                 className="btn btn-ghost justify-start" 
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Contact
-              </Link>
+              </a>
               
               {/* Mobile user actions */}
               {login && (
