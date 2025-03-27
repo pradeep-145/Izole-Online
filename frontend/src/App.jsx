@@ -12,6 +12,7 @@ import Product from "./Pages/customer/Product";
 import AdminDashboard from "./Pages/Admin/AdminDashboard";
 import AdminProductForm from "./Pages/Admin/ProductForm";
 import CartPage from "./Pages/customer/CartPage";
+import Checkout from "./Pages/customer/Checkout";
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
           <Route path="products" element={<ProductList />} />
           <Route path="product" element={<Product />} />
           <Route path='cart' element={<CartPage/>}/>
+          <Route path='checkout' element={<Checkout/>}/>
           
         </Route>
 
