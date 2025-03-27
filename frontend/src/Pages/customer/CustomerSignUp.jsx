@@ -37,7 +37,7 @@ const CustomerSignUp = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     await axios
-      .post("http://localhost:3000/sign-up", {
+      .post("/api/auth/sign-up", {
         username: formData.username,
         name: formData.name,
         email: formData.email,
