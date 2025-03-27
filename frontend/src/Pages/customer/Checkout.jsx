@@ -35,8 +35,8 @@ const CheckoutPage = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-gray-50 rounded-lg shadow-2xl my-10">
-      <h1 className="text-3xl font-bold mb-8 text-center text-wineRed">Checkout</h1>
+    <div className=" mx-auto p-6 bg-wineRed min-h-screen ">
+      <h1 className="text-3xl font-bold mb-8 text-center text-mustard mt-10">Checkout</h1>
       
       <div className="grid md:grid-cols-2 gap-8">
         <div className="bg-white p-6 rounded-lg shadow-md">
@@ -44,16 +44,16 @@ const CheckoutPage = () => {
             <Package className="mr-2 text-mustard" /> Order Summary
           </h2>
           {cartItems.map(item => (
-            <div key={item.id} className="flex items-center mb-4 pb-4 border-b border-gray-200">
+            <div key={item.id} className="flex items-center mb-4 pb-4 border-b border-gray-200 bg-wineRed rounded-lg">
               <img 
                 src={item.image} 
                 alt={item.name} 
                 className="w-24 h-24 mr-6 object-cover rounded-lg shadow-md"
               />
               <div>
-                <p className="font-bold text-lg text-gray-800">{item.name}</p>
-                <p className="text-gray-600">Quantity: {item.quantity}</p>
-                <p className="font-bold text-wineRed">${item.price.toFixed(2)}</p>
+                <p className="font-bold text-lg text-mustard">{item.name}</p>
+                <p className="text-mustard">Quantity: {item.quantity}</p>
+                <p className="font-bold text-mustard">${item.price.toFixed(2)}</p>
               </div>
             </div>
           ))}
