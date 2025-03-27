@@ -1,27 +1,31 @@
+const productSchema = require('./product.model.js')
 const mongoose = require('mongoose');
-const Order=mongoose.model('Order',{
-    customerName:{
-        type:String,
-        required:true
-    },
-    productId:{
-        type:mongoose.Schema.Types.ObjectId,
-        required:true
-    },
-    quantity:{
-        type:Number,
-        required:true,
-        min:1
-    },
-    totalPrice:{
-        type:Number,
-        required :true
-    },
-    status:{
-        type:String,
-        required:true
-    }
+const Order= new mongoose.Schema({
+    productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
+  quantity: { type: Number, required: true },
+  sessionId: { type: String, required: true, index: true },
+  status: { 
+    type: String, 
+    enum: ['PENDING', 'COMPLETED', 'CANCELLED'], 
+    default: 'PENDING',
+    index: true
+  },
+  delivery:{
+    type: String, 
+    enum: ['PENDING', 'COMPLETED', 'CANCELLED'], 
+    default: 'PENDING',
+    index: true
+  }
 
 
 })
-module.exports=Order;
+
+Order.statics.storeOrder=async function(params) {
+    
+  return this.create({  
+    params
+  })
+}
+
+
+module.exports=mongoose.model('Order',Order); 

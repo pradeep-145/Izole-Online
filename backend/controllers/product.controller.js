@@ -52,7 +52,10 @@ const ProductController = {
       res.status(500).json("Internal server Error");
     }
   },
-  
+  getProduct:async(req,res)=>{
+    const response=await Product.find({"images._id":req.params.id});
+    res.json(response);
+  }
 };
 
 module.exports = ProductController;

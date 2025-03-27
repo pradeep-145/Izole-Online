@@ -30,7 +30,7 @@ const AuthController = {
     console.log("Login request received:", req.body);
 
     try {
-      const response = await customerModel.findOne(username);
+      const response = await customerModel.findOne({username});
       if (response) {
         if (response.password == password) {
           const payload = {

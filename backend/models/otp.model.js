@@ -18,12 +18,11 @@ const OTPSchema = new mongoose.Schema({
     },
 });
 
-// ✅ Use function keyword to correctly bind `this`
 OTPSchema.statics.storeOTP = async function (customerId, code) {
     return this.findOneAndUpdate(
         { customerId },
         { customerId, code },
-        { new: true, upsert: true } // `upsert: true` creates a new document if not found
+        { new: true, upsert: true }
     );
 };
 
