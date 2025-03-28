@@ -207,7 +207,7 @@ const Product = () => {
       stars.push(
         <Star
           key="half"
-          className="fill-yellow-400 text-yellow-400"
+          className="fill-mustard text-mustard"
           size={16}
         />
       );
@@ -224,7 +224,7 @@ const Product = () => {
   };
 
   return (
-    <div className="bg-gray-50 min-h-screen">
+    <div className="bg-wineRed min-h-screen">
       <Navbar />
 
       <main className="max-w-6xl mx-auto pt-16 px-4 lg:px-0">
@@ -293,25 +293,25 @@ const Product = () => {
 
             {/* Product Info Section */}
             <div className="lg:w-1/2 flex flex-col">
-              <h1 className="text-2xl font-bold text-gray-800">
+              <h1 className="text-2xl font-bold text-wineRed">
                 {product.name}
               </h1>
 
               {/* Ratings */}
               <div className="flex items-center gap-2 mt-2">
                 <div className="flex">{renderStars(product.rating)}</div>
-                <span className="text-sm text-gray-600">
+                <span className="text-sm text-wineRed">
                   {product.rating} ({product.reviewCount} reviews)
                 </span>
               </div>
 
               {/* Price */}
               <div className="mt-4 flex items-center">
-                <span className="text-2xl font-bold text-gray-900">
+                <span className="text-2xl font-bold text-wineRed">
                   ${product.price}
                 </span>
                 {product.originalPrice && (
-                  <span className="ml-3 text-lg text-gray-500 line-through">
+                  <span className="ml-3 text-lg text-wineRed line-through">
                     ${product.originalPrice}
                   </span>
                 )}
@@ -328,7 +328,7 @@ const Product = () => {
               </div>
 
               {/* Description */}
-              <p className="mt-4 text-gray-600">{product.description}</p>
+              <p className="mt-4 text-wineRed">{product.description}</p>
 
               {/* Availability */}
               <div className="mt-4 flex items-center">
@@ -348,14 +348,14 @@ const Product = () => {
 
               {/* Product Details */}
               <div className="mt-4">
-                <h3 className="text-lg font-medium text-gray-900">
+                <h3 className="text-lg font-medium text-wineRed">
                   Product Details
                 </h3>
                 <ul className="mt-2 space-y-1">
                   {product.details.map((detail, index) => (
                     <li
                       key={index}
-                      className="text-sm text-gray-600 flex items-center"
+                      className="text-sm text-wineRed flex items-center"
                     >
                       <span className="w-2 h-2 bg-gray-400 rounded-full mr-2"></span>
                       {detail}
@@ -366,7 +366,7 @@ const Product = () => {
 
               {/* Color Selection */}
               <div className="mt-6">
-                <h3 className="text-sm font-medium text-gray-900">Color</h3>
+                <h3 className="text-sm font-medium text-wineRed">Color</h3>
                 <div className="flex items-center space-x-3 mt-2">
                   {product.images.map((colorOption, index) => (
                     <div
@@ -395,7 +395,7 @@ const Product = () => {
                     </div>
                   ))}
                 </div>
-                <span className="text-sm text-gray-500">
+                <span className="text-sm text-wineRed">
                   Selected: {selectedColor}
                 </span>
               </div>
@@ -403,7 +403,7 @@ const Product = () => {
               {/* Size Selection */}
               <div className="mt-6">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-medium text-gray-900">Size</h3>
+                  <h3 className="text-sm font-medium text-wineRed">Size</h3>
                   <a
                     href="#"
                     className="text-sm font-medium text-blue-600 hover:text-blue-500"
@@ -420,7 +420,7 @@ const Product = () => {
                       className={`py-2 px-4 text-sm font-medium rounded-md border ${
                         selectedSize === size
                           ? "bg-wineRed text-mustard border-transparent"
-                          : "bg-white text-gray-900 border-gray-300 hover:bg-gray-50"
+                          : "bg-white text-wineRed border-gray-300 hover:bg-wineRed"
                       }`}
                     >
                       {size}
@@ -431,11 +431,11 @@ const Product = () => {
 
               {/* Quantity */}
               <div className="mt-6">
-                <h3 className="text-sm font-medium text-gray-900">Quantity</h3>
+                <h3 className="text-sm font-medium text-wineRed">Quantity</h3>
                 <div className="flex items-center mt-2 border border-gray-300 rounded-md w-32">
                   <button
                     type="button"
-                    className="p-2 text-gray-500 hover:text-gray-700"
+                    className="p-2 text-wineRed hover:text-gray-700"
                     onClick={decrementCount}
                     disabled={itemCount <= 1}
                   >
@@ -449,7 +449,7 @@ const Product = () => {
                   />
                   <button
                     type="button"
-                    className="p-2 text-gray-500 hover:text-gray-700"
+                    className="p-2 text-wineRed hover:text-gray-700"
                     onClick={incrementCount}
                     disabled={itemCount >= quantity}
                   >
@@ -480,13 +480,13 @@ const Product = () => {
               </div>
 
               {/* Shipping Information */}
-              <div className="mt-6 p-4 bg-gray-50 rounded-md flex items-start">
-                <Truck className="h-5 w-5 text-gray-400 mr-2 mt-0.5" />
+              <div className="mt-6 p-4 bg-wineRed/20 rounded-md flex items-start">
+                <Truck className="h-5 w-5 text-wineRed mr-2 mt-0.5" />
                 <div>
-                  <h4 className="text-sm font-medium text-gray-900">
+                  <h4 className="text-sm font-medium text-wineRed">
                     Free Shipping & Returns
                   </h4>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-wineRed">
                     Free standard shipping on orders over $50. Estimated
                     delivery: 3-5 business days.
                   </p>
@@ -495,11 +495,11 @@ const Product = () => {
 
               {/* Wishlist & Share */}
               <div className="mt-6 flex items-center space-x-4">
-                <button className="flex items-center text-sm text-gray-500 hover:text-gray-700">
+                <button className="flex items-center text-sm text-wineRed hover:text-gray-700">
                   <Heart className="h-5 w-5 mr-1" />
                   Add to Wishlist
                 </button>
-                <button className="flex items-center text-sm text-gray-500 hover:text-gray-700">
+                <button className="flex items-center text-sm text-wineRed hover:text-gray-700">
                   <Share2 className="h-5 w-5 mr-1" />
                   Share
                 </button>
@@ -510,7 +510,7 @@ const Product = () => {
 
         {/* Color Options Section */}
         <section className="bg-white rounded-lg shadow-md p-6 mt-6">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">
+          <h2 className="text-xl font-semibold text-wineRed mb-4">
             Available Colors
           </h2>
           <div className="flex gap-6 items-center overflow-x-auto pb-4">
@@ -519,8 +519,8 @@ const Product = () => {
                 key={index}
                 className={`flex flex-col items-center cursor-pointer min-w-[100px] p-2 rounded-lg ${
                   index === currentColorIndex
-                    ? "bg-blue-50 ring-2 ring-blue-300"
-                    : "hover:bg-gray-50"
+                    ? "bg-mustard ring-2 ring-mustard text-wineRed"
+                    : "hover:bg-mustard/85 text-wineRed"
                 }`}
                 onClick={() => handleColorSelect(colorData, index)}
               >
@@ -530,7 +530,7 @@ const Product = () => {
                   className="w-20 h-20 object-cover rounded-lg shadow-sm"
                 />
                 <p className="mt-2 text-sm font-medium">{colorData.color}</p>
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-black">
                   {colorData.quantity > 0
                     ? `${colorData.quantity} in stock`
                     : "Out of stock"}
@@ -543,12 +543,12 @@ const Product = () => {
         {/* Review Section */}
         <section className="bg-white rounded-lg shadow-md p-6 mt-6 mb-12">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-semibold text-gray-800">
+            <h2 className="text-xl font-semibold text-wineRed">
               Customer Reviews
             </h2>
             <button
               onClick={() => setOpen(true)}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              className="px-4 py-2 bg-wineRed text-mustard rounded-md hover:bg-mustard hover:text-wineRed focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
             >
               Write a Review
             </button>
@@ -557,11 +557,11 @@ const Product = () => {
           {/* Review Summary */}
           <div className="flex flex-col md:flex-row gap-6 pb-6 border-b">
             <div className="flex flex-col items-center justify-center">
-              <div className="text-5xl font-bold text-gray-900">
+              <div className="text-5xl font-bold text-wineRed">
                 {product.rating}
               </div>
               <div className="flex mt-2">{renderStars(product.rating)}</div>
-              <div className="mt-1 text-sm text-gray-500">
+              <div className="mt-1 text-sm text-wineRed">
                 {product.reviewCount} reviews
               </div>
             </div>
@@ -579,16 +579,16 @@ const Product = () => {
 
                 return (
                   <div key={star} className="flex items-center">
-                    <div className="w-12 text-sm text-gray-600">
+                    <div className="w-12 text-sm text-wineRed">
                       {star} stars
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2.5 ml-2">
                       <div
-                        className="bg-yellow-400 h-2.5 rounded-full"
+                        className="bg-mustard h-2.5 rounded-full"
                         style={{ width: `${percentage}%` }}
                       ></div>
                     </div>
-                    <div className="ml-2 text-sm text-gray-500">
+                    <div className="ml-2 text-sm text-wineRed">
                       {percentage}%
                     </div>
                   </div>
@@ -603,22 +603,22 @@ const Product = () => {
               <div key={index} className="border-b pb-6 last:border-0">
                 <div className="flex justify-between items-start">
                   <div>
-                    <h3 className="font-medium text-gray-900">{review.name}</h3>
+                    <h3 className="font-medium text-wineRed">{review.name}</h3>
                     <div className="flex items-center mt-1">
                       <div className="flex">{renderStars(review.rating)}</div>
-                      <span className="ml-2 text-sm text-gray-500">
+                      <span className="ml-2 text-sm text-wineRed">
                         {review.date}
                       </span>
                     </div>
                   </div>
                 </div>
-                <div className="mt-4 text-gray-600">{review.comment}</div>
+                <div className="mt-4 text-wineRed">{review.comment}</div>
                 <div className="mt-4 flex gap-2">
-                  <button className="text-sm text-gray-500 hover:text-gray-700">
+                  <button className="text-sm text-wineRed hover:text-gray-700">
                     Helpful
                   </button>
                   <span className="text-gray-300">|</span>
-                  <button className="text-sm text-gray-500 hover:text-gray-700">
+                  <button className="text-sm text-wineRed hover:text-gray-700">
                     Report
                   </button>
                 </div>
@@ -627,7 +627,7 @@ const Product = () => {
 
             {product.reviews.length === 0 && (
               <div className="text-center py-8">
-                <p className="text-gray-500">
+                <p className="text-wineRed">
                   No reviews yet. Be the first to review this product!
                 </p>
               </div>
