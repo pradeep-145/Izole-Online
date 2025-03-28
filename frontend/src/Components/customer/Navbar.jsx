@@ -6,7 +6,7 @@ import logo from '../../assets/logo.jpg';
 const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [login, setLogin] = useState(localStorage.getItem("token") || null);
+  const [login, setLogin] = useState(localStorage.getItem("authUser") || null);
   const [cartCount, setCartCount] = useState(0);
   const [totalPrice, setTotalPrice] = useState(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -57,7 +57,7 @@ const Navbar = () => {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
+    localStorage.removeItem("authUser");
     setLogin(null);
     navigate('/customer/login');
   };
@@ -263,7 +263,7 @@ const Navbar = () => {
           </div>
 
           {/* Wishlist */}
-          {login === "customer" && (
+          {login  && (
             <Link to="/customer/wishlist" className="btn btn-ghost btn-circle relative">
               <Heart className="h-5 w-5" />
               <span className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center rounded-full bg-wineRed text-white text-xs">3</span>

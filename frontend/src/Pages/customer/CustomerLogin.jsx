@@ -18,9 +18,14 @@ const CustomerLogin = () => {
         password: formData.password,
       })
       .then((res) => {
-        console.log(res);
-        localStorage.setItem("token", res.data.token);
-        navigate("/");
+        console.log(res.data.authUser);
+        localStorage.setItem("authUser", JSON.stringify(res.data.authUser));
+        if(res.data.authUser.isVerified){
+
+          navigate("/");
+        }
+        else
+        navigate('/customer/otp-verification')
       })
       .catch((err) => {
         console.log(err);

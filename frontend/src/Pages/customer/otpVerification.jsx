@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 const otpVerification = () => {
     const [otp, setOtp] = useState("");
     const navigate = useNavigate();
+
     
   return (
     <div className="hero bg-base-200 min-h-screen flex justify-center items-center">
@@ -25,7 +26,7 @@ const otpVerification = () => {
           <button className="btn btn-primary" onClick={(e)=>{
                 e.preventDefault()
               axios.post("http://localhost:3000/confirm",{
-                username:localStorage.getItem("username"),
+                username:JSON.parse(localStorage.getItem("authUser")),
                 code:otp
               }).then((res)=>{
                 navigate('/customerLogin')

@@ -2,6 +2,7 @@ const crypto = require("crypto");
 const customerModel = require("../models/customer.model.js");
 const { JwtService } = require("../services/jwt.service.js");
 const otpModel=require('../models/otp.model.js')
+const nodemailer = require('nodemailer')
 
 const AuthController = {
   signUp: async (req, res) => {
@@ -17,8 +18,9 @@ const AuthController = {
         name
       }
       );
-      console.log("Sign-up successful:", response);
-      res.json(response);
+      const { password: _, ...userWithoutPassword } = response.toObject();
+      console.log("Sign-up successful:", userWithoutPassword);
+      res.json(userWithoutPassword);
     } catch (err) {
       console.error("Sign-up error:", err);
       res.status(500).json(err);
@@ -67,6 +69,30 @@ const AuthController = {
     const otp = crypto.randomInt(10 ** 5, 10 ** 6);
     await otpModel.storeOTP(customerId,otp);
     //nodemailer code
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL,
+        pass: process.env.PASSWORD,
+      },
+    });
+    transporter.sendMail(
+      {
+        from: process.env.EMAIL,
+        to: email,
+        subject: "OTP Verification",
+        text: `Your OTP is ${otp}`,
+      },
+      (error, info) => {
+        if (error) {
+          console.log("Error sending email:", error);
+          res.status(500).json("Error sending email");
+        } else {
+          console.log("Email sent:", info.response);
+        }
+      }
+    );
+    
 
     res.status(200).json(`Email Sent to ${email}`);
   },

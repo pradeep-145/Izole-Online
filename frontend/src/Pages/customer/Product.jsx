@@ -17,103 +17,7 @@ const Product = () => {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   // const product = location.state?.product;
-  const product = {
-    name: "Premium Leather Jacket",
-    price: 199.99,
-    originalPrice: 249.99,
-    description:
-      "High-quality leather jacket with a modern design. Perfect for casual outings and formal events alike. Made from genuine leather that is both durable and comfortable.",
-    details: [
-      "100% Genuine Leather",
-      "Soft cotton lining",
-      "Multiple pockets",
-      "Water-resistant",
-      "Available in 5 colors",
-    ],
-    rating: 4.5,
-    reviewCount: 127,
-    images: [
-      {
-        image: [
-          "https://th.bing.com/th/id/OIP.HOb_8jSrQ1mwzuuE9B7SfAHaLG?rs=1&pid=ImgDetMain",
-          "https://th.bing.com/th/id/OIP.xU1B1N4yNIitYKdy61_5RgHaIC?w=185&h=200&c=7&r=0&o=5&pid=1.7",
-          "https://th.bing.com/th/id/OIP.f4kxBVKD8iYdwIG3ZtjpsgHaHa?w=200&h=200&c=7&r=0&o=5&pid=1.7",
-          "https://th.bing.com/th/id/OIP.s_SjZaWQOOPk1VUs_nKbawHaHa?w=195&h=195&c=7&r=0&o=5&pid=1.7",
-          "https://th.bing.com/th/id/OIP.HOb_8jSrQ1mwzuuE9B7SfAHaLG?rs=1&pid=ImgDetMain",
-        ],
-        quantity: 20,
-        color: "Black",
-        size: ["S", "M", "L", "XL", "XXL"],
-      },
-      {
-        image: [
-          "https://th.bing.com/th/id/OIP.xU1B1N4yNIitYKdy61_5RgHaIC?w=185&h=200&c=7&r=0&o=5&pid=1.7",
-          "https://th.bing.com/th/id/OIP.f4kxBVKD8iYdwIG3ZtjpsgHaHa?w=200&h=200&c=7&r=0&o=5&pid=1.7",
-          "https://th.bing.com/th/id/OIP.s_SjZaWQOOPk1VUs_nKbawHaHa?w=195&h=195&c=7&r=0&o=5&pid=1.7",
-          "https://th.bing.com/th/id/OIP.HOb_8jSrQ1mwzuuE9B7SfAHaLG?rs=1&pid=ImgDetMain",
-        ],
-        quantity: 2,
-        color: "Blue",
-        size: ["M", "L", "XL"],
-      },
-      {
-        image: [
-          "https://th.bing.com/th/id/OIP.f4kxBVKD8iYdwIG3ZtjpsgHaHa?w=200&h=200&c=7&r=0&o=5&pid=1.7",
-          "https://th.bing.com/th/id/OIP.s_SjZaWQOOPk1VUs_nKbawHaHa?w=195&h=195&c=7&r=0&o=5&pid=1.7",
-          "https://th.bing.com/th/id/OIP.HOb_8jSrQ1mwzuuE9B7SfAHaLG?rs=1&pid=ImgDetMain",
-          "https://th.bing.com/th/id/OIP.xU1B1N4yNIitYKdy61_5RgHaIC?w=185&h=200&c=7&r=0&o=5&pid=1.7",
-        ],
-        quantity: 40,
-        color: "Brown",
-        size: ["S", "M", "L", "XL", "XXL"],
-      },
-      {
-        image: [
-          "https://th.bing.com/th/id/OIP.s_SjZaWQOOPk1VUs_nKbawHaHa?w=195&h=195&c=7&r=0&o=5&pid=1.7",
-          "https://th.bing.com/th/id/OIP.HOb_8jSrQ1mwzuuE9B7SfAHaLG?rs=1&pid=ImgDetMain",
-          "https://th.bing.com/th/id/OIP.xU1B1N4yNIitYKdy61_5RgHaIC?w=185&h=200&c=7&r=0&o=5&pid=1.7",
-          "https://th.bing.com/th/id/OIP.f4kxBVKD8iYdwIG3ZtjpsgHaHa?w=200&h=200&c=7&r=0&o=5&pid=1.7",
-        ],
-        quantity: 50,
-        color: "Green",
-        size: ["S", "M", "L", "XL"],
-      },
-      {
-        image: [
-          "https://th.bing.com/th/id/OIP.HOb_8jSrQ1mwzuuE9B7SfAHaLG?rs=1&pid=ImgDetMain",
-          "https://th.bing.com/th/id/OIP.xU1B1N4yNIitYKdy61_5RgHaIC?w=185&h=200&c=7&r=0&o=5&pid=1.7",
-          "https://th.bing.com/th/id/OIP.f4kxBVKD8iYdwIG3ZtjpsgHaHa?w=200&h=200&c=7&r=0&o=5&pid=1.7",
-          "https://th.bing.com/th/id/OIP.s_SjZaWQOOPk1VUs_nKbawHaHa?w=195&h=195&c=7&r=0&o=5&pid=1.7",
-        ],
-        quantity: 60,
-        color: "Olive Green",
-        size: ["M", "L", "XL", "XXL"],
-      },
-    ],
-    reviews: [
-      {
-        name: "John Doe",
-        rating: 5,
-        date: "March 10, 2025",
-        comment:
-          "This jacket exceeded my expectations. The quality is excellent, and it fits perfectly. I've received many compliments while wearing it.",
-      },
-      {
-        name: "Sarah Smith",
-        rating: 4,
-        date: "February 28, 2025",
-        comment:
-          "I love the design and the material. It's slightly heavier than I expected, but the quality is worth it. Fast shipping too!",
-      },
-      {
-        name: "Mike Johnson",
-        rating: 4.5,
-        date: "February 15, 2025",
-        comment:
-          "Great jacket for the price. The leather is soft and the stitching is well done. My only complaint is that it runs a bit small.",
-      },
-    ],
-  };
+  const product = location.state?.product
 
   const [images, setImages] = useState(product.images[0].image);
   const [image, setImage] = useState(images[0]);
@@ -301,7 +205,7 @@ const Product = () => {
               <div className="flex items-center gap-2 mt-2">
                 <div className="flex">{renderStars(product.rating)}</div>
                 <span className="text-sm text-gray-600">
-                  {product.rating} ({product.reviewCount} reviews)
+                  {product.rating} ({product.reviewCount} review)
                 </span>
               </div>
 
@@ -352,7 +256,7 @@ const Product = () => {
                   Product Details
                 </h3>
                 <ul className="mt-2 space-y-1">
-                  {product.details.map((detail, index) => (
+                  {product?.details?.map((detail, index) => (
                     <li
                       key={index}
                       className="text-sm text-gray-600 flex items-center"
@@ -570,10 +474,10 @@ const Product = () => {
               {[5, 4, 3, 2, 1].map((star) => {
                 const percentage =
                   Math.round(
-                    (product.reviews.filter(
+                    (product?.review.filter(
                       (review) => Math.floor(review.rating) === star
                     ).length /
-                      product.reviews.length) *
+                      product.review.length) *
                       100
                   ) || 0;
 
@@ -599,7 +503,7 @@ const Product = () => {
 
           {/* Individual Reviews */}
           <div className="mt-6 space-y-6">
-            {product.reviews.map((review, index) => (
+            {product.review.map((review, index) => (
               <div key={index} className="border-b pb-6 last:border-0">
                 <div className="flex justify-between items-start">
                   <div>
@@ -625,7 +529,7 @@ const Product = () => {
               </div>
             ))}
 
-            {product.reviews.length === 0 && (
+            {product.review.length === 0 && (
               <div className="text-center py-8">
                 <p className="text-gray-500">
                   No reviews yet. Be the first to review this product!
@@ -633,7 +537,7 @@ const Product = () => {
               </div>
             )}
 
-            {product.reviews.length > 0 && (
+            {product.review.length > 0 && (
               <div className="mt-6 text-center">
                 <button className="text-blue-600 hover:text-blue-800 font-medium">
                   Load more reviews

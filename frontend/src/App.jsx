@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Navigate, Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import AdminLogin from "./Pages/Admin/AdminLogin";
 import CustomerLogin from "./Pages/customer/CustomerLogin";
@@ -13,8 +13,19 @@ import AdminDashboard from "./Pages/Admin/AdminDashboard";
 import AdminProductForm from "./Pages/Admin/ProductForm";
 import CartPage from "./Pages/customer/CartPage";
 import Checkout from "./Pages/customer/Checkout";
-
+import { useProduct } from "./zustand/useProducts";
+import { useRef } from "react";
 function App() {
+  const fetchProductsIfEmpty = useProduct(state => state.fetchProductsIfEmpty);
+  const initialized = useRef(false);
+
+  useEffect(() => {
+    if (!initialized.current) {
+      fetchProductsIfEmpty();
+      initialized.current = true;
+    }
+  }, [fetchProductsIfEmpty]);
+
   return (
     <Router>
       <Routes>
@@ -28,7 +39,7 @@ function App() {
           <Route path="login" element={<CustomerLogin />} />
           <Route path="otp-verification" element={<OtpVerification />} />
           <Route path="products" element={<ProductList />} />
-          <Route path="product" element={<Product />} />
+          <Route path="product/:id" element={<Product />} />
           <Route path='cart' element={<CartPage/>}/>
           <Route path='checkout' element={<Checkout/>}/>
           

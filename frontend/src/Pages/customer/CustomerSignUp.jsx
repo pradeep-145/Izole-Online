@@ -46,6 +46,7 @@ const CustomerSignUp = () => {
       })
       .then((res) => {
         console.log(res);
+        
         navigate("/otpVerification");
       })
       .catch((err) => {

@@ -1,85 +1,16 @@
 import React, { useState } from "react";
 import Navbar from "../../Components/customer/Navbar";
 import Footer from "../../Components/customer/Footer";
+import { useProduct } from "../../zustand/useProducts";
+import { useNavigate } from "react-router-dom";
 
 const ProductList = () => {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [cartItems, setCartItems] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [isCartOpen, setIsCartOpen] = useState(false);
+  const navigate=useNavigate()
   
-  const products = [
-    {
-      id: 1,
-      img: "/api/placeholder/300/250",
-      title: "Casual T-Shirt",
-      desc: "Premium quality cotton t-shirt for a stylish and comfortable look.",
-      price: 24.99,
-      category: "Men",
-      rating: 4.5,
-      inStock: true,
-    },
-    {
-      id: 2,
-      img: "/api/placeholder/300/250",
-      title: "Classic Black Shirt",
-      desc: "Elegant black shirt designed for all occasions.",
-      price: 34.99,
-      category: "Men",
-      rating: 4.8,
-      inStock: true,
-    },
-    {
-      id: 3,
-      img: "/api/placeholder/300/250",
-      title: "Olive Green Jacket",
-      desc: "A perfect blend of warmth and style with this olive green jacket.",
-      price: 59.99,
-      category: "Men",
-      rating: 4.2,
-      inStock: false,
-    },
-    {
-      id: 4,
-      img: "/api/placeholder/300/250",
-      title: "Trendy Joggers",
-      desc: "Comfortable and stylish joggers for your active lifestyle.",
-      price: 29.99,
-      category: "Leisure wear",
-      rating: 4.0,
-      inStock: true,
-    },
-    {
-      id: 5,
-      img: "/api/placeholder/300/250",
-      title: "Athleisure Pants",
-      desc: "Soft and flexible athleisure pants for everyday wear.",
-      price: 32.99,
-      category: "Leisure wear",
-      rating: 4.3,
-      inStock: true,
-    },
-    {
-      id: 6,
-      img: "/api/placeholder/300/250",
-      title: "Slim Fit Jeans",
-      desc: "Classic slim-fit jeans with a modern touch.",
-      price: 39.99,
-      category: "Men",
-      rating: 4.7,
-      inStock: true,
-    },
-    {
-      id: 7,
-      img: "/api/placeholder/300/250",
-      title: "Blue Denim Jacket",
-      desc: "Iconic blue denim jacket for a timeless look.",
-      price: 49.99,
-      category: "Boys",
-      rating: 4.4,
-      inStock: true,
-    },
-  ];
+  const {products}= useProduct();
 
   const categories = ["All", "Men", "Boys", "Leisure wear"];
 
@@ -97,33 +28,18 @@ const ProductList = () => {
     }
   };
 
-  const handleRemoveFromCart = (productId) => {
-    setCartItems(cartItems.filter(item => item.id !== productId));
-  };
+ 
 
-  const handleQuantityChange = (productId, change) => {
-    setCartItems(
-      cartItems.map(item => {
-        if (item.id === productId) {
-          const newQuantity = item.quantity + change;
-          return newQuantity > 0 ? { ...item, quantity: newQuantity } : item;
-        }
-        return item;
-      })
-    );
-  };
+  
   
   const filteredProducts = products.filter(product => {
     const matchesCategory = selectedCategory === "All" || product.category === selectedCategory;
-    const matchesSearch = product.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                         product.desc.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                         product.description.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
   });
 
-  const getTotalPrice = () => {
-    return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0).toFixed(2);
-  };
-
+ 
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
@@ -163,103 +79,22 @@ const ProductList = () => {
             ))}
           </div>
           
-          <button 
-            className="btn btn-secondary gap-2 relative"
-            onClick={() => setIsCartOpen(!isCartOpen)}
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-            </svg>
-            Cart
-            {cartItems.length > 0 && (
-              <div className="badge badge-accent absolute -top-2 -right-2">
-                {cartItems.reduce((total, item) => total + item.quantity, 0)}
-              </div>
-            )}
-          </button>
+          
         </div>
         
-        {/* Shopping Cart Dropdown */}
-        {isCartOpen && (
-          <div className="card shadow-xl bg-base-100 mb-8">
-            <div className="card-body">
-              <h2 className="card-title">Your Cart</h2>
-              {cartItems.length === 0 ? (
-                <p>Your cart is empty</p>
-              ) : (
-                <>
-                  <div className="overflow-x-auto">
-                    <table className="table w-full">
-                      <thead>
-                        <tr>
-                          <th>Product</th>
-                          <th>Price</th>
-                          <th>Quantity</th>
-                          <th>Total</th>
-                          <th></th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {cartItems.map((item) => (
-                          <tr key={item.id}>
-                            <td className="flex items-center gap-2">
-                              <div className="avatar">
-                                <div className="w-12 h-12 rounded">
-                                  <img src={item.img} alt={item.title} />
-                                </div>
-                              </div>
-                              <span>{item.title}</span>
-                            </td>
-                            <td>${item.price.toFixed(2)}</td>
-                            <td>
-                              <div className="flex items-center gap-2">
-                                <button 
-                                  className="btn btn-xs btn-circle"
-                                  onClick={() => handleQuantityChange(item.id, -1)}
-                                  disabled={item.quantity <= 1}
-                                >
-                                  -
-                                </button>
-                                {item.quantity}
-                                <button 
-                                  className="btn btn-xs btn-circle"
-                                  onClick={() => handleQuantityChange(item.id, 1)}
-                                >
-                                  +
-                                </button>
-                              </div>
-                            </td>
-                            <td>${(item.price * item.quantity).toFixed(2)}</td>
-                            <td>
-                              <button 
-                                className="btn btn-error btn-xs"
-                                onClick={() => handleRemoveFromCart(item.id)}
-                              >
-                                Remove
-                              </button>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                  <div className="flex justify-between items-center mt-4">
-                    <span className="text-xl font-bold">Total: ${getTotalPrice()}</span>
-                    <button className="btn btn-primary">Checkout</button>
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
-        )}
-        
+       
         {/* Product Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {filteredProducts.map((product) => (
-            <div key={product.id} className="card bg-wineRed shadow-xl hover:shadow-2xl transition-shadow duration-300">
+            <div key={product._id} className="card  bg-wineRed shadow-xl hover:shadow-2xl transition-shadow duration-300"
+              onClick={()=>{
+                console.log("Hello")
+                navigate(`/customer/product/${product._id}`, { state: { product } });
+              }}
+            >
               <figure className="relative h-64 bg-gray-100">
-                <img src={product.img} alt={product.title} className="object-cover w-full h-full" />
-                {!product.inStock && (
+                <img src={product.images[0].image[0]} alt={product.name} className="object-contain w-full h-full" />
+                {!product.images[0].quantity>0 && (
                   <div className="absolute top-0 right-0 bg-red-500 text-white px-3 py-1 m-2 rounded-md">
                     Out of Stock
                   </div>
@@ -270,19 +105,18 @@ const ProductList = () => {
               </figure>
               <div className="card-body">
                 <div className="flex justify-between items-start">
-                  <h2 className="card-title text-lg">{product.title}</h2>
-                  <div className="badge badge-outline">${product.price.toFixed(2)}</div>
+                  <h2 className="card-title text-lg">{product.name}</h2>
+                  <div className="badge badge-outline">₹{product.images[0].price.toFixed(2)}</div>
                 </div>
-                <p className="text-sm text-mustard mb-2">{product.desc}</p>
                 <div className="flex items-center mb-4">
                   <div className="rating rating-sm">
                     {[...Array(5)].map((_, i) => (
                       <input 
                         key={i}
                         type="radio" 
-                        name={`rating-${product.id}`} 
+                        name={`rating-${product._id}`} 
                         className="mask mask-star-2 bg-orange-400" 
-                        checked={Math.round(product.rating) === i + 1}
+                        checked={Math.round(product?.review?.rating) === i + 1}
                         readOnly
                       />
                     ))}
@@ -292,10 +126,10 @@ const ProductList = () => {
                 <div className="card-actions">
                   <button 
                     className="btn bg-mustard text-wineRed btn-block" 
-                    disabled={!product.inStock}
+                    disabled={!product.images[0].quantity>0}
                     onClick={() => handleAddToCart(product)}
                   >
-                    {product.inStock ? "Add to Cart" : "Out of Stock"}
+                    {product.images[0].quantity>0 ? "Add to Cart" : "Out of Stock"}
                   </button>
                 </div>
               </div>
