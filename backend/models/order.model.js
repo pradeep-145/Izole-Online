@@ -1,7 +1,7 @@
 const productSchema = require('./product.model.js')
 const mongoose = require('mongoose');
 const Order= new mongoose.Schema({
-    productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
+  productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
   quantity: { type: Number, required: true },
   sessionId: { type: String, required: true, index: true },
   status: { 
@@ -9,6 +9,10 @@ const Order= new mongoose.Schema({
     enum: ['PENDING', 'COMPLETED', 'CANCELLED'], 
     default: 'PENDING',
     index: true
+  },
+  address:{
+    type:String,
+    required:true
   },
   delivery:{
     type: String, 

@@ -30,6 +30,10 @@ const customerSchema = mongoose.Schema(
       default: false,
       required: true,
     },
+    address:[{
+      type:String,
+
+    }],
     expiresAt: {
       type: Date,
       default: Date.now,

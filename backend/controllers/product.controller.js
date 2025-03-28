@@ -3,7 +3,7 @@ const reviewModel = require("../models/review.model.js");
 const ProductController = {
   saveProduct: async (req, res) => {
     try {
-      const { name, description, price, quantity, images } = req.body;
+      const { name, description, price, quantity, images, category } = req.body;
       console.log(req.body);
 
       const product = new Product({
@@ -12,6 +12,7 @@ const ProductController = {
         price,
         quantity,
         images,
+        category
       });
 
       await product.save();
@@ -23,6 +24,7 @@ const ProductController = {
       res.status(500).json("Internal server Error");
     }
   },
+  
   getProducts:async(req,res)=>{
     try{
       
