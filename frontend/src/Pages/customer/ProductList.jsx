@@ -61,17 +61,18 @@ const ProductList = () => {
             <input 
               type="text" 
               placeholder="Search products..." 
-              className="input input-bordered w-full" 
+              className="input input-bordered w-full bg-white border border-wineRed text-wineRed focus:outline-none focus:ring-2 focus:ring-mustard" 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
           
-          <div className="flex gap-2 overflow-x-auto w-full md:w-auto pb-2">
+          <div className="flex gap-2 overflow-x-auto w-full md:w-auto pb-2 items-center">
+            <p className="text-wineRed text-lg font-bold">Filter by Category:</p>
             {categories.map((category) => (
               <button 
                 key={category}
-                className={`btn ${selectedCategory === category ? 'btn-primary' : 'btn-outline'}`}
+                className={`btn ${selectedCategory === category ? 'bg-wineRed text-mustard' : 'bg-mustard text-wineRed'}  hover:bg-wineRed hover:text-mustard transition-colors duration-300`}
                 onClick={() => setSelectedCategory(category)}
               >
                 {category}
@@ -145,19 +146,7 @@ const ProductList = () => {
         )}
       </div>
       
-      {/* Newsletter Section */}
-      <div className="bg-gray-100 py-12">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-2xl font-bold mb-4">Join Our Newsletter</h2>
-          <p className="mb-6">Subscribe to receive updates on new arrivals and special promotions</p>
-          <div className="form-control max-w-md mx-auto">
-            <div className="input-group">
-              <input type="email" placeholder="Your email address" className="input input-bordered w-full" />
-              <button className="btn btn-primary">Subscribe</button>
-            </div>
-          </div>
-        </div>
-      </div>
+      
       
         <Footer/>
     </div>
