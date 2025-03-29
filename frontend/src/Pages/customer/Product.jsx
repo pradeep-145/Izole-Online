@@ -17,7 +17,7 @@ const Product = () => {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   // const product = location.state?.product;
-  const product = location.state?.product
+  const product = location.state?.product;
 
   const [images, setImages] = useState(product.images[0].image);
   const [image, setImage] = useState(images[0]);
@@ -45,8 +45,28 @@ const Product = () => {
   };
 
   // Handle add to cart
-  const handleAddToCart = () => {
+  const handleAddToCart = (product, colorIndex) => {
     // Implement add to cart functionality
+    const selectedColorData = product.images[colorIndex];
+    
+    // Check if enough stock is available
+    if (quantity < itemCount) {
+      alert('Not enough stock available!');
+      return;
+    }
+
+    const cartItem = {
+      product: product,
+      quantity: itemCount,
+      color: selectedColor,
+      size: selectedSize,
+      price: selectedColorData.price,
+      image: selectedColorData.image[0] // First image of selected color
+    };
+
+    addToCart(cartItem);
+    
+    // Show success message
     alert(`Added ${itemCount} ${selectedColor} ${selectedSize} to cart!`);
   };
 
@@ -109,11 +129,7 @@ const Product = () => {
 
     if (hasHalfStar) {
       stars.push(
-        <Star
-          key="half"
-          className="fill-mustard text-mustard"
-          size={16}
-        />
+        <Star key="half" className="fill-mustard text-mustard" size={16} />
       );
     }
 
@@ -212,11 +228,11 @@ const Product = () => {
               {/* Price */}
               <div className="mt-4 flex items-center">
                 <span className="text-2xl font-bold text-wineRed">
-                  ${product.price}
+                ₹{product.images[currentColorIndex].price}
                 </span>
-                {product.originalPrice && (
+                {product.images[currentColorIndex].originalPrice!=product.images[currentColorIndex].price && (
                   <span className="ml-3 text-lg text-wineRed line-through">
-                    ${product.originalPrice}
+                    ₹{product.images[currentColorIndex].originalPrice}
                   </span>
                 )}
                 {product.originalPrice && (
@@ -366,7 +382,9 @@ const Product = () => {
               <div className="mt-8 flex gap-4">
                 <button
                   type="button"
-                  onClick={handleAddToCart}
+                  onClick={()=>{
+                    handleAddToCart(product,currentColorIndex);
+                  }}
                   disabled={quantity === 0}
                   className="flex-1 flex items-center justify-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-wineRed bg-mustard hover:bg-mustard/50 disabled:bg-gray-300"
                 >
