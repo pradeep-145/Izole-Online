@@ -56,12 +56,12 @@ const ProductList = () => {
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
         {/* Search & Filter Bar */}
-        <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+        <div className="flex flex-col md:flex-row justify-end items-center mb-8 gap-4">
           <div className="form-control w-full md:w-64">
             <input 
               type="text" 
               placeholder="Search products..." 
-              className="input input-bordered w-full bg-white border border-wineRed text-wineRed focus:outline-none focus:ring-2 focus:ring-mustard" 
+              className="input input-bordered w-full bg-white border-2 border-wineRed text-wineRed focus:outline-none focus:ring-2 focus:ring-black" 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -87,7 +87,7 @@ const ProductList = () => {
         {/* Product Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {filteredProducts.map((product) => (
-            <div key={product._id} className="card  bg-wineRed shadow-xl hover:shadow-2xl transition-shadow duration-300"
+            <div key={product._id} className="card  bg-wineRed shadow-2xl hover:shadow-wineRed transition-shadow duration-300 hover:cursor-pointer"
               onClick={()=>{
                 console.log("Hello")
                 navigate(`/customer/product/${product._id}`, { state: { product } });
@@ -100,7 +100,7 @@ const ProductList = () => {
                     Out of Stock
                   </div>
                 )}
-                <div className="badge badge-secondary absolute bottom-2 right-2">
+                <div className="badge bg-mustard text-wineRed absolute bottom-2 right-2">
                   {product.category}
                 </div>
               </figure>

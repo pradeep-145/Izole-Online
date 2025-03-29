@@ -53,7 +53,7 @@ const Product = () => {
   // Handle buy now
   const handleBuyNow = () => {
     // Implement buy now functionality
-    navigate("/checkout", {
+    navigate("/customer/checkout", {
       state: {
         product: product,
         quantity: itemCount,

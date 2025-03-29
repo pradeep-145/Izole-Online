@@ -73,7 +73,7 @@ const CheckoutPage = () => {
               placeholder="First Name" 
               value={formData.firstName}
               onChange={handleInputChange}
-              className="input input-bordered w-full bg-mustard border border-wineRed text-wineRed placeholder:text-wineRed"
+              className="input input-bordered w-full bg-white border border-wineRed text-wineRed placeholder:text-wineRed"
               required 
             />
             <input 
@@ -82,7 +82,7 @@ const CheckoutPage = () => {
               placeholder="Last Name" 
               value={formData.lastName}
               onChange={handleInputChange}
-              className="input input-bordered w-full bg-mustard border border-wineRed text-wineRed placeholder:text-wineRed"
+              className="input input-bordered w-full bg-white border border-wineRed text-wineRed placeholder:text-wineRed"
               required 
             />
           </div>
@@ -92,7 +92,7 @@ const CheckoutPage = () => {
             placeholder="Email Address" 
             value={formData.email}
             onChange={handleInputChange}
-            className="input input-bordered w-full bg-mustard border border-wineRed text-wineRed placeholder:text-wineRed"
+            className="input input-bordered w-full bg-white border border-wineRed text-wineRed placeholder:text-wineRed"
             required 
           />
           <input 
@@ -101,7 +101,7 @@ const CheckoutPage = () => {
             placeholder="Street Address" 
             value={formData.address}
             onChange={handleInputChange}
-            className="input input-bordered w-full bg-mustard border border-wineRed text-wineRed placeholder:text-wineRed"
+            className="input input-bordered w-full bg-white border border-wineRed text-wineRed placeholder:text-wineRed"
             required 
           />
           <div className="grid md:grid-cols-2 gap-4">
@@ -111,7 +111,7 @@ const CheckoutPage = () => {
               placeholder="City" 
               value={formData.city}
               onChange={handleInputChange}
-              className="input input-bordered w-full bg-mustard border border-wineRed text-wineRed placeholder:text-wineRed"
+              className="input input-bordered w-full bg-white border border-wineRed text-wineRed placeholder:text-wineRed"
               required 
             />
             <input 
@@ -120,7 +120,7 @@ const CheckoutPage = () => {
               placeholder="Zip Code" 
               value={formData.zipCode}
               onChange={handleInputChange}
-              className="input input-bordered w-full bg-mustard border border-wineRed text-wineRed placeholder:text-wineRed"
+              className="input input-bordered w-full bg-white border border-wineRed text-wineRed placeholder:text-wineRed"
               required 
             />
           </div>
@@ -132,7 +132,7 @@ const CheckoutPage = () => {
             name="paymentMethod"
             value={formData.paymentMethod}
             onChange={handleInputChange}
-            className="w-full p-3 border border-wineRed rounded-md focus:outline-none focus:ring-2 text-wineRed bg-mustard"
+            className="w-full p-3 border border-wineRed rounded-md focus:outline-none focus:ring-2 text-wineRed bg-white"
             required
           >
             <option value="">Select Payment Method</option>
@@ -149,7 +149,7 @@ const CheckoutPage = () => {
                 placeholder="Card Number" 
                 value={formData.cardNumber}
                 onChange={handleInputChange}
-                className="input input-bordered w-full bg-mustard border border-wineRed text-wineRed placeholder:text-wineRed"
+                className="input input-bordered w-full bg-white border border-wineRed text-wineRed placeholder:text-wineRed"
                 required 
               />
               <div className="grid md:grid-cols-2 gap-4">
@@ -159,7 +159,7 @@ const CheckoutPage = () => {
                   placeholder="MM/YY" 
                   value={formData.expiryDate}
                   onChange={handleInputChange}
-                  className="input input-bordered w-full bg-mustard border border-wineRed text-wineRed placeholder:text-wineRed"
+                  className="input input-bordered w-full bg-white border border-wineRed text-wineRed placeholder:text-wineRed"
                   required 
                 />
                 <input 
@@ -168,7 +168,7 @@ const CheckoutPage = () => {
                   placeholder="CVV" 
                   value={formData.cvv}
                   onChange={handleInputChange}
-                  className="input input-bordered w-full bg-mustard border border-wineRed text-wineRed placeholder:text-wineRed"
+                  className="input input-bordered w-full bg-white border border-wineRed text-wineRed placeholder:text-wineRed"
                   required 
                 />
               </div>

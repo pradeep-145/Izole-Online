@@ -80,7 +80,7 @@ const Contact = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="form-control w-full">
                     <label className="label">
-                      <span className="label-text font-medium">Your Name</span>
+                      <span className="label-text font-medium text-mustard">Your Name</span>
                     </label>
                     <input
                       type="text"
@@ -88,14 +88,14 @@ const Contact = () => {
                       value={formData.name}
                       onChange={handleChange}
                       placeholder="Enter your name"
-                      className="input input-bordered w-full bg-wineRed border border-mustard placeholder:text-mustard"
+                      className="input input-bordered w-full bg-wineRed border border-mustard placeholder:text-mustard focus:outline-none"
                       required
                     />
                   </div>
                   
                   <div className="form-control w-full">
                     <label className="label">
-                      <span className="label-text font-medium">Email Address</span>
+                      <span className="label-text font-medium text-mustard">Email Address</span>
                     </label>
                     <input
                       type="email"
@@ -103,7 +103,7 @@ const Contact = () => {
                       value={formData.email}
                       onChange={handleChange}
                       placeholder="Enter your email"
-                      className="input input-bordered w-full bg-wineRed border border-mustard placeholder:text-mustard"
+                      className="input input-bordered w-full bg-wineRed border border-mustard placeholder:text-mustard focus:outline-none"
                       required
                     />
                   </div>
@@ -111,7 +111,7 @@ const Contact = () => {
                 
                 <div className="form-control w-full">
                   <label className="label">
-                    <span className="label-text font-medium">Subject</span>
+                    <span className="label-text font-medium text-mustard">Subject</span>
                   </label>
                   <input
                     type="text"
@@ -119,26 +119,26 @@ const Contact = () => {
                     value={formData.subject}
                     onChange={handleChange}
                     placeholder="How can we help you?"
-                    className="input input-bordered w-full bg-wineRed border border-mustard placeholder:text-mustard"
+                    className="input input-bordered w-full bg-wineRed border border-mustard placeholder:text-mustard focus:outline-none"
                     required
                   />
                 </div>
                 
                 <div className="form-control w-full">
                   <label className="label">
-                    <span className="label-text font-medium">Message</span>
+                    <span className="label-text font-medium text-mustard">Message</span>
                   </label>
                   <textarea
                     name="message"
                     value={formData.message}
                     onChange={handleChange}
                     placeholder="Type your message here..."
-                    className="textarea textarea-bordered w-full h-32 bg-wineRed border border-mustard placeholder:text-mustard"
+                    className="textarea textarea-bordered w-full h-32 bg-wineRed border border-mustard placeholder:text-mustard focus:outline-none"
                     required
                   ></textarea>
                 </div>
                 
-                <button type="submit" className="btn bg-mustard text-wineRed hover:bg-mustard/90 btn-lg gap-2">
+                <button type="submit" className="btn bg-mustard text-wineRed hover:bg-mustard/90 btn-lg gap-2 rounded-lg">
                   Send Message <Send className="h-5 w-5" />
                 </button>
               </form>
@@ -147,11 +147,11 @@ const Contact = () => {
         </div>
 
         {/* Map Section */}
-        <div className="mt-16">
-          <div className="bg-wineRed rounded-xl p-4">
-            <div className=" w-80 h-80 rounded-lg bg-gray-300 flex items-center justify-center">
-              <div className="text-center p-8">
-                <MapPin className="h-6 w-6 mx-auto mb-4 text-mustard" />
+        <div className="mt-16 justify-center flex">
+          <div className=" rounded-xl p-4">
+            <div className=" w-80 h-80 rounded-lg bg-mustard shadow-2xl flex items-center justify-center">
+              <div className="text-center p-8 text-wineRed">
+                <MapPin className="h-6 w-6 mx-auto mb-4 text-wineRed" />
                 <h4 className="text-2xl font-bold mb-2">Visit Our Store</h4>
                 <p className="text-lg max-w-md mx-auto text-wineRed">
                   Come visit our store at Sournapuri Layout, Tirupur. We're conveniently located near Kombai Thottam with ample parking space.
@@ -161,7 +161,7 @@ const Contact = () => {
                     href="https://maps.google.com/?q=60/A,+Sournapuri+Layout,+Kombai+Thottam,+Tirupur-4,+Tamil+Nadu,+India" 
                     target="_blank" 
                     rel="noopener noreferrer" 
-                    className="btn bg-mustard text-wineRed hover:bg-mustard/90"
+                    className="btn bg-wineRed text-mustard hover:bg-wineRed/90"
                   >
                     Get Directions
                   </a>

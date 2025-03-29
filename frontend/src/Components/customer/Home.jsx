@@ -28,7 +28,7 @@ const Home = () => {
                 <a href="/customer/products" className="btn bg-mustard text-wineRed hover:bg-mustard/90">
                   Shop Now <ArrowRight className="h-5 w-5 ml-1" />
                 </a>
-                <a href="/customer/sign-up" className="btn border-mustard text-mustard hover:bg-mustard/20">
+                <a href="/customer/sign-up" className="btn border border-mustard text-mustard">
                   Get Started
                 </a>
               </div>
