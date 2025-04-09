@@ -3,13 +3,16 @@ import { ShoppingCart, Heart, User, Search, Menu, X, ChevronDown, Bell, Package,
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import logo from '../../assets/logo.jpg';
 import { useCart } from '../../zustand/useCart'; // Adjust the path according to your store location
+import { useWishlist } from '../../zustand/useWishlist';
 
 const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [login, setLogin] = useState(localStorage.getItem("authUser") || null);
   const {cartItems}= useCart();
+  const {wishlistItems}=useWishlist();
   const [cartCount, setCartCount] = useState(cartItems.reduce((sum, item) => sum + item.quantity, 0));
+  const [wishlistCount, setWishlistCount] = useState(wishlistItems.length);
   const [totalPrice, setTotalPrice] = useState(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -26,6 +29,9 @@ const Navbar = () => {
     console.log(cartCount)
     setCartCount(cartItems.reduce((sum, item) => sum + item.quantity, 0));
   }, [cartItems]);
+  useEffect(()=>{
+    setWishlistCount(wishlistItems.length);
+  },[wishlistItems])
 
   const handleLogout = () => {
     localStorage.removeItem("authUser");
@@ -237,11 +243,11 @@ const Navbar = () => {
           {login  && (
             <Link to="/customer/wishlist" className="btn btn-ghost btn-circle relative">
               <Heart className="h-5 w-5" />
-              <span className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center rounded-full bg-wineRed text-white text-xs">3</span>
+              <span className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center rounded-full bg-wineRed text-white text-xs">{wishlistCount}</span>
             </Link>
           )}
           {login  && (
-            <Link to="/customer/wishlist" className="btn btn-ghost btn-circle relative">
+            <Link to="/customer/cart" className="btn btn-ghost btn-circle relative">
               <ShoppingCartIcon className="h-5 w-5" />
               <span className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center rounded-full bg-wineRed text-white text-xs">{cartCount}</span>
             </Link>

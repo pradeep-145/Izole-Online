@@ -16,18 +16,22 @@ import { useProduct } from "./zustand/useProducts";
 import { useCart } from "./zustand/useCart";
 import { useRef } from "react";
 import Cart from "./Pages/customer/cart";
+import Wishlist from "./Pages/customer/Wishlist";
+import { useWishlist } from "./zustand/useWishlist";
 function App() {
   const fetchProductsIfEmpty = useProduct(state => state.fetchProductsIfEmpty);
   const initialized = useRef(false);
   const { fetchCart } = useCart();
+  const {fetchWishlist}=useWishlist()
   useEffect(() => {
     if (!initialized.current) {
       fetchProductsIfEmpty();
       initialized.current = true;
     }
     fetchCart();
+    fetchWishlist()
 
-  }, [fetchProductsIfEmpty,fetchCart]);
+  }, [fetchProductsIfEmpty,fetchCart,fetchWishlist]);
 
   return (
     <Router>
@@ -45,6 +49,7 @@ function App() {
           <Route path="product/:id" element={<Product />} />
           <Route path='cart' element={<Cart/>}/>
           <Route path='checkout' element={<Checkout/>}/>
+          <Route path='wishlist' element={<Wishlist />} />
         </Route>
 
         {/* Admin Routes */}

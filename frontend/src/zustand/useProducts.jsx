@@ -32,7 +32,7 @@ export const useProduct = create(
       // Add a method to clear the store if needed
       clearStore: () => {
         set({ products: [], isInitialized: false });
-      }
+      },
     }),
     {
       name: 'products-storage',

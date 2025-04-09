@@ -7,29 +7,85 @@ import {
   Star,
   Truck,
 } from "lucide-react";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Navbar from "../../Components/customer/Navbar";
 import ReviewDialog from "../../Components/customer/ReviewDialog";
 import { useCart } from "../../zustand/useCart";
 import { useAuth } from "../../context/AuthContext";
+import { useWishlist } from "../../zustand/useWishlist";
+
 const Product = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const product = location.state?.product;
-  const {authUser}=useAuth();
-  const [images, setImages] = useState(product.images[0].image);
-  const [image, setImage] = useState(images[0]);
-  const [quantity, setQuantity] = useState(product.images[0].quantity);
-  const [selectedColor, setSelectedColor] = useState(product.images[0].color);
-  const [selectedSize, setSelectedSize] = useState(product.images[0].size[0]);
+  const { authUser } = useAuth();
+  
+  // Initialize states with proper null checks
+  const [images, setImages] = useState(product?.images?.[0]?.image || []);
+  const [image, setImage] = useState(images[0] || '');
+  const [quantity, setQuantity] = useState(product?.images?.[0]?.quantity || 0);
+  const [selectedColor, setSelectedColor] = useState(product?.images?.[0]?.color || '');
+  const [selectedSize, setSelectedSize] = useState(product?.images?.[0]?.size?.[0] || '');
   const [itemCount, setItemCount] = useState(1);
   const [currentColorIndex, setCurrentColorIndex] = useState(0);
   const [mainImageIndex, setMainImageIndex] = useState(0);
+  
+  // Wishlist related states and functions
+  const { addToWishlist, removeFromWishlist, isInWishlist, fetchWishlist } = useWishlist();
+  const [isWishlistLoading, setIsWishlistLoading] = useState(false);
+  const inWishlist = product ? isInWishlist(product._id) : false;
+
+  // Fetch wishlist on component mount
+  useEffect(() => {
+    if (authUser) {
+      fetchWishlist().catch(error => {
+        console.error("Failed to fetch wishlist:", error);
+      });
+    }
+  }, [authUser, fetchWishlist]);
+
+  // Handle wishlist toggle
+  const handleWishlistToggle = async (e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    
+    if (!authUser) {
+      navigate('/customer/login');
+      return;
+    }
+    
+    if (!product) return;
+    
+    setIsWishlistLoading(true);
+    try {
+      if (inWishlist) {
+        const result = await removeFromWishlist(product._id);
+        if (result.success) {
+          // Optional: show success message
+          console.log("Removed from wishlist successfully");
+        }
+      } else {
+        const result = await addToWishlist(product);
+        if (result.success) {
+          // Optional: show success message  
+          console.log("Added to wishlist successfully");
+        }
+      }
+    } catch (error) {
+      console.error('Wishlist operation failed:', error);
+    } finally {
+      setIsWishlistLoading(false);
+    }
+  };
 
   // Handle color selection
   const handleColorSelect = (colorData, index) => {
+    if (!colorData) return;
+    
     setImages(colorData.image);
     setImage(colorData.image[0]);
     setQuantity(colorData.quantity);
@@ -45,49 +101,49 @@ const Product = () => {
   };
 
   // Handle add to cart
-  // In your Product component
-const { addToCart, isLoading, error } = useCart();
+  const { addToCart, isLoading } = useCart();
 
-const handleAddToCart = async (product, colorIndex) => {
-  // Check if enough stock is available
-  if(authUser){
+  const handleAddToCart = async (product, colorIndex) => {
+    // Check if enough stock is available
+    if (!product || !authUser) {
+      navigate('/customer/login');
+      return;
+    }
 
-    
     if (quantity < itemCount) {
-    alert('Not enough stock available!');
-    return;
-  }
+      alert('Not enough stock available!');
+      return;
+    }
 
-  const selectedColorData = product.images[colorIndex];
-  
-  const cartItem = {
-    product: product,
-    quantity: itemCount,
-    color: selectedColor,
-    size: selectedSize,
-    price: selectedColorData.price,
-    image: selectedColorData.image[0] // First image of selected color
+    const selectedColorData = product.images[colorIndex];
+    
+    const cartItem = {
+      product: product,
+      quantity: itemCount,
+      color: selectedColor,
+      size: selectedSize,
+      price: selectedColorData.price,
+      image: selectedColorData.image[0] // First image of selected color
+    };
+
+    const result = await addToCart(cartItem);
+    
+    if (result.success) {
+      // Show success message
+      alert(`Added ${itemCount} ${selectedColor} ${selectedSize} to cart!`);
+    } else {
+      // Show error message
+      alert(`Failed to add to cart: ${result.error || 'Unknown error'}`);
+    }
   };
-
-  const result = await addToCart(cartItem);
-  
-  if (result.success) {
-    // Show success message
-    alert(`Added ${itemCount} ${selectedColor} ${selectedSize} to cart!`);
-  } else {
-    // Show error message
-    alert(`Failed to add to cart: ${result.error || 'Unknown error'}`);
-  }
-}
-else
-{
-  navigate('/customer/login');
-}
-};
 
   // Handle buy now
   const handleBuyNow = () => {
-    // Implement buy now functionality
+    if (!authUser) {
+      navigate('/customer/login');
+      return;
+    }
+    
     navigate("/customer/checkout", {
       state: {
         product: product,
@@ -128,6 +184,8 @@ else
 
   // Function to render stars based on rating
   const renderStars = (rating) => {
+    if (!rating) return [];
+    
     const stars = [];
     const fullStars = Math.floor(rating);
     const hasHalfStar = rating % 1 !== 0;
@@ -157,6 +215,18 @@ else
 
     return stars;
   };
+
+  // If product is not available, show loading or error state
+  if (!product) {
+    return (
+      <div className="bg-wineRed min-h-screen">
+        <Navbar />
+        <div className="flex justify-center items-center h-screen">
+          <p className="text-white text-xl">Loading product information...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-wineRed min-h-screen">
@@ -198,6 +268,20 @@ else
                   }`}
                 >
                   <ArrowRight size={20} />
+                </button>
+                
+                {/* Add Wishlist Button in top-right corner */}
+                <button
+                  onClick={handleWishlistToggle}
+                  disabled={isWishlistLoading}
+                  className={`absolute top-2 right-2 p-2 rounded-full shadow-md ${
+                    inWishlist 
+                      ? "bg-red-50 text-red-500 hover:bg-red-100" 
+                      : "bg-white text-gray-400 hover:text-red-500 hover:bg-red-50"
+                  } transition-colors`}
+                  aria-label={inWishlist ? "Remove from wishlist" : "Add to wishlist"}
+                >
+                  <Heart size={24} className={inWishlist ? "fill-red-500" : ""} />
                 </button>
               </div>
 
@@ -245,16 +329,16 @@ else
                 <span className="text-2xl font-bold text-wineRed">
                 ₹{product.images[currentColorIndex].price}
                 </span>
-                {product.images[currentColorIndex].originalPrice!=product.images[currentColorIndex].price && (
+                {product.images[currentColorIndex].originalPrice !== product.images[currentColorIndex].price && (
                   <span className="ml-3 text-lg text-wineRed line-through">
                     ₹{product.images[currentColorIndex].originalPrice}
                   </span>
                 )}
-                {product.originalPrice && (
+                {product.images[currentColorIndex].originalPrice !== product.images[currentColorIndex].price && (
                   <span className="ml-3 text-sm font-medium text-green-600">
                     {Math.round(
-                      ((product.originalPrice - product.price) /
-                        product.originalPrice) *
+                      ((product.images[currentColorIndex].originalPrice - product.images[currentColorIndex].price) /
+                        product.images[currentColorIndex].originalPrice) *
                         100
                     )}
                     % OFF
@@ -397,14 +481,14 @@ else
               <div className="mt-8 flex gap-4">
                 <button
                   type="button"
-                  onClick={()=>{
-                    handleAddToCart(product,currentColorIndex);
+                  onClick={() => {
+                    handleAddToCart(product, currentColorIndex);
                   }}
-                  disabled={quantity === 0}
+                  disabled={quantity === 0 || isLoading}
                   className="flex-1 flex items-center justify-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-wineRed bg-mustard hover:bg-mustard/50 disabled:bg-gray-300"
                 >
                   <ShoppingCart className="mr-2 h-5 w-5" />
-                  Add to Cart
+                  {isLoading ? "Adding..." : "Add to Cart"}
                 </button>
                 <button
                   type="button"
@@ -432,9 +516,20 @@ else
 
               {/* Wishlist & Share */}
               <div className="mt-6 flex items-center space-x-4">
-                <button className="flex items-center text-sm text-wineRed hover:text-gray-700">
-                  <Heart className="h-5 w-5 mr-1" />
-                  Add to Wishlist
+                <button 
+                  onClick={handleWishlistToggle}
+                  disabled={isWishlistLoading}
+                  className={`flex items-center text-sm ${
+                    inWishlist ? "text-red-500" : "text-wineRed hover:text-red-500"
+                  }`}
+                >
+                  <Heart className={`h-5 w-5 mr-1 ${inWishlist ? "fill-red-500" : ""}`} />
+                  {isWishlistLoading 
+                    ? "Processing..." 
+                    : inWishlist 
+                      ? "Remove from Wishlist" 
+                      : "Add to Wishlist"
+                  }
                 </button>
                 <button className="flex items-center text-sm text-wineRed hover:text-gray-700">
                   <Share2 className="h-5 w-5 mr-1" />
@@ -506,13 +601,15 @@ else
             <div className="flex-1 space-y-2">
               {[5, 4, 3, 2, 1].map((star) => {
                 const percentage =
-                  Math.round(
-                    (product?.review.filter(
-                      (review) => Math.floor(review.rating) === star
-                    ).length /
-                      product.review.length) *
-                      100
-                  ) || 0;
+                  product.review && product.review.length > 0
+                    ? Math.round(
+                        (product.review.filter(
+                          (review) => Math.floor(review.rating) === star
+                        ).length /
+                          product.review.length) *
+                          100
+                      )
+                    : 0;
 
                 return (
                   <div key={star} className="flex items-center">
@@ -536,33 +633,33 @@ else
 
           {/* Individual Reviews */}
           <div className="mt-6 space-y-6">
-            {product.review.map((review, index) => (
-              <div key={index} className="border-b pb-6 last:border-0">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="font-medium text-wineRed">{review.name}</h3>
-                    <div className="flex items-center mt-1">
-                      <div className="flex">{renderStars(review.rating)}</div>
-                      <span className="ml-2 text-sm text-wineRed">
-                        {review.date}
-                      </span>
+            {product.review && product.review.length > 0 ? (
+              product.review.map((review, index) => (
+                <div key={index} className="border-b pb-6 last:border-0">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h3 className="font-medium text-wineRed">{review.name}</h3>
+                      <div className="flex items-center mt-1">
+                        <div className="flex">{renderStars(review.rating)}</div>
+                        <span className="ml-2 text-sm text-wineRed">
+                          {review.date}
+                        </span>
+                      </div>
                     </div>
                   </div>
+                  <div className="mt-4 text-wineRed">{review.comment}</div>
+                  <div className="mt-4 flex gap-2">
+                    <button className="text-sm text-wineRed hover:text-gray-700">
+                      Helpful
+                    </button>
+                    <span className="text-gray-300">|</span>
+                    <button className="text-sm text-wineRed hover:text-gray-700">
+                      Report
+                    </button>
+                  </div>
                 </div>
-                <div className="mt-4 text-wineRed">{review.comment}</div>
-                <div className="mt-4 flex gap-2">
-                  <button className="text-sm text-wineRed hover:text-gray-700">
-                    Helpful
-                  </button>
-                  <span className="text-gray-300">|</span>
-                  <button className="text-sm text-wineRed hover:text-gray-700">
-                    Report
-                  </button>
-                </div>
-              </div>
-            ))}
-
-            {product.review.length === 0 && (
+              ))
+            ) : (
               <div className="text-center py-8">
                 <p className="text-wineRed">
                   No reviews yet. Be the first to review this product!
@@ -570,7 +667,7 @@ else
               </div>
             )}
 
-            {product.review.length > 0 && (
+            {product.review && product.review.length > 0 && (
               <div className="mt-6 text-center">
                 <button className="text-blue-600 hover:text-blue-800 font-medium">
                   Load more reviews
