@@ -22,7 +22,10 @@ const Order= new mongoose.Schema({
   }
 
 
-})
+},{timestamps: {
+  currentTime: () => new Date().toLocaleString('en-US', {
+    timeZone: 'Asia/Kolkata'
+  })}})
 
 Order.statics.storeOrder=async function(params) {
     

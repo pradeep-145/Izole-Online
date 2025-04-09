@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { ShoppingCart, Heart, User, Search, Menu, X, ChevronDown, Bell, Package, LogOut } from 'lucide-react';
+import { ShoppingCart, Heart, User, Search, Menu, X, ChevronDown, Bell, Package, LogOut, ShoppingCartIcon } from 'lucide-react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import logo from '../../assets/logo.jpg';
+import { useCart } from '../../zustand/useCart'; // Adjust the path according to your store location
 
 const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [login, setLogin] = useState(localStorage.getItem("authUser") || null);
-  const [cartCount, setCartCount] = useState(0);
+  const {cartItems}= useCart();
+  const [cartCount, setCartCount] = useState(cartItems.reduce((sum, item) => sum + item.quantity, 0));
   const [totalPrice, setTotalPrice] = useState(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -21,40 +23,9 @@ const Navbar = () => {
 
   // Function to get cart data from localStorage
   useEffect(() => {
-    const getCartData = () => {
-      try {
-        const cartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
-        setCartCount(cartItems.reduce((sum, item) => sum + item.quantity, 0));
-        setTotalPrice(cartItems.reduce((total, item) => total + (item.price * item.quantity), 0));
-      } catch (error) {
-        console.error("Error loading cart data:", error);
-        setCartCount(0);
-        setTotalPrice(0);
-      }
-    };
-
-    // Initial load
-    getCartData();
-
-    // Set up event listener for cart updates
-    window.addEventListener('cartUpdated', getCartData);
-
-    // Scroll effect handler
-    const handleScroll = () => {
-      if (window.scrollY > 50) {
-        setScrolled(true);
-      } else {
-        setScrolled(false);
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll);
-
-    return () => {
-      window.removeEventListener('cartUpdated', getCartData);
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, []);
+    console.log(cartCount)
+    setCartCount(cartItems.reduce((sum, item) => sum + item.quantity, 0));
+  }, [cartItems]);
 
   const handleLogout = () => {
     localStorage.removeItem("authUser");
@@ -269,89 +240,15 @@ const Navbar = () => {
               <span className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center rounded-full bg-wineRed text-white text-xs">3</span>
             </Link>
           )}
+          {login  && (
+            <Link to="/customer/wishlist" className="btn btn-ghost btn-circle relative">
+              <ShoppingCartIcon className="h-5 w-5" />
+              <span className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center rounded-full bg-wineRed text-white text-xs">{cartCount}</span>
+            </Link>
+          )}
           
-          {/* Shopping Cart */}
-          <div className="dropdown dropdown-end">
-            <div 
-              tabIndex={0} 
-              role="button" 
-              className="btn btn-ghost btn-circle relative"
-              aria-label="Cart"
-            >
-              <ShoppingCart className="h-5 w-5" />
-              {cartCount > 0 && (
-                <span className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center rounded-full bg-wineRed text-white text-xs">
-                  {cartCount}
-                </span>
-              )}
-            </div>
             
-            <div tabIndex={0} className="card dropdown-content bg-base-100 z-30 mt-3 w-80 shadow-lg rounded-box">
-              <div className="card-body p-4">
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="font-bold text-lg">Your Cart</h3>
-                  <span className="badge badge-primary">{cartCount} items</span>
-                </div>
-                
-                {cartCount > 0 ? (
-                  <>
-                    <div className="max-h-60 overflow-y-auto space-y-3">
-                      {/* This would be populated with actual cart items */}
-                      <div className="flex gap-3 border-b pb-3">
-                        <div className="w-16 h-16 bg-base-200 rounded-md overflow-hidden">
-                          <img src="/api/placeholder/100/100" alt="Product" className="w-full h-full object-cover" />
-                        </div>
-                        <div className="flex-1">
-                          <h4 className="font-medium text-sm">Premium Cotton Tee</h4>
-                          <p className="text-xs text-base-content/70">Size: M | Color: Blue</p>
-                          <div className="flex justify-between mt-1">
-                            <span className="text-primary font-bold">$29.99</span>
-                            <span className="text-sm">Qty: 1</span>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      {/* Sample repeated item - in production this would be mapped from real cart data */}
-                      <div className="flex gap-3 border-b pb-3">
-                        <div className="w-16 h-16 bg-base-200 rounded-md overflow-hidden">
-                          <img src="/api/placeholder/100/100" alt="Product" className="w-full h-full object-cover" />
-                        </div>
-                        <div className="flex-1">
-                          <h4 className="font-medium text-sm">Classic Hoodie</h4>
-                          <p className="text-xs text-base-content/70">Size: L | Color: Black</p>
-                          <div className="flex justify-between mt-1">
-                            <span className="text-primary font-bold">$45.99</span>
-                            <span className="text-sm">Qty: 1</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="border-t pt-3 mt-2">
-                      <div className="flex justify-between mb-3">
-                        <span className="font-medium">Subtotal:</span>
-                        <span className="font-bold">${totalPrice.toFixed(2)}</span>
-                      </div>
-                      <Link to="/customer/cart" className="btn btn-primary btn-block">
-                        View Cart
-                      </Link>
-                      <Link to="/customer/checkout" className="btn btn-outline btn-block mt-2">
-                        Checkout
-                      </Link>
-                    </div>
-                  </>
-                ) : (
-                  <div className="text-center py-8">
-                    <ShoppingCart className="h-12 w-12 text-base-content/30 mx-auto mb-3" />
-                    <p className="text-base-content/70">Your cart is empty</p>
-                    <button className="btn btn-primary mt-4" onClick={() => navigate('/customer/products')}>
-                      Shop Now
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
+          
           
           {/* User Account */}
           {login && (

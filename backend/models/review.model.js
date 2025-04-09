@@ -20,6 +20,9 @@ const ReviewSchema = new mongoose.Schema({
     type: String,
     required: true,
   }
-},{timestamps:true});
+},{timestamps: {
+  currentTime: () => new Date().toLocaleString('en-US', {
+    timeZone: 'Asia/Kolkata'
+  })}});
 
 module.exports = mongoose.model("Review", ReviewSchema);

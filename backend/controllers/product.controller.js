@@ -12,7 +12,7 @@ const ProductController = {
         price,
         quantity,
         images,
-        category
+        category,
       });
 
       await product.save();
@@ -24,29 +24,26 @@ const ProductController = {
       res.status(500).json("Internal server Error");
     }
   },
-  
-  getProducts:async(req,res)=>{
-    try{
-      
-      const response =await Product.find({})
-      res.status(200).json({result:response});
-    }catch(error){
-      console.log("Error ar getProducts",error);
-      res.status(500).json("Internal server Error")
+
+  getProducts: async (req, res) => {
+    try {
+      const response = await Product.find({});
+      res.status(200).json({ result: response });
+    } catch (error) {
+      console.log("Error ar getProducts", error);
+      res.status(500).json("Internal server Error");
     }
   },
   addReview: async (req, res) => {
     try {
       const { productId, review } = req.body;
       const product = await Product.findById(productId);
-      const response=await reviewModel.create(req.body);
-      if(response){
-        product.review.push(response._id);                                                                                                          
+      const response = await reviewModel.create(req.body);
+      if (response) {
+        product.review.push(response._id);
         await product.save();
-      }
-      else
-      {
-        throw new Error("Review not added")
+      } else {
+        throw new Error("Review not added");
       }
       res.status(200).json({ message: "Review added successfully" });
     } catch (error) {
@@ -54,10 +51,10 @@ const ProductController = {
       res.status(500).json("Internal server Error");
     }
   },
-  getProduct:async(req,res)=>{
-    const response=await Product.find({"images._id":req.params.id});
+  getProduct: async (req, res) => {
+    const response = await Product.find({ "images._id": req.params.id });
     res.json(response);
-  }
+  },
 };
 
 module.exports = ProductController;

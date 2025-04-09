@@ -158,7 +158,7 @@ const Contact = () => {
                 </p>
                 <div className="mt-6">
                   <a 
-                    href="https://maps.google.com/?q=60/A,+Sournapuri+Layout,+Kombai+Thottam,+Tirupur-4,+Tamil+Nadu,+India" 
+                    href="https://maps.app.goo.gl/C9sL4gRkUZVgSLRw6" 
                     target="_blank" 
                     rel="noopener noreferrer" 
                     className="btn bg-wineRed text-mustard hover:bg-wineRed/90"

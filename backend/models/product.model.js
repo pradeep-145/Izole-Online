@@ -45,6 +45,9 @@
         ref: "Review",
       },
     ],
-  },{timestamps:true});
+  },{timestamps: {
+    currentTime: () => new Date().toLocaleString('en-US', {
+      timeZone: 'Asia/Kolkata'
+    })}});
 
   module.exports = mongoose.model("Product", ProductSchema);

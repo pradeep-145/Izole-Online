@@ -8,76 +8,68 @@ import {
   Trash2,
   TruckIcon,
 } from "lucide-react";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../../Components/customer/Navbar";
+import { useCart } from "../../zustand/useCart"; // Update path as needed
+import axios from "axios";
 
 const Cart = () => {
   const navigate = useNavigate();
-  const [cartItems, setCartItems] = useState([
-    {
-      id: 1,
-      name: "Premium Leather Jacket",
-      price: 199.99,
-      color: "Black",
-      size: "L",
-      quantity: 1,
-      image:
-        "https://th.bing.com/th/id/OIP.HOb_8jSrQ1mwzuuE9B7SfAHaLG?rs=1&pid=ImgDetMain",
-      available: 20,
-    },
-    {
-      id: 2,
-      name: "Casual Denim Shirt",
-      price: 49.99,
-      color: "Blue",
-      size: "M",
-      quantity: 2,
-      image:
-        "https://th.bing.com/th/id/OIP.xU1B1N4yNIitYKdy61_5RgHaIC?w=185&h=200&c=7&r=0&o=5&pid=1.7",
-      available: 15,
-    },
-  ]);
-
+  const { 
+    cartItems, 
+    removeFromCart, 
+    updateQuantity, 
+    getCartTotal, 
+    fetchCart, 
+    isLoading 
+  } = useCart();
+  
   const [promoCode, setPromoCode] = useState("");
   const [promoApplied, setPromoApplied] = useState(false);
   const [discount, setDiscount] = useState(0);
 
+  // Fetch cart data on component mount
+  useEffect(() => {
+    fetchCart();
+  }, [fetchCart]);
+
   // Calculate cart summary values
-  const subtotal = cartItems.reduce(
-    (total, item) => total + item.price * item.quantity,
-    0
-  );
+  const subtotal = getCartTotal();
   const shipping = subtotal > 100 ? 0 : 9.99;
   const tax = subtotal * 0.08; // 8% tax rate
   const total = subtotal + shipping + tax - discount;
 
   // Handle quantity changes
-  const updateQuantity = (id, newQuantity) => {
-    setCartItems(
-      cartItems.map((item) => {
-        if (item.id === id) {
-          // Ensure quantity is within valid range
-          const validQuantity = Math.max(
-            1,
-            Math.min(newQuantity, item.available)
-          );
-          return { ...item, quantity: validQuantity };
-        }
-        return item;
-      })
-    );
+  const handleUpdateQuantity = async (productId, color, size, newQuantity, availableStock) => {
+    // Ensure quantity is within valid range
+    const validQuantity = Math.max(1, Math.min(newQuantity, availableStock));
+    
+    // Update quantity in store and backend
+    await updateQuantity(productId, color, size, validQuantity);
   };
 
   // Remove item from cart
-  const removeItem = (id) => {
-    setCartItems(cartItems.filter((item) => item.id !== id));
+  const handleRemoveItem = async (productId, color, size) => {
+    await removeFromCart(productId, color, size);
   };
 
   // Move item to wishlist
-  const moveToWishlist = (id) => {
-    removeItem(id);
-    alert("Item moved to wishlist!");
+  const moveToWishlist = async (productId, color, size) => {
+    try {
+      // Add to wishlist API call
+      await axios.post('/api/wishlist/add', {
+        productId,
+        color,
+        size
+      });
+      
+      // Remove from cart
+      await removeFromCart(productId, color, size);
+      alert("Item moved to wishlist!");
+    } catch (error) {
+      alert("Failed to move item to wishlist");
+    }
   };
 
   // Apply promo code
@@ -115,8 +107,22 @@ const Cart = () => {
     });
   };
 
+  // Show loading indicator
+  if (isLoading) {
+    return (
+      <div className="bg-gray-50 min-h-screen">
+        <Navbar />
+        <div className="max-w-6xl mx-auto pt-16 px-4 lg:px-0 flex justify-center items-center h-64">
+          <div className="text-center">
+            <div>Loading your cart...</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // Show empty cart message if no items
-  if (cartItems.length === 0) {
+  if (!cartItems.length) {
     return (
       <div className="bg-gray-50 min-h-screen">
         <Navbar />
@@ -164,110 +170,130 @@ const Cart = () => {
                 </div>
 
                 {/* Cart items */}
-                {cartItems.map((item) => (
-                  <div
-                    key={item.id}
-                    className="grid grid-cols-1 md:grid-cols-12 gap-4 py-6 border-b last:border-0"
-                  >
-                    {/* Product info - mobile & desktop */}
-                    <div className="col-span-1 md:col-span-6">
-                      <div className="flex gap-4">
-                        <div className="w-24 h-24 flex-shrink-0">
-                          <img
-                            src={item.image}
-                            alt={item.name}
-                            className="w-full h-full object-cover rounded-md"
-                          />
-                        </div>
-                        <div className="flex flex-col justify-between">
-                          <div>
-                            <h3 className="font-medium text-gray-800">
-                              {item.name}
-                            </h3>
-                            <div className="mt-1 text-sm text-gray-500">
-                              <span>Color: {item.color}</span>
-                              <span className="mx-2">|</span>
-                              <span>Size: {item.size}</span>
+                {cartItems.map((item) => {
+                  const colorData = item.product.images.find(img => img.color === item.color);
+                  const price = item.price || colorData?.price || 0;
+                  const available = colorData?.quantity || 0;
+                  
+                  return (
+                    <div
+                      key={`${item.product._id}-${item.color}-${item.size}`}
+                      className="grid grid-cols-1 md:grid-cols-12 gap-4 py-6 border-b last:border-0"
+                    >
+                      {/* Product info - mobile & desktop */}
+                      <div className="col-span-1 md:col-span-6">
+                        <div className="flex gap-4">
+                          <div className="w-24 h-24 flex-shrink-0">
+                            <img
+                              src={item.image}
+                              alt={item.product.name}
+                              className="w-full h-full object-cover rounded-md"
+                            />
+                          </div>
+                          <div className="flex flex-col justify-between">
+                            <div>
+                              <h3 className="font-medium text-gray-800">
+                                {item.product.name}
+                              </h3>
+                              <div className="mt-1 text-sm text-gray-500">
+                                <span>Color: {item.color}</span>
+                                <span className="mx-2">|</span>
+                                <span>Size: {item.size}</span>
+                              </div>
+                            </div>
+
+                            {/* Mobile price */}
+                            <div className="md:hidden flex justify-between mt-2">
+                              <span className="font-medium">
+                                ${price.toFixed(2)}
+                              </span>
+                              <span className="font-medium">
+                                ${(price * item.quantity).toFixed(2)}
+                              </span>
+                            </div>
+
+                            {/* Action buttons */}
+                            <div className="flex gap-4 mt-2">
+                              <button
+                                onClick={() => handleRemoveItem(item.product._id, item.color, item.size)}
+                                className="text-sm text-gray-500 hover:text-red-500 flex items-center gap-1"
+                              >
+                                <Trash2 className="w-4 h-4" /> Remove
+                              </button>
+                              <button
+                                onClick={() => moveToWishlist(item.product._id, item.color, item.size)}
+                                className="text-sm text-gray-500 hover:text-blue-500 flex items-center gap-1"
+                              >
+                                <Heart className="w-4 h-4" /> Save
+                              </button>
                             </div>
                           </div>
-
-                          {/* Mobile price */}
-                          <div className="md:hidden flex justify-between mt-2">
-                            <span className="font-medium">
-                              ${item.price.toFixed(2)}
-                            </span>
-                            <span className="font-medium">
-                              ${(item.price * item.quantity).toFixed(2)}
-                            </span>
-                          </div>
-
-                          {/* Action buttons */}
-                          <div className="flex gap-4 mt-2">
-                            <button
-                              onClick={() => removeItem(item.id)}
-                              className="text-sm text-gray-500 hover:text-red-500 flex items-center gap-1"
-                            >
-                              <Trash2 className="w-4 h-4" /> Remove
-                            </button>
-                            <button
-                              onClick={() => moveToWishlist(item.id)}
-                              className="text-sm text-gray-500 hover:text-blue-500 flex items-center gap-1"
-                            >
-                              <Heart className="w-4 h-4" /> Save
-                            </button>
-                          </div>
                         </div>
                       </div>
-                    </div>
 
-                    {/* Price - desktop only */}
-                    <div className="hidden md:flex col-span-2 items-center justify-center">
-                      <span className="font-medium">
-                        ${item.price.toFixed(2)}
-                      </span>
-                    </div>
+                      {/* Price - desktop only */}
+                      <div className="hidden md:flex col-span-2 items-center justify-center">
+                        <span className="font-medium">
+                          ${price.toFixed(2)}
+                        </span>
+                      </div>
 
-                    {/* Quantity controls */}
-                    <div className="col-span-1 md:col-span-2 flex items-center justify-center">
-                      <div className="flex items-center border border-gray-300 rounded-md">
-                        <button
-                          onClick={() =>
-                            updateQuantity(item.id, item.quantity - 1)
-                          }
-                          disabled={item.quantity <= 1}
-                          className="p-2 text-gray-600 hover:text-gray-800 disabled:opacity-50"
-                        >
-                          <Minus className="w-4 h-4" />
-                        </button>
-                        <input
-                          type="text"
-                          value={item.quantity}
-                          onChange={(e) => {
-                            const val = parseInt(e.target.value) || 1;
-                            updateQuantity(item.id, val);
-                          }}
-                          className="w-12 text-center border-0 focus:ring-0"
-                        />
-                        <button
-                          onClick={() =>
-                            updateQuantity(item.id, item.quantity + 1)
-                          }
-                          disabled={item.quantity >= item.available}
-                          className="p-2 text-gray-600 hover:text-gray-800 disabled:opacity-50"
-                        >
-                          <Plus className="w-4 h-4" />
-                        </button>
+                      {/* Quantity controls */}
+                      <div className="col-span-1 md:col-span-2 flex items-center justify-center">
+                        <div className="flex items-center border border-gray-300 rounded-md">
+                          <button
+                            onClick={() => handleUpdateQuantity(
+                              item.product._id, 
+                              item.color, 
+                              item.size, 
+                              item.quantity - 1,
+                              available
+                            )}
+                            disabled={item.quantity <= 1}
+                            className="p-2 text-gray-600 hover:text-gray-800 disabled:opacity-50"
+                          >
+                            <Minus className="w-4 h-4" />
+                          </button>
+                          <input
+                            type="text"
+                            value={item.quantity}
+                            onChange={(e) => {
+                              const val = parseInt(e.target.value) || 1;
+                              handleUpdateQuantity(
+                                item.product._id, 
+                                item.color, 
+                                item.size, 
+                                val,
+                                available
+                              );
+                            }}
+                            className="w-12 text-center border-0 focus:ring-0"
+                          />
+                          <button
+                            onClick={() => handleUpdateQuantity(
+                              item.product._id, 
+                              item.color, 
+                              item.size, 
+                              item.quantity + 1,
+                              available
+                            )}
+                            disabled={item.quantity >= available}
+                            className="p-2 text-gray-600 hover:text-gray-800 disabled:opacity-50"
+                          >
+                            <Plus className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Subtotal - desktop only */}
+                      <div className="hidden md:flex col-span-2 items-center justify-center">
+                        <span className="font-medium">
+                          ${(price * item.quantity).toFixed(2)}
+                        </span>
                       </div>
                     </div>
-
-                    {/* Subtotal - desktop only */}
-                    <div className="hidden md:flex col-span-2 items-center justify-center">
-                      <span className="font-medium">
-                        ${(item.price * item.quantity).toFixed(2)}
-                      </span>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
 
                 {/* Continue shopping button */}
                 <div className="mt-6">
@@ -380,6 +406,7 @@ const Cart = () => {
                   <button
                     className="btn btn-primary w-full gap-2"
                     onClick={proceedToCheckout}
+                    disabled={cartItems.length === 0}
                   >
                     <CreditCard className="w-4 h-4" />
                     Proceed to Checkout

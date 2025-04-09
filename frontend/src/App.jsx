@@ -11,20 +11,23 @@ import AdminLayout from "./Pages/Admin/AdminLayout";
 import Product from "./Pages/customer/Product";
 import AdminDashboard from "./Pages/Admin/AdminDashboard";
 import AdminProductForm from "./Pages/Admin/ProductForm";
-import CartPage from "./Pages/customer/CartPage";
 import Checkout from "./Pages/customer/Checkout";
 import { useProduct } from "./zustand/useProducts";
+import { useCart } from "./zustand/useCart";
 import { useRef } from "react";
+import Cart from "./Pages/customer/cart";
 function App() {
   const fetchProductsIfEmpty = useProduct(state => state.fetchProductsIfEmpty);
   const initialized = useRef(false);
-
+  const { fetchCart } = useCart();
   useEffect(() => {
     if (!initialized.current) {
       fetchProductsIfEmpty();
       initialized.current = true;
     }
-  }, [fetchProductsIfEmpty]);
+    fetchCart();
+
+  }, [fetchProductsIfEmpty,fetchCart]);
 
   return (
     <Router>
@@ -40,9 +43,8 @@ function App() {
           <Route path="otp-verification" element={<OtpVerification />} />
           <Route path="products" element={<ProductList />} />
           <Route path="product/:id" element={<Product />} />
-          <Route path='cart' element={<CartPage/>}/>
+          <Route path='cart' element={<Cart/>}/>
           <Route path='checkout' element={<Checkout/>}/>
-          
         </Route>
 
         {/* Admin Routes */}

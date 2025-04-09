@@ -40,8 +40,10 @@ const customerSchema = mongoose.Schema(
       expires:10*24*60*60,
     },
   },
-  { timestamps: true,
-  }
+  {timestamps: {
+    currentTime: () => new Date().toLocaleString('en-US', {
+      timeZone: 'Asia/Kolkata'
+    })}}
 );
 
 

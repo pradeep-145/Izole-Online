@@ -11,14 +11,14 @@ import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Navbar from "../../Components/customer/Navbar";
 import ReviewDialog from "../../Components/customer/ReviewDialog";
-
+import { useCart } from "../../zustand/useCart";
+import { useAuth } from "../../context/AuthContext";
 const Product = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
-  // const product = location.state?.product;
   const product = location.state?.product;
-
+  const {authUser}=useAuth();
   const [images, setImages] = useState(product.images[0].image);
   const [image, setImage] = useState(images[0]);
   const [quantity, setQuantity] = useState(product.images[0].quantity);
@@ -45,30 +45,45 @@ const Product = () => {
   };
 
   // Handle add to cart
-  const handleAddToCart = (product, colorIndex) => {
-    // Implement add to cart functionality
-    const selectedColorData = product.images[colorIndex];
+  // In your Product component
+const { addToCart, isLoading, error } = useCart();
+
+const handleAddToCart = async (product, colorIndex) => {
+  // Check if enough stock is available
+  if(authUser){
+
     
-    // Check if enough stock is available
     if (quantity < itemCount) {
-      alert('Not enough stock available!');
-      return;
-    }
+    alert('Not enough stock available!');
+    return;
+  }
 
-    const cartItem = {
-      product: product,
-      quantity: itemCount,
-      color: selectedColor,
-      size: selectedSize,
-      price: selectedColorData.price,
-      image: selectedColorData.image[0] // First image of selected color
-    };
+  const selectedColorData = product.images[colorIndex];
+  
+  const cartItem = {
+    product: product,
+    quantity: itemCount,
+    color: selectedColor,
+    size: selectedSize,
+    price: selectedColorData.price,
+    image: selectedColorData.image[0] // First image of selected color
+  };
 
-    addToCart(cartItem);
-    
+  const result = await addToCart(cartItem);
+  
+  if (result.success) {
     // Show success message
     alert(`Added ${itemCount} ${selectedColor} ${selectedSize} to cart!`);
-  };
+  } else {
+    // Show error message
+    alert(`Failed to add to cart: ${result.error || 'Unknown error'}`);
+  }
+}
+else
+{
+  navigate('/customer/login');
+}
+};
 
   // Handle buy now
   const handleBuyNow = () => {
