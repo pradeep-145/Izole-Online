@@ -14,6 +14,16 @@ import Navbar from "../../Components/customer/Navbar";
 import { useCart } from "../../zustand/useCart"; // Update path as needed
 import axios from "axios";
 
+// IZOLE brand colors
+const COLORS = {
+  darkGreen: "#1A3B2A", // Main background color
+  mustardGold: "#D6AF36", // Accent color
+  lightGold: "#E9D185", // Lighter accent
+  cream: "#F5F1E0", // Light background
+  darkText: "#333333", // Dark text
+  white: "#FFFFFF", // White text
+};
+
 const Cart = () => {
   const navigate = useNavigate();
   const { 
@@ -110,11 +120,11 @@ const Cart = () => {
   // Show loading indicator
   if (isLoading) {
     return (
-      <div className="bg-gray-50 min-h-screen">
+      <div className="bg-cream min-h-screen">
         <Navbar />
         <div className="max-w-6xl mx-auto pt-16 px-4 lg:px-0 flex justify-center items-center h-64">
           <div className="text-center">
-            <div>Loading your cart...</div>
+            <div className="text-lg font-medium text-darkGreen">Loading your cart...</div>
           </div>
         </div>
       </div>
@@ -124,19 +134,24 @@ const Cart = () => {
   // Show empty cart message if no items
   if (!cartItems.length) {
     return (
-      <div className="bg-gray-50 min-h-screen">
+      <div style={{ backgroundColor: COLORS.cream }} className="min-h-screen">
         <Navbar />
         <div className="max-w-6xl mx-auto pt-16 px-4 lg:px-0">
-          <div className="card bg-white shadow-xl p-8 text-center">
-            <div className="card-body items-center">
-              <ShoppingBag className="w-16 h-16 text-gray-300 mb-4" />
-              <h2 className="text-2xl font-bold">Your cart is empty</h2>
-              <p className="text-gray-500 mt-2">
+          <div style={{ backgroundColor: COLORS.white, boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' }} className="rounded-lg p-8 text-center">
+            <div className="flex flex-col items-center">
+              <ShoppingBag style={{ color: COLORS.mustardGold }} className="w-16 h-16 mb-4" />
+              <h2 style={{ color: COLORS.darkGreen }} className="text-2xl font-bold">Your cart is empty</h2>
+              <p className="text-gray-600 mt-2">
                 Looks like you haven't added anything to your cart yet.
               </p>
               <button
                 onClick={continueShopping}
-                className="btn btn-primary mt-6"
+                style={{ 
+                  backgroundColor: COLORS.darkGreen, 
+                  color: COLORS.mustardGold,
+                  border: 'none' 
+                }}
+                className="px-6 py-3 rounded-md font-medium mt-6 hover:opacity-90 transition-opacity"
               >
                 Start Shopping
               </button>
@@ -148,21 +163,21 @@ const Cart = () => {
   }
 
   return (
-    <div className="bg-gray-50 min-h-screen">
+    <div style={{ backgroundColor: COLORS.cream }} className="min-h-screen">
       <Navbar />
 
       <main className="max-w-6xl mx-auto pt-16 px-4 lg:px-0">
-        <h1 className="text-3xl font-bold text-gray-800 mt-8 mb-6">
+        <h1 style={{ color: COLORS.darkGreen }} className="text-3xl font-bold mt-8 mb-6">
           Shopping Cart
         </h1>
 
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Cart Items Section */}
           <div className="lg:w-2/3">
-            <div className="card bg-white shadow-md">
-              <div className="card-body p-6">
+            <div style={{ backgroundColor: COLORS.white }} className="rounded-lg shadow-md">
+              <div className="p-6">
                 {/* Table header */}
-                <div className="hidden md:grid grid-cols-12 gap-4 pb-4 border-b text-sm font-medium text-gray-600">
+                <div className="hidden md:grid grid-cols-12 gap-4 pb-4 border-b border-gray-200 text-sm font-medium text-gray-600">
                   <div className="col-span-6">Product</div>
                   <div className="col-span-2 text-center">Price</div>
                   <div className="col-span-2 text-center">Quantity</div>
@@ -178,7 +193,7 @@ const Cart = () => {
                   return (
                     <div
                       key={`${item.product._id}-${item.color}-${item.size}`}
-                      className="grid grid-cols-1 md:grid-cols-12 gap-4 py-6 border-b last:border-0"
+                      className="grid grid-cols-1 md:grid-cols-12 gap-4 py-6 border-b border-gray-200 last:border-0"
                     >
                       {/* Product info - mobile & desktop */}
                       <div className="col-span-1 md:col-span-6">
@@ -192,7 +207,7 @@ const Cart = () => {
                           </div>
                           <div className="flex flex-col justify-between">
                             <div>
-                              <h3 className="font-medium text-gray-800">
+                              <h3 style={{ color: COLORS.darkGreen }} className="font-medium">
                                 {item.product.name}
                               </h3>
                               <div className="mt-1 text-sm text-gray-500">
@@ -204,11 +219,11 @@ const Cart = () => {
 
                             {/* Mobile price */}
                             <div className="md:hidden flex justify-between mt-2">
-                              <span className="font-medium">
-                                ${price.toFixed(2)}
+                              <span style={{ color: COLORS.darkGreen }} className="font-medium">
+                                ₹{price.toFixed(2)}
                               </span>
-                              <span className="font-medium">
-                                ${(price * item.quantity).toFixed(2)}
+                              <span style={{ color: COLORS.darkGreen }} className="font-medium">
+                                ₹{(price * item.quantity).toFixed(2)}
                               </span>
                             </div>
 
@@ -233,14 +248,14 @@ const Cart = () => {
 
                       {/* Price - desktop only */}
                       <div className="hidden md:flex col-span-2 items-center justify-center">
-                        <span className="font-medium">
-                          ${price.toFixed(2)}
+                        <span style={{ color: COLORS.darkGreen }} className="font-medium">
+                          ₹{price.toFixed(2)}
                         </span>
                       </div>
 
                       {/* Quantity controls */}
                       <div className="col-span-1 md:col-span-2 flex items-center justify-center">
-                        <div className="flex items-center border border-gray-300 rounded-md">
+                        <div style={{ borderColor: COLORS.darkGreen }} className="flex items-center border rounded-md">
                           <button
                             onClick={() => handleUpdateQuantity(
                               item.product._id, 
@@ -250,7 +265,8 @@ const Cart = () => {
                               available
                             )}
                             disabled={item.quantity <= 1}
-                            className="p-2 text-gray-600 hover:text-gray-800 disabled:opacity-50"
+                            style={{ color: COLORS.darkGreen }}
+                            className="p-2 hover:text-gray-800 disabled:opacity-50"
                           >
                             <Minus className="w-4 h-4" />
                           </button>
@@ -267,6 +283,7 @@ const Cart = () => {
                                 available
                               );
                             }}
+                            style={{ color: COLORS.darkGreen }}
                             className="w-12 text-center border-0 focus:ring-0"
                           />
                           <button
@@ -278,7 +295,8 @@ const Cart = () => {
                               available
                             )}
                             disabled={item.quantity >= available}
-                            className="p-2 text-gray-600 hover:text-gray-800 disabled:opacity-50"
+                            style={{ color: COLORS.darkGreen }}
+                            className="p-2 hover:text-gray-800 disabled:opacity-50"
                           >
                             <Plus className="w-4 h-4" />
                           </button>
@@ -287,8 +305,8 @@ const Cart = () => {
 
                       {/* Subtotal - desktop only */}
                       <div className="hidden md:flex col-span-2 items-center justify-center">
-                        <span className="font-medium">
-                          ${(price * item.quantity).toFixed(2)}
+                        <span style={{ color: COLORS.darkGreen }} className="font-medium">
+                          ₹{(price * item.quantity).toFixed(2)}
                         </span>
                       </div>
                     </div>
@@ -299,7 +317,12 @@ const Cart = () => {
                 <div className="mt-6">
                   <button
                     onClick={continueShopping}
-                    className="btn btn-outline gap-2"
+                    style={{ 
+                      color: COLORS.darkGreen, 
+                      borderColor: COLORS.darkGreen,
+                      backgroundColor: 'transparent'
+                    }}
+                    className="px-4 py-2 rounded-md border font-medium flex items-center gap-2 hover:bg-gray-50"
                   >
                     <ArrowLeft className="w-4 h-4" /> Continue Shopping
                   </button>
@@ -310,9 +333,9 @@ const Cart = () => {
 
           {/* Order Summary Section */}
           <div className="lg:w-1/3">
-            <div className="card bg-white shadow-md sticky top-24">
-              <div className="card-body p-6">
-                <h2 className="card-title text-xl mb-4">Order Summary</h2>
+            <div style={{ backgroundColor: COLORS.white }} className="rounded-lg shadow-md sticky top-24">
+              <div className="p-6">
+                <h2 style={{ color: COLORS.darkGreen }} className="text-xl font-bold mb-4">Order Summary</h2>
 
                 {/* Summary details */}
                 <div className="space-y-3 text-sm">
@@ -322,48 +345,48 @@ const Cart = () => {
                       {cartItems.reduce((sum, item) => sum + item.quantity, 0)}{" "}
                       items)
                     </span>
-                    <span className="font-medium">${subtotal.toFixed(2)}</span>
+                    <span style={{ color: COLORS.darkGreen }} className="font-medium">₹{subtotal.toFixed(2)}</span>
                   </div>
 
                   <div className="flex justify-between">
                     <span className="text-gray-600">Shipping</span>
-                    <span className="font-medium">
-                      {shipping === 0 ? "Free" : `$${shipping.toFixed(2)}`}
+                    <span style={{ color: COLORS.darkGreen }} className="font-medium">
+                      {shipping === 0 ? "Free" : `₹${shipping.toFixed(2)}`}
                     </span>
                   </div>
 
                   <div className="flex justify-between">
                     <span className="text-gray-600">Tax (8%)</span>
-                    <span className="font-medium">${tax.toFixed(2)}</span>
+                    <span style={{ color: COLORS.darkGreen }} className="font-medium">₹{tax.toFixed(2)}</span>
                   </div>
 
                   {discount > 0 && (
                     <div className="flex justify-between text-green-600">
                       <span>Discount</span>
                       <span className="font-medium">
-                        -${discount.toFixed(2)}
+                        -₹{discount.toFixed(2)}
                       </span>
                     </div>
                   )}
 
-                  <div className="border-t pt-3 mt-3">
+                  <div className="border-t border-gray-200 pt-3 mt-3">
                     <div className="flex justify-between font-bold text-lg">
-                      <span>Total</span>
-                      <span>${total.toFixed(2)}</span>
+                      <span style={{ color: COLORS.darkGreen }}>Total</span>
+                      <span style={{ color: COLORS.darkGreen }}>₹{total.toFixed(2)}</span>
                     </div>
                   </div>
                 </div>
 
                 {/* Shipping info */}
-                <div className="mt-4 bg-blue-50 p-4 rounded-lg flex items-start gap-3">
-                  <TruckIcon className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
+                <div style={{ backgroundColor: COLORS.lightGold + '30' }} className="mt-4 p-4 rounded-lg flex items-start gap-3">
+                  <TruckIcon style={{ color: COLORS.mustardGold }} className="w-5 h-5 flex-shrink-0 mt-0.5" />
                   <div className="text-sm">
-                    <p className="font-medium text-blue-800">
-                      Free shipping on orders over $100
+                    <p style={{ color: COLORS.darkGreen }} className="font-medium">
+                      Free shipping on orders over ₹100
                     </p>
-                    <p className="text-blue-700 mt-1">
+                    <p style={{ color: COLORS.darkGreen + 'CC' }} className="mt-1">
                       {subtotal < 100
-                        ? `Add $${(100 - subtotal).toFixed(
+                        ? `Add ₹${(100 - subtotal).toFixed(
                             2
                           )} more to qualify for free shipping.`
                         : "You've qualified for free shipping!"}
@@ -373,18 +396,31 @@ const Cart = () => {
 
                 {/* Promo code section */}
                 <div className="mt-6">
-                  <div className="text-sm font-medium mb-2">Promo Code</div>
-                  <div className="join w-full">
+                  <div style={{ color: COLORS.darkGreen }} className="text-sm font-medium mb-2">Promo Code</div>
+                  <div className="flex w-full">
                     <input
                       type="text"
                       placeholder="Enter promo code"
-                      className="input input-bordered join-item flex-grow"
+                      style={{ 
+                        borderColor: COLORS.darkGreen,
+                        color: COLORS.darkGreen,
+                        borderRight: 'none',
+                        borderTopRightRadius: 0,
+                        borderBottomRightRadius: 0,
+                      }}
+                      className="flex-grow px-3 py-2 border rounded-l-md focus:outline-none"
                       value={promoCode}
                       onChange={(e) => setPromoCode(e.target.value)}
                       disabled={promoApplied}
                     />
                     <button
-                      className="btn join-item btn-primary"
+                      style={{ 
+                        backgroundColor: COLORS.darkGreen, 
+                        color: COLORS.mustardGold,
+                        borderTopLeftRadius: 0,
+                        borderBottomLeftRadius: 0,
+                      }}
+                      className="px-4 py-2 rounded-r-md font-medium hover:opacity-90 transition-opacity"
                       onClick={applyPromoCode}
                       disabled={promoApplied || !promoCode}
                     >
@@ -404,7 +440,11 @@ const Cart = () => {
                 {/* Checkout button */}
                 <div className="mt-6">
                   <button
-                    className="btn btn-primary w-full gap-2"
+                    style={{ 
+                      backgroundColor: COLORS.mustardGold, 
+                      color: COLORS.darkGreen,
+                    }}
+                    className="w-full px-6 py-3 rounded-md font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity"
                     onClick={proceedToCheckout}
                     disabled={cartItems.length === 0}
                   >

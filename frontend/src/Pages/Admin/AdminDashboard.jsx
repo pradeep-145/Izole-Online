@@ -24,6 +24,8 @@ import {
 } from 'lucide-react';
 import AdminProductForm from './ProductForm';
 import OrderManagement from '../../Components/admin/Ordermanagement';
+import ProductTable from '../../Components/admin/ProductTable';
+import { useProduct } from '../../zustand/useProducts';
 
 const AdminDashboard = () => {
     const [activeTab, setActiveTab] = useState('dashboard');
@@ -32,18 +34,19 @@ const AdminDashboard = () => {
     const [notificationOpen, setNotificationOpen] = useState(false);
 const [profileOpen, setProfileOpen] = useState(false);
     // Sample data
+    const {products }=useProduct();
     const recentOrders = [
-        { id: '#ORD-7462', customer: 'Emma Wilson', date: '15 Mar 2025', status: 'Delivered', total: '$129.99' },
-        { id: '#ORD-7461', customer: 'Jason Brown', date: '14 Mar 2025', status: 'Processing', total: '$85.50' },
-        { id: '#ORD-7460', customer: 'Sarah Thomas', date: '14 Mar 2025', status: 'Shipped', total: '$214.30' },
-        { id: '#ORD-7459', customer: 'Michael Davis', date: '13 Mar 2025', status: 'Pending', total: '$59.99' },
+        { id: '#ORD-7462', customer: 'Emma Wilson', date: '15 Mar 2025', status: 'Delivered', total: '₹129.99' },
+        { id: '#ORD-7461', customer: 'Jason Brown', date: '14 Mar 2025', status: 'Processing', total: '₹85.50' },
+        { id: '#ORD-7460', customer: 'Sarah Thomas', date: '14 Mar 2025', status: 'Shipped', total: '₹214.30' },
+        { id: '#ORD-7459', customer: 'Michael Davis', date: '13 Mar 2025', status: 'Pending', total: '₹59.99' },
     ];
 
     const topProducts = [
-        { name: 'Classic White T-Shirt', sold: 324, stock: 156, price: '$24.99' },
-        { name: 'Slim Fit Jeans', sold: 276, stock: 82, price: '$59.99' },
-        { name: 'Summer Floral Dress', sold: 198, stock: 43, price: '$45.50' },
-        { name: 'Casual Linen Blazer', sold: 182, stock: 27, price: '$89.99' },
+        { name: 'Classic White T-Shirt', sold: 324, stock: 156, price: '₹24.99' },
+        { name: 'Slim Fit Jeans', sold: 276, stock: 82, price: '₹59.99' },
+        { name: 'Summer Floral Dress', sold: 198, stock: 43, price: '₹45.50' },
+        { name: 'Casual Linen Blazer', sold: 182, stock: 27, price: '₹89.99' },
     ];
 
     const getStatusColor = (status) => {
@@ -76,8 +79,8 @@ useEffect(() => {
 }, [notificationOpen, profileOpen]);
     // Sample analytics data
     const salesData = {
-        today: '$3,245',
-        yesterday: '$2,890',
+        today: '₹3,245',
+        yesterday: '₹2,890',
         growth: '+12.3%'
     };
 
@@ -93,8 +96,10 @@ useEffect(() => {
         growth: '+50.0%'
     };
 
-    const lowStockItems = 12;
-    const pendingReturns = 5;
+    const lowStockItems = products.reduce((count, product) => {
+  const lowStockImages = product.images.filter(img => img.quantity <= 10);
+  return count + lowStockImages.length;
+}, 0);    const pendingReturns = 5;
     const notifications = 3;
 
     return (
@@ -319,7 +324,7 @@ useEffect(() => {
                 className="flex items-center space-x-2 focus:outline-none"
             >
                 <img
-                    src="/api/placeholder/32/32"
+                    src="https://avatar.iran.liara.run/public/boy?username=admin"
                     alt="User avatar"
                     className="w-8 h-8 rounded-full bg-gray-300 border-2 border-gray-200"
                 />
@@ -582,7 +587,7 @@ useEffect(() => {
         <Plus className="w-4 h-4 mr-2" /> Add Product
       </button>
     </div>
-    
+
     {showProductForm ? (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
         <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-screen overflow-y-auto">
@@ -602,77 +607,12 @@ useEffect(() => {
       </div>
     ) : (
       <div className="bg-white shadow-md rounded-lg overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Product
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Price
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Inventory
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Status
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {topProducts.map((product, index) => (
-                <tr key={index}>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <div className="flex-shrink-0 h-10 w-10 bg-gray-200 rounded-md"></div>
-                      <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-900">{product.name}</div>
-                        <div className="text-sm text-gray-500">ID: PROD-{1000 + index}</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{product.price}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{product.stock} in stock</div>
-                    <div className="text-sm text-gray-500">{product.sold} sold</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                      ${product.stock > 50 ? 'bg-green-100 text-green-800' : 
-                        product.stock > 10 ? 'bg-yellow-100 text-yellow-800' : 
-                        'bg-red-100 text-red-800'}`}>
-                      {product.stock > 50 ? 'In Stock' : 
-                        product.stock > 10 ? 'Low Stock' : 'Out of Stock'}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    <div className="flex space-x-2">
-                      <button className="text-blue-600 hover:text-blue-900">
-                        <Eye className="w-4 h-4" />
-                      </button>
-                      <button className="text-green-600 hover:text-green-900">
-                        <Edit className="w-4 h-4" />
-                      </button>
-                      <button className="text-red-600 hover:text-red-900">
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <ProductTable />
       </div>
     )}
   </div>
 )}
+
 
                             {activeTab === 'customers' && (
                                 <div>
