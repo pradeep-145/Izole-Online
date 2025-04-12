@@ -45,11 +45,11 @@ const ProductList = () => {
       <Navbar />
       
       {/* Hero Section */}
-      <div className="bg-wineRed text-white py-28">
+      <div className="bg-wineRed text-white py-20 relative overflow-hidden">
+
         <div className="container mx-auto px-4 text-mustard">
-          <h1 className="text-4xl font-bold mb-4">IZOLE</h1>
-          <p className="text-xl mb-6">Discover the latest trends in fashion with our new arrivals</p>
-          <button className="btn bg-mustard text-wineRed">Shop Now</button>
+          <h1 className="text-4xl font-bold mb-4 mt-4">IZOLE</h1>
+          <p className="text-xl mb-2">Discover the latest trends in fashion with our new arrivals</p>
         </div>
       </div>
       

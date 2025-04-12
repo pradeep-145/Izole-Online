@@ -28,7 +28,7 @@ const Wishlist = () => {
   const handleRemoveFromWishlist = async (productId) => {
     const result = await removeFromWishlist(productId);
     if (result.success) {
-      showNotification("Item removed from wishlist", "success");
+      showNotification(<span style={{ color: COLORS.darkGreen }}>"Item removed from wishlist"</span>, "success");
     } else {
       showNotification(result.error || "Failed to remove item", "error");
     }

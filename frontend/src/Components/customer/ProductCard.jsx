@@ -54,7 +54,7 @@ const ProductCard = ({ product }) => {
       <div className="p-4">
         <div className="flex justify-between">
           <h3 className="font-medium text-green-900">{product.name}</h3>
-          <span className="bg-yellow-100 text-green-900 px-2 py-1 text-xs rounded-full">
+          <span className="bg-mustard text-green-900 font-bold px-2 py-1 text-xs rounded-full">
             {product.images[0].color}
           </span>
         </div>
@@ -71,7 +71,7 @@ const ProductCard = ({ product }) => {
         <button
           onClick={handleAddToCart}
           disabled={product.images[0].quantity <= 0}
-          className="mt-3 w-full flex items-center justify-center px-4 py-2 bg-yellow-500 text-green-900 rounded-md hover:bg-yellow-400 disabled:bg-gray-300 disabled:text-gray-500"
+          className="mt-3 w-full flex items-center justify-center px-4 py-2 bg-mustard text-green-900 rounded-md hover:bg-mustard font-bold disabled:bg-gray-300 disabled:text-gray-500"
         >
           <ShoppingCart className="mr-2 h-4 w-4" />
           Add to Cart
