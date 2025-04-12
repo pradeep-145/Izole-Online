@@ -62,7 +62,7 @@ const AdminProductForm = () => {
     });
 
     const options = {
-      maxSizeMB: 1,
+      maxSizeMB: 3,
       maxWidthOrHeight: 1920,
       useWebWorker: true,
       onProgress: (percent) => {
