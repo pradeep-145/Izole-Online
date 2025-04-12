@@ -242,7 +242,7 @@ const Product = () => {
                 <img
                   src={image}
                   alt={`${product.name} in ${selectedColor}`}
-                  className="w-full h-96 object-cover rounded-lg shadow-md"
+                  className="w-full h-full object-contain rounded-lg shadow-md"
                 />
 
                 {/* Image navigation buttons */}

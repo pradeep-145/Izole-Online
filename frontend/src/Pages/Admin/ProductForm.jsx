@@ -46,7 +46,7 @@ const AdminProductForm = () => {
   const [compressionProgress, setCompressionProgress] = useState({ show: false, file: "", progress: 0 });
 
   // Available size options
-  const availableSizes = ["XS", "S", "M", "L", "XL", "XXL"];
+  const availableSizes = ["XS", "S", "M", "L", "XL", "XXL", "3XL", "4XL"];
 
   // Image compression function
   const compressImage = async (imageFile) => {

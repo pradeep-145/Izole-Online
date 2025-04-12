@@ -58,7 +58,7 @@ const ProductPreview = () => {
                         <img
                           src={previewImage}
                           alt={product.name}
-                          className="w-full h-auto object-cover rounded-md"
+                          className="w-full h-auto object-contain rounded-md"
                         />
                         {/* Optional badge */}
                         <span className="absolute top-4 left-4 bg-mustard text-wineRed px-3 py-1 rounded-full text-sm font-bold">

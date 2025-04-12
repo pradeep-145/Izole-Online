@@ -202,7 +202,7 @@ const Cart = () => {
                             <img
                               src={item.image}
                               alt={item.product.name}
-                              className="w-full h-full object-cover rounded-md"
+                              className="w-full h-full object-contain rounded-md"
                             />
                           </div>
                           <div className="flex flex-col justify-between">
