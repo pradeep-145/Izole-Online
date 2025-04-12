@@ -229,7 +229,7 @@ const Product = () => {
   }
 
   return (
-    <div className="bg-wineRed min-h-screen">
+    <div className="bg-[#F5F1E0] min-h-screen">
       <Navbar />
 
       <main className="max-w-6xl mx-auto pt-16 px-4 lg:px-0">
@@ -462,7 +462,7 @@ const Product = () => {
                   </button>
                   <input
                     type="text"
-                    className="w-full text-center border-0 focus:ring-0"
+                    className="w-full text-center border-0 bg-white text-black focus:ring-0"
                     value={itemCount}
                     readOnly
                   />

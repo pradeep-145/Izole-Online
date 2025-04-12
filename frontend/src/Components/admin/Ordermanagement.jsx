@@ -405,7 +405,7 @@ const handleBulkAction = (action) => {
     if (!currentOrder) return null;
     
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="fixed inset-0 bg-black bg-opacity-50 text-black flex items-center justify-center z-50">
         <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl mx-4">
           <div className="p-4 border-b flex justify-between items-center">
             <h3 className="text-lg font-medium">Shipment Details: {currentOrder.id}</h3>
@@ -561,7 +561,7 @@ const handleBulkAction = (action) => {
               <span className="text-gray-500">All Orders</span>
               <ShoppingBag size={18} className="text-gray-400" />
             </div>
-            <p className="text-2xl font-semibold mt-2">{getStatusCount('all')}</p>
+            <p className="text-2xl text-gray-500 font-semibold mt-2">{getStatusCount('all')}</p>
           </div>
           
           <div 
@@ -572,7 +572,7 @@ const handleBulkAction = (action) => {
               <span className="text-gray-500">Pending</span>
               <Clock size={18} className="text-yellow-500" />
             </div>
-            <p className="text-2xl font-semibold mt-2">{getStatusCount('pending')}</p>
+            <p className="text-2xl text-gray-500 font-semibold mt-2">{getStatusCount('pending')}</p>
           </div>
           
           <div 
@@ -583,7 +583,7 @@ const handleBulkAction = (action) => {
               <span className="text-gray-500">Processing</span>
               <TrendingUp size={18} className="text-blue-500" />
             </div>
-            <p className="text-2xl font-semibold mt-2">{getStatusCount('processing')}</p>
+            <p className="text-2xl text-gray-500 font-semibold mt-2">{getStatusCount('processing')}</p>
           </div>
           
           <div 
@@ -594,7 +594,7 @@ const handleBulkAction = (action) => {
               <span className="text-gray-500">Shipped</span>
               <Truck size={18} className="text-purple-500" />
             </div>
-            <p className="text-2xl font-semibold mt-2">{getStatusCount('shipped')}</p>
+            <p className="text-2xl text-gray-500 font-semibold mt-2">{getStatusCount('shipped')}</p>
           </div>
           
           <div 
@@ -605,7 +605,7 @@ const handleBulkAction = (action) => {
               <span className="text-gray-500">Delivered</span>
               <CheckCircle size={18} className="text-green-500" />
             </div>
-            <p className="text-2xl font-semibold mt-2">{getStatusCount('delivered')}</p>
+            <p className="text-2xl text-gray-500 font-semibold mt-2">{getStatusCount('delivered')}</p>
           </div>
           
           <div 
@@ -616,7 +616,7 @@ const handleBulkAction = (action) => {
               <span className="text-gray-500">Canceled</span>
               <AlertCircle size={18} className="text-red-500" />
             </div>
-            <p className="text-2xl font-semibold mt-2">{getStatusCount('canceled') + getStatusCount('returned')}</p>
+            <p className="text-2xl text-gray-500 font-semibold mt-2">{getStatusCount('canceled') + getStatusCount('returned')}</p>
           </div>
         </div>
         
@@ -631,7 +631,7 @@ const handleBulkAction = (action) => {
                 <input
                   type="text"
                   placeholder="Search orders..."
-                  className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  className="block w-full pl-10 pr-3 py-2 border text-black border-gray-300 rounded-md shadow-sm focus:outline-none bg-white focus:ring-blue-500 focus:border-blue-500"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />

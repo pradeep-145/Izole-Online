@@ -284,7 +284,7 @@ const Cart = () => {
                               );
                             }}
                             style={{ color: COLORS.darkGreen }}
-                            className="w-12 text-center border-0 focus:ring-0"
+                            className="w-12 text-center bg-white border-0 focus:ring-0"
                           />
                           <button
                             onClick={() => handleUpdateQuantity(
@@ -408,7 +408,7 @@ const Cart = () => {
                         borderTopRightRadius: 0,
                         borderBottomRightRadius: 0,
                       }}
-                      className="flex-grow px-3 py-2 border rounded-l-md focus:outline-none"
+                      className="flex-grow px-3 py-2 border rounded-l-md bg-white focus:outline-none"
                       value={promoCode}
                       onChange={(e) => setPromoCode(e.target.value)}
                       disabled={promoApplied}

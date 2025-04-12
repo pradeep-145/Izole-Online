@@ -6,24 +6,24 @@ const Contact = () => {
     name: "",
     email: "",
     subject: "",
-    message: ""
+    message: "",
   });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log("Form submitted:", formData);
-    
+
     // Reset form
     setFormData({
       name: "",
       email: "",
       subject: "",
-      message: ""
+      message: "",
     });
 
     alert("Thank you for your message! We'll get back to you soon.");
@@ -32,30 +32,50 @@ const Contact = () => {
   return (
     <div id="contact" className="text-mustard bg-wineRed py-24">
       <div className="container mx-auto px-4">
-        
         {/* Header */}
         <div className="text-center mb-16">
           <h2 className="text-5xl font-bold font-serif mb-4">Contact Us</h2>
           <div className="w-24 h-1 bg-mustard mx-auto mb-8"></div>
           <p className="text-xl max-w-3xl mx-auto">
-            We'd love to hear from you. Reach out with any questions, feedback, or inquiries.
+            We'd love to hear from you. Reach out with any questions, feedback,
+            or inquiries.
           </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          
           {/* Contact Information */}
           <div className="lg:col-span-1">
             <div className="bg-wineRed rounded-xl shadow-lg p-8 h-full">
               <h3 className="text-2xl font-bold mb-6">Get In Touch</h3>
-              
+
               <div className="space-y-6">
                 {[
-                  { icon: MapPin, title: "Our Location", details: "60/A, Sournapuri Layout, Kombai Thottam, Tirupur-4, Tamil Nadu, India" },
-                  { icon: Phone, title: "Phone Number", details: "+91 9994600337\n0421 4254969" },
-                  { icon: Mail, title: "Email Address", details: "izoleclothingcompany@gmail.com" },
-                  { icon: Instagram, title: "Social Media", details: "@izole_clothing_company" },
-                  { icon: Clock, title: "Business Hours", details: "Monday - Saturday: 9AM - 6PM\nSunday: Closed" }
+                  {
+                    icon: MapPin,
+                    title: "Our Location",
+                    details:
+                      "60/A, Sournapuri Layout, Kombai Thottam, Tirupur-4, Tamil Nadu, India",
+                  },
+                  {
+                    icon: Phone,
+                    title: "Phone Number",
+                    details: "+91 9994600337\n0421 4254969",
+                  },
+                  {
+                    icon: Mail,
+                    title: "Email Address",
+                    details: "izoleclothingcompany@gmail.com",
+                  },
+                  {
+                    icon: Instagram,
+                    title: "Social Media",
+                    details: "@izole_clothing_company",
+                  },
+                  {
+                    icon: Clock,
+                    title: "Business Hours",
+                    details: "Monday - Saturday: 9AM - 6PM\nSunday: Closed",
+                  },
                 ].map(({ icon: Icon, title, details }, idx) => (
                   <div key={idx} className="flex items-start gap-4">
                     <div className="bg-mustard p-3 rounded-full flex-shrink-0">
@@ -75,12 +95,14 @@ const Contact = () => {
           <div className="lg:col-span-2">
             <div className="bg-wineRed rounded-xl shadow-lg p-8">
               <h3 className="text-2xl font-bold mb-6">Send a Message</h3>
-              
+
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="form-control w-full">
                     <label className="label">
-                      <span className="label-text font-medium text-mustard">Your Name</span>
+                      <span className="label-text font-medium text-mustard">
+                        Your Name
+                      </span>
                     </label>
                     <input
                       type="text"
@@ -92,10 +114,12 @@ const Contact = () => {
                       required
                     />
                   </div>
-                  
+
                   <div className="form-control w-full">
                     <label className="label">
-                      <span className="label-text font-medium text-mustard">Email Address</span>
+                      <span className="label-text font-medium text-mustard">
+                        Email Address
+                      </span>
                     </label>
                     <input
                       type="email"
@@ -108,10 +132,12 @@ const Contact = () => {
                     />
                   </div>
                 </div>
-                
+
                 <div className="form-control w-full">
                   <label className="label">
-                    <span className="label-text font-medium text-mustard">Subject</span>
+                    <span className="label-text font-medium text-mustard">
+                      Subject
+                    </span>
                   </label>
                   <input
                     type="text"
@@ -123,10 +149,12 @@ const Contact = () => {
                     required
                   />
                 </div>
-                
+
                 <div className="form-control w-full">
                   <label className="label">
-                    <span className="label-text font-medium text-mustard">Message</span>
+                    <span className="label-text font-medium text-mustard">
+                      Message
+                    </span>
                   </label>
                   <textarea
                     name="message"
@@ -137,8 +165,11 @@ const Contact = () => {
                     required
                   ></textarea>
                 </div>
-                
-                <button type="submit" className="btn bg-mustard text-wineRed hover:bg-mustard/90 btn-lg gap-2 rounded-lg">
+
+                <button
+                  type="submit"
+                  className="btn bg-mustard text-wineRed hover:bg-mustard/90 btn-lg gap-2 rounded-lg"
+                >
                   Send Message <Send className="h-5 w-5" />
                 </button>
               </form>
@@ -154,13 +185,15 @@ const Contact = () => {
                 <MapPin className="h-6 w-6 mx-auto mb-4 text-wineRed" />
                 <h4 className="text-2xl font-bold mb-2">Visit Our Store</h4>
                 <p className="text-lg max-w-md mx-auto text-wineRed">
-                  Come visit our store at Sournapuri Layout, Tirupur. We're conveniently located near Kombai Thottam with ample parking space.
+                  Come visit our store at Sournapuri Layout, Tirupur. We're
+                  conveniently located near Kombai Thottam with ample parking
+                  space.
                 </p>
                 <div className="mt-6">
-                  <a 
-                    href="https://maps.app.goo.gl/C9sL4gRkUZVgSLRw6" 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
+                  <a
+                    href="https://maps.app.goo.gl/C9sL4gRkUZVgSLRw6"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="btn bg-wineRed text-mustard hover:bg-wineRed/90"
                   >
                     Get Directions
@@ -170,7 +203,6 @@ const Contact = () => {
             </div>
           </div>
         </div>
-
       </div>
     </div>
   );

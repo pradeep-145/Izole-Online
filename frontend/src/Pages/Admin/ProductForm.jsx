@@ -201,7 +201,7 @@ const AdminProductForm = () => {
   };
 
   return (
-    <div className="bg-gray-50 min-h-screen p-6">
+    <div className="bg-gray-50 min-h-screen text-black p-6">
       <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-md p-6">
         <div className="flex items-center border-b pb-4 mb-6">
           <Package className="h-6 w-6 text-blue-600 mr-3" />
@@ -222,7 +222,7 @@ const AdminProductForm = () => {
                   id="name"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border bg-white border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                    
                 />
               </div>
@@ -235,7 +235,7 @@ const AdminProductForm = () => {
                   id="category"
                   value={formData.category}
                   onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border bg-white border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                    
                 />
               </div>
@@ -249,7 +249,7 @@ const AdminProductForm = () => {
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 rows="3"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border textarea textarea-lg bg-white border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                  
               ></textarea>
             </div>
@@ -270,7 +270,7 @@ const AdminProductForm = () => {
                   id="color"
                   value={currentVariant.color}
                   onChange={(e) => setCurrentVariant({ ...currentVariant, color: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border bg-white border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="e.g., Black, Red, Blue"
                 />
               </div>
@@ -283,7 +283,7 @@ const AdminProductForm = () => {
                   id="quantity"
                   value={currentVariant.quantity}
                   onChange={(e) => setCurrentVariant({ ...currentVariant, quantity: parseInt(e.target.value) })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border bg-white border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   min="0"
                 />
               </div>
@@ -300,7 +300,7 @@ const AdminProductForm = () => {
                     id="price"
                     value={currentVariant.price}
                     onChange={(e) => setCurrentVariant({ ...currentVariant, price: parseFloat(e.target.value) })}
-                    className="w-full pl-7 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full pl-7 pr-3 py-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                     min="0"
                     step="0.01"
                      
@@ -324,7 +324,7 @@ const AdminProductForm = () => {
                     id="originalPrice"
                     value={currentVariant.originalPrice}
                     onChange={(e) => setCurrentVariant({ ...currentVariant, originalPrice: parseFloat(e.target.value) })}
-                    className="w-full pl-7 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full pl-7 pr-3 py-2 border border-gray-300 bg-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     min="0"
                     step="0.01"
                      
@@ -473,7 +473,7 @@ const AdminProductForm = () => {
               disabled={loading || productAdded || imageVariants.length === 0}
               className={`w-full flex items-center justify-center px-4 py-2 rounded-md text-white ${
                 (loading || productAdded || imageVariants.length === 0)
-                  ? "bg-gray-400 cursor-not-allowed"
+                  ? "bg-gray-400 hover:cursor-not-allowed"
                   : "bg-blue-600 hover:bg-blue-700"
               }`}
             >
