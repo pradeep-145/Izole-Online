@@ -54,6 +54,7 @@ const AdminProductForm = () => {
         "https://api.cloudinary.com/v1_1/dxuywp3zi/image/upload",
         formData
       );
+      console.log("Image uploaded to Cloudinary:", response.data.secure_url); 
       return response.data.secure_url;
     } catch (error) {
       console.error("Error uploading image to Cloudinary:", error);
