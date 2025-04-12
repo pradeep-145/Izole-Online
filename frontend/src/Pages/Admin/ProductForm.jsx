@@ -101,20 +101,20 @@ const AdminProductForm = () => {
       return null;
     }
     
-    // Check file size - Cloudinary has limits
-    if (image.size > 10 * 1024 * 1024) { // 10MB limit example
-      console.error("Image too large:", image.name, image.size);
+    // Compress image regardless of size
+    const processedImage = await compressImage(image);
+    
+    // Check compressed file size - Cloudinary has limits
+    if (processedImage.size > 10 * 1024 * 1024) { // 10MB limit after compression
+      console.error("Image still too large after compression:", processedImage.name, processedImage.size);
       return null;
     }
-    
-    // Compress image if needed
-    const processedImage = await compressImage(image);
     
     const formData = new FormData();
     formData.append("file", processedImage);
     formData.append("upload_preset", "preset1");
     formData.append("cloud_name", "dxuywp3zi");
-
+  
     // Implement retry logic
     let attempts = 0;
     const maxAttempts = 3;
