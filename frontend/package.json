@@ -12,6 +12,7 @@
   "dependencies": {
     "autoprefixer": "^10.4.20",
     "axios": "^1.8.2",
+    "browser-image-compression": "^2.0.2",
     "cloudinary": "^2.5.1",
     "daisyui": "^5.0.0",
     "frontend": "file:",
