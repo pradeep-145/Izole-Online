@@ -1,0 +1,42 @@
+service: izole-api
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  stage: ${opt:stage, 'dev'}
+  region: 'ap-south-1'
+  environment:
+    # Direct file references for key content
+    PRIVATE_KEY_CONTENT: ${file(./private.pem)}
+    PUBLIC_KEY_CONTENT: ${file(./public.pem)}
+    
+    # Load from .env file using dotenv plugin
+    MONGO_URI: ${env:MONGO_URI, ''}
+    JWT_SECRET: ${env:JWT_SECRET, ''}
+    PRIVATE_KEY: ${env:PRIVATE_KEY, ''}
+    PUBLIC_KEY: ${env:PUBLIC_KEY, ''}
+  deploymentBucket:
+    name: izole-deployment-bucket
+
+functions:
+  api:
+    handler: main.handler
+    events:
+      - httpApi:
+          path: /{proxy+}
+          method: any
+
+plugins:
+  - serverless-dotenv-plugin
+  - serverless-offline
+
+custom:
+  serverless-offline:
+    httpPort:1220
+  dotenv:
+    path: .env
+    include:
+      - MONGO_URI
+      - JWT_SECRET
+      - PRIVATE_KEY
+      - PUBLIC_KEY
