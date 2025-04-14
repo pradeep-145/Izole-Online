@@ -1,15 +1,34 @@
-service:  izole-api
+service: izole-api
 
 provider:
   name: aws
   runtime: nodejs18.x
-  region: ap-south-1 # Change to your preferred region
+  region: us-east-1  # Change to your preferred region
   memorySize: 512
   timeout: 30
+  environment:
+  # Direct file references for key content
+    PRIVATE_KEY_CONTENT: ${file(./private.pem)}
+    PUBLIC_KEY_CONTENT: ${file(./public.pem)}
+    
+    # Load from .env file using dotenv plugin
+    MONGO_URI: ${env:MONGO_URI, ''}
+    SECRET_KEY: ${env:SECRET_key, ''}
+    PRIVATE_KEY: ${env:PRIVATE_KEY, ''}
+    PUBLIC_KEY: ${env:PUBLIC_KEY, ''}
 
 functions:
   api:
-    name: 'izole-api-dev'
+    name: 'izole-api'
     image: ${env:ECR_IMAGE_URI}
     events:
       - httpApi: '*'
+custom:
+  
+  dotenv:
+    path: .env
+    include:
+      - MONGO_URI
+      - SECRET_KEY
+      - PRIVATE_KEY
+      - PUBLIC_KEY
