@@ -44,4 +44,6 @@ jobs:
       - name: Deploy to Lambda with Serverless
         env:
           ECR_IMAGE_URI: ${{ steps.build-image.outputs.image }}
-        run: serverless deploy
+        run: |
+          cd backend
+          serverless deploy
