@@ -8,15 +8,9 @@ provider:
   timeout: 30
   environment:
   # Direct file references for key content
-    PRIVATE_KEY_CONTENT: ${file(./private.pem)}
-    PUBLIC_KEY_CONTENT: ${file(./public.pem)}
-    
-    # Load from .env file using dotenv plugin
     MONGO_URI: ${env:MONGO_URI, ''}
     SECRET_KEY: ${env:SECRET_key, ''}
-    PRIVATE_KEY: ${env:PRIVATE_KEY, ''}
-    PUBLIC_KEY: ${env:PUBLIC_KEY, ''}
-
+    
 functions:
   api:
     name: 'izole-api'
@@ -30,5 +24,4 @@ custom:
     include:
       - MONGO_URI
       - SECRET_KEY
-      - PRIVATE_KEY
-      - PUBLIC_KEY
+   
