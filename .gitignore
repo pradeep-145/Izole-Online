@@ -13,7 +13,7 @@ dist-ssr
 *.local
 
 .env
-
+backend.zip
 private.pem
 public.pem
 # Editor directories and files
