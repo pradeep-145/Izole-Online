@@ -9,6 +9,7 @@ provider:
 
 functions:
   api:
+    name: 'izole-api-dev'
     image: ${env:ECR_IMAGE_URI}
     events:
       - httpApi: '*'
