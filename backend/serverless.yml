@@ -3,7 +3,7 @@ service:  izole-api
 provider:
   name: aws
   runtime: nodejs18.x
-  region: us-east-1  # Change to your preferred region
+  region: ap-south-1 # Change to your preferred region
   memorySize: 512
   timeout: 30
 
