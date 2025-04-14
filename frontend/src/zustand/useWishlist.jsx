@@ -74,7 +74,9 @@ export const useWishlist = create(
         set({ isLoading: true, error: null });
         console.log("Hello");
         try {
-          const response = await axios.get('/api/wishlist/get');
+          var response=null;
+          if(!response)
+          response = await axios.get('/api/wishlist/get');
           
           set({ wishlistItems: response.data.items || [], isLoading: false });
           return { success: true };

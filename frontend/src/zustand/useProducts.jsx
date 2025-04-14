@@ -18,7 +18,9 @@ export const useProduct = create(
         }
 
         try {
-          const response = await axios.get('/api/products/get-products');
+          var response = null;
+          if(!response)
+          response = await axios.get('/api/products/get-products');
           const data = await response.data;
           set({ 
             products: data.result,
