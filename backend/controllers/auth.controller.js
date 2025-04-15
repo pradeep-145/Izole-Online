@@ -48,7 +48,7 @@ const AuthController = {
             httpOnly: false, // Allow JavaScript access
             secure: true,
             sameSite: 'None',
-            domain: 'http://izole.s3-website.ap-south-1.amazonaws.com' // Use your actual domain - must include the CloudFront/S3 domain
+            domain: '.izole.s3-website.ap-south-1.amazonaws.com' // Use your actual domain - must include the CloudFront/S3 domain
           });
           res.json({
             message: "Login successful",
