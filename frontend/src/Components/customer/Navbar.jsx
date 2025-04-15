@@ -250,35 +250,6 @@ const Navbar = () => {
         {/* Search bar and user actions */}
         <div className="flex items-center gap-2">
           {/* Search button and dropdown */}
-          <div className="dropdown dropdown-end">
-            <button
-              onClick={() => setIsSearchOpen(!isSearchOpen)}
-              className="btn btn-ghost btn-circle"
-              aria-label="Search"
-            >
-              <Search className="h-5 w-5" />
-            </button>
-
-            {isSearchOpen && (
-              <div className="dropdown-content bg-[#F5F1E0] rounded-box mt-3 p-2 shadow w-72 md:w-96 absolute right-0">
-                <div className="join w-full gap-2">
-                  <input
-                    type="text"
-                    placeholder="Search products..."
-                    className="input input-bordered join-item bg-white flex-grow"
-                    autoFocus
-                  />
-                  <button className="btn join-item bg-[#1A3B2A]">
-                    <Search className="h-4 text-[#D6AF36] w-4" />
-                  </button>
-                </div>
-                <div className="mt-2 text-xs text-base-content/60">
-                  Popular: T-Shirts, Dresses, Jeans
-                </div>
-              </div>
-            )}
-          </div>
-
           {/* Wishlist */}
           {login && (
             <Link
