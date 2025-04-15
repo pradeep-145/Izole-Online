@@ -43,15 +43,11 @@ const AuthController = {
           const token = await JwtService.generateToken(payload);
           const { password: _, ...userWithoutPassword } = response.toObject();
 
-          res.cookie("jwt", token, {
-            maxAge: 150 * 24 * 60 * 60 * 1000,
-            httpOnly: true,
-            secure: true,
-          });
-
+          
           res.json({
             message: "Login successful",
-            authUser: userWithoutPassword,
+            authUser: userWithoutPassword, 
+            token:token
           });
         } else {
           res.status(400).json("Invalid Password");

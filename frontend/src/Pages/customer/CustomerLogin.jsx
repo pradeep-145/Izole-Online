@@ -13,13 +13,15 @@ const CustomerLogin = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     await axios
-      .post("/api/auth/sign-in", {
+      .post("https://izole-online.onrender.com/api/auth/sign-in", {
         username: formData.username,
         password: formData.password,
       })
       .then((res) => {
         console.log(res.data.authUser);
         localStorage.setItem("authUser", JSON.stringify(res.data.authUser));
+        console.log(res.data);
+        localStorage.setItem('token',res.data.token);
         if(res.data.authUser.isVerified){
 
           navigate("/");

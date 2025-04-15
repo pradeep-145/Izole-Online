@@ -17,7 +17,9 @@ export const useOrders = create((set, get) => ({
   fetchOrders: async () => {
     try {
       set({ isLoading: true });
-      const response = await axios.get('/api/orders');
+      const response = await axios.get('https://izole-online.onrender.com/api/orders',{
+        withCredentials:true
+      });
       set({ orders: response.data, isLoading: false });
     } catch (error) {
       set({ error: error.message, isLoading: false });
@@ -27,7 +29,9 @@ export const useOrders = create((set, get) => ({
   // Update order status
   updateOrderStatus: async (orderId, status) => {
     try {
-      const response = await axios.patch(`/api/orders/${orderId}/status`, { status });
+      const response = await axios.patch(`https://izole-online.onrender.com/api/orders/${orderId}/status`, { status },{
+        withCredentials:true
+      });
       if (response.data) {
         const updatedOrders = get().orders.map(order => 
           order._id === orderId ? { ...order, status } : order
@@ -42,7 +46,9 @@ export const useOrders = create((set, get) => ({
   // Update delivery status
   updateDeliveryStatus: async (orderId, delivery) => {
     try {
-      const response = await axios.patch(`/api/orders/${orderId}/delivery`, { delivery });
+      const response = await axios.patch(`https://izole-online.onrender.com/api/orders/${orderId}/delivery`, { delivery },{
+        withCredentials:true
+      });
       if (response.data) {
         const updatedOrders = get().orders.map(order => 
           order._id === orderId ? { ...order, delivery } : order

@@ -33,11 +33,16 @@ export const useCart = create(
         return { success: false, error: 'Not enough stock available' };
       }
 
-      await axios.put('/api/cart/update', {
+      await axios.put('https://izole-online.onrender.com/api/cart/update', {
         productId: item.product._id,
         color: item.color,
         size: item.size,
         quantity: updatedQuantity
+      },{
+        headers:{
+          Authorization:localStorage.getItem('token')
+        },
+        withCredentials:true
       });
 
       const updatedItems = [...cartItems];
@@ -46,7 +51,11 @@ export const useCart = create(
       
     } else {
       // If item is new, add it via API
-      const response = await axios.post('/api/cart/add', item);
+      const response = await axios.post('https://izole-online.onrender.com/api/cart/add', item,{
+        headers:{
+          Authorization:localStorage.getItem('token')
+        }, withCredentials:true
+      });
       set({ 
         cartItems: [...cartItems, response.data.item || item], 
         isLoading: false 
@@ -67,8 +76,12 @@ export const useCart = create(
         set({ isLoading: true, error: null });
         try {
           // First remove from backend
-          await axios.delete('/api/cart/remove', { 
+          await axios.delete('https://izole-online.onrender.com/api/cart/remove', { 
             data: { productId: itemId, color, size } 
+          },{
+            headers:{
+              Authorization:localStorage.getItem('token')
+            },withCredentials:true
           });
           
           // Then update local state
@@ -97,11 +110,16 @@ export const useCart = create(
         set({ isLoading: true, error: null });
         try {
           // First update on backend
-          await axios.put('/api/cart/update', {
+          await axios.put('https://izole-online.onrender.com/api/cart/update', {
             productId: itemId,
             color,
             size,
             quantity: newQuantity
+          },{
+            headers:{
+              Authorization:localStorage.getItem('token')
+            },
+            withCredentials:true
           });
           
           // Then update local state
@@ -129,7 +147,12 @@ export const useCart = create(
       fetchCart: async () => {
         set({ isLoading: true, error: null });
         try {
-          const response = await axios.get('/api/cart/get');
+          const response = await axios.get('https://izole-online.onrender.com/api/cart/get',{
+            headers:{
+              Authorization:localStorage.getItem('token')
+            },
+            withCredentials:true
+          });
           set({ cartItems: response.data.items || [], isLoading: false });
           return { success: true };
         } catch (error) {
@@ -145,7 +168,12 @@ export const useCart = create(
       clearCart: async () => {
         set({ isLoading: true, error: null });
         try {
-          await axios.delete('/api/cart/clear');
+          await axios.delete('https://izole-online.onrender.com/api/cart/clear',{
+            headers:{
+              Authorization:localStorage.getItem('token')
+            },
+            withCredentials:true
+          });
           set({ cartItems: [], isLoading: false });
           return { success: true };
         } catch (error) {

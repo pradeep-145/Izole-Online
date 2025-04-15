@@ -7,6 +7,7 @@ export default defineConfig({
   server:{
     proxy:{
       '/api':"https://izole-online.onrender.com"
+
     }
   }
 })

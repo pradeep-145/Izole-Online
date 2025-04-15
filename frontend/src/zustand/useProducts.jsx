@@ -18,7 +18,10 @@ export const useProduct = create(
         }
 
         try {
-          const response = await axios.get('/api/products/get-products');
+          var response = null;
+          if(!response)
+          response = await axios.get('https://izole-online.onrender.com/api/products/get-products',{
+        withCredentials:true});
           const data = await response.data;
           set({ 
             products: data.result,
