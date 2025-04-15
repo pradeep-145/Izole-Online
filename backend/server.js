@@ -15,7 +15,7 @@ require("dotenv").config();
 connectToDB().catch(err => console.error("Failed to connect to DB:", err));
 
 app.use(cors({
-  origin: 'http://izole.s3-website.ap-south-1.amazonaws.com/',
+  origin: 'http://izole.s3-website.ap-south-1.amazonaws.com',
   credentials: true
 }));
 app.use(cookieParser());
