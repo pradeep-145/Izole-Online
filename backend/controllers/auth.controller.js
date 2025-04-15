@@ -45,11 +45,11 @@ const AuthController = {
 
           res.cookie("jwt", token, {
             maxAge: 150 * 24 * 60 * 60 * 1000,
-            httpOnly: true,
+            httpOnly: false, // Allow JavaScript access
             secure: true,
-            sameSite:'None'
+            sameSite: 'None',
+            domain: 'http://izole.s3-website.ap-south-1.amazonaws.com' // Use your actual domain - must include the CloudFront/S3 domain
           });
-
           res.json({
             message: "Login successful",
             authUser: userWithoutPassword,
