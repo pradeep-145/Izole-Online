@@ -6,7 +6,7 @@ export default defineConfig({
   plugins: [react()],
   server:{
     proxy:{
-      '/api':"http://localhost:1220/"
+      '/api':"https://izole-online.onrender.com"
     }
   }
 })
