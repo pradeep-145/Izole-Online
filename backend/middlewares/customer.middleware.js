@@ -1,26 +1,34 @@
-const {JwtService} = require('../services/jwt.service.js')
+const { JwtService } = require('../services/jwt.service.js');
 const customerModel = require('../models/customer.model.js');
-const authenticateJWT=async (req,res,next)=>{
-    const token=req.cookies.jwt;
-    try {
-        if(!token){
-            throw new "token Not found"
-        }
-        const decoded = await JwtService.verifyToken(token);
-        if(!decoded){
-            throw new "Token Expired"
-        }
-        const user= await customerModel.find({_id:decoded.userId});
-        if(!user){
-            console.log(token)
-            throw new "User Not found";
-        }
 
-        req.user=decoded;
-        next();
-    } catch (error) {
-        res.status(401).json(error)
+const authenticateJWT = async (req, res, next) => {
+  try {
+    const authHeader = req.headers['authorization'];
+    
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      throw new Error('Authorization header missing or malformed');
     }
-}
 
-module.exports= authenticateJWT;
+    const token = authHeader.split(' ')[1];
+    if (!token) {
+      throw new Error('Token not found');
+    }
+
+    const decoded = await JwtService.verifyToken(token);
+    if (!decoded || !decoded.userId) {
+      throw new Error('Invalid or expired token');
+    }
+
+    const user = await customerModel.findById(decoded.userId);
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    req.user = decoded; // optionally you can attach the whole user object if needed
+    next();
+  } catch (error) {
+    res.status(401).json({ message: error.message || 'Unauthorized' });
+  }
+};
+
+module.exports = authenticateJWT;

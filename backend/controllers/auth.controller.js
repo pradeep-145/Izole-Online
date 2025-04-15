@@ -43,16 +43,11 @@ const AuthController = {
           const token = await JwtService.generateToken(payload);
           const { password: _, ...userWithoutPassword } = response.toObject();
 
-          res.cookie("jwt", token, {
-            maxAge: 150 * 24 * 60 * 60 * 1000,
-            httpOnly: false, // Allow JavaScript access
-            secure: true,
-            sameSite: 'None',
-            domain: '.izole.s3-website.ap-south-1.amazonaws.com' // Use your actual domain - must include the CloudFront/S3 domain
-          });
+          
           res.json({
             message: "Login successful",
-            authUser: userWithoutPassword,
+            authUser: userWithoutPassword, 
+            token:token
           });
         } else {
           res.status(400).json("Invalid Password");

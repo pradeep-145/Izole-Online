@@ -39,6 +39,9 @@ export const useCart = create(
         size: item.size,
         quantity: updatedQuantity
       },{
+        headers:{
+          Authorization:localStorage.getItem('token')
+        },
         withCredentials:true
       });
 
@@ -49,7 +52,9 @@ export const useCart = create(
     } else {
       // If item is new, add it via API
       const response = await axios.post('https://lcnfyb0s62.execute-api.ap-south-1.amazonaws.com/api/cart/add', item,{
-        withCredentials:true
+        headers:{
+          Authorization:localStorage.getItem('token')
+        }, withCredentials:true
       });
       set({ 
         cartItems: [...cartItems, response.data.item || item], 
@@ -74,7 +79,9 @@ export const useCart = create(
           await axios.delete('https://lcnfyb0s62.execute-api.ap-south-1.amazonaws.com/api/cart/remove', { 
             data: { productId: itemId, color, size } 
           },{
-            withCredentials:true
+            headers:{
+              Authorization:localStorage.getItem('token')
+            },withCredentials:true
           });
           
           // Then update local state
@@ -109,6 +116,9 @@ export const useCart = create(
             size,
             quantity: newQuantity
           },{
+            headers:{
+              Authorization:localStorage.getItem('token')
+            },
             withCredentials:true
           });
           
@@ -138,6 +148,9 @@ export const useCart = create(
         set({ isLoading: true, error: null });
         try {
           const response = await axios.get('https://lcnfyb0s62.execute-api.ap-south-1.amazonaws.com/api/cart/get',{
+            headers:{
+              Authorization:localStorage.getItem('token')
+            },
             withCredentials:true
           });
           set({ cartItems: response.data.items || [], isLoading: false });
@@ -156,6 +169,9 @@ export const useCart = create(
         set({ isLoading: true, error: null });
         try {
           await axios.delete('https://lcnfyb0s62.execute-api.ap-south-1.amazonaws.com/api/cart/clear',{
+            headers:{
+              Authorization:localStorage.getItem('token')
+            },
             withCredentials:true
           });
           set({ cartItems: [], isLoading: false });

@@ -20,6 +20,8 @@ const CustomerLogin = () => {
       .then((res) => {
         console.log(res.data.authUser);
         localStorage.setItem("authUser", JSON.stringify(res.data.authUser));
+        console.log(res.data);
+        localStorage.setItem('token',res.data.token);
         if(res.data.authUser.isVerified){
 
           navigate("/");

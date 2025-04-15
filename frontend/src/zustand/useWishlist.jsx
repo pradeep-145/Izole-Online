@@ -15,6 +15,9 @@ export const useWishlist = create(
         try {
           // First add to backend
           const response = await axios.post('https://lcnfyb0s62.execute-api.ap-south-1.amazonaws.com/api/wishlist/add', { productId: product._id },{
+            headers:{
+              Authorization:localStorage.getItem('token')
+            },
             withCredentials:true
           });
           
@@ -48,6 +51,9 @@ export const useWishlist = create(
           await axios.delete('https://lcnfyb0s62.execute-api.ap-south-1.amazonaws.com/api/wishlist/remove', { 
             data: { productId } 
           },{
+            headers:{
+              Authorization:localStorage.getItem('token')
+            },
             withCredentials:true
           });
           
@@ -81,6 +87,9 @@ export const useWishlist = create(
           var response=null;
           if(!response)
           response = await axios.get('https://lcnfyb0s62.execute-api.ap-south-1.amazonaws.com/api/wishlist/get',{
+            headers:{
+              Authorization:localStorage.getItem('token')
+            },
         withCredentials:true});
           
           set({ wishlistItems: response.data.items || [], isLoading: false });
@@ -99,6 +108,9 @@ export const useWishlist = create(
         set({ isLoading: true, error: null });
         try {
           await axios.delete('https://lcnfyb0s62.execute-api.ap-south-1.amazonaws.com/api/wishlist/clear',{
+            headers:{
+              Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
             withCredentials:true
           });
           set({ wishlistItems: [], isLoading: false });
