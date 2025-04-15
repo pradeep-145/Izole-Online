@@ -14,7 +14,9 @@ export const useWishlist = create(
         set({ isLoading: true, error: null });
         try {
           // First add to backend
-          const response = await axios.post('/api/wishlist/add', { productId: product._id });
+          const response = await axios.post('https://lcnfyb0s62.execute-api.ap-south-1.amazonaws.com/api/wishlist/add', { productId: product._id },{
+            withCredentials:true
+          });
           
           // Then update local state
           const { wishlistItems } = get();
@@ -43,8 +45,10 @@ export const useWishlist = create(
         set({ isLoading: true, error: null });
         try {
           // First remove from backend
-          await axios.delete('/api/wishlist/remove', { 
+          await axios.delete('https://lcnfyb0s62.execute-api.ap-south-1.amazonaws.com/api/wishlist/remove', { 
             data: { productId } 
+          },{
+            withCredentials:true
           });
           
           // Then update local state
@@ -76,7 +80,8 @@ export const useWishlist = create(
         try {
           var response=null;
           if(!response)
-          response = await axios.get('/api/wishlist/get');
+          response = await axios.get('https://lcnfyb0s62.execute-api.ap-south-1.amazonaws.com/api/wishlist/get',{
+        withCredentials:true});
           
           set({ wishlistItems: response.data.items || [], isLoading: false });
           return { success: true };
@@ -93,7 +98,9 @@ export const useWishlist = create(
       clearWishlist: async () => {
         set({ isLoading: true, error: null });
         try {
-          await axios.delete('/api/wishlist/clear');
+          await axios.delete('https://lcnfyb0s62.execute-api.ap-south-1.amazonaws.com/api/wishlist/clear',{
+            withCredentials:true
+          });
           set({ wishlistItems: [], isLoading: false });
           return { success: true };
         } catch (error) {

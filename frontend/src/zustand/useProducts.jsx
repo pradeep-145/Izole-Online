@@ -20,7 +20,8 @@ export const useProduct = create(
         try {
           var response = null;
           if(!response)
-          response = await axios.get('/api/products/get-products');
+          response = await axios.get('https://lcnfyb0s62.execute-api.ap-south-1.amazonaws.com/api/products/get-products',{
+        withCredentials:true});
           const data = await response.data;
           set({ 
             products: data.result,

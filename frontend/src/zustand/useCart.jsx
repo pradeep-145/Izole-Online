@@ -33,11 +33,13 @@ export const useCart = create(
         return { success: false, error: 'Not enough stock available' };
       }
 
-      await axios.put('/api/cart/update', {
+      await axios.put('https://lcnfyb0s62.execute-api.ap-south-1.amazonaws.com/api/cart/update', {
         productId: item.product._id,
         color: item.color,
         size: item.size,
         quantity: updatedQuantity
+      },{
+        withCredentials:true
       });
 
       const updatedItems = [...cartItems];
@@ -46,7 +48,9 @@ export const useCart = create(
       
     } else {
       // If item is new, add it via API
-      const response = await axios.post('/api/cart/add', item);
+      const response = await axios.post('https://lcnfyb0s62.execute-api.ap-south-1.amazonaws.com/api/cart/add', item,{
+        withCredentials:true
+      });
       set({ 
         cartItems: [...cartItems, response.data.item || item], 
         isLoading: false 
@@ -67,8 +71,10 @@ export const useCart = create(
         set({ isLoading: true, error: null });
         try {
           // First remove from backend
-          await axios.delete('/api/cart/remove', { 
+          await axios.delete('https://lcnfyb0s62.execute-api.ap-south-1.amazonaws.com/api/cart/remove', { 
             data: { productId: itemId, color, size } 
+          },{
+            withCredentials:true
           });
           
           // Then update local state
@@ -97,11 +103,13 @@ export const useCart = create(
         set({ isLoading: true, error: null });
         try {
           // First update on backend
-          await axios.put('/api/cart/update', {
+          await axios.put('https://lcnfyb0s62.execute-api.ap-south-1.amazonaws.com/api/cart/update', {
             productId: itemId,
             color,
             size,
             quantity: newQuantity
+          },{
+            withCredentials:true
           });
           
           // Then update local state
@@ -129,7 +137,9 @@ export const useCart = create(
       fetchCart: async () => {
         set({ isLoading: true, error: null });
         try {
-          const response = await axios.get('/api/cart/get');
+          const response = await axios.get('https://lcnfyb0s62.execute-api.ap-south-1.amazonaws.com/api/cart/get',{
+            withCredentials:true
+          });
           set({ cartItems: response.data.items || [], isLoading: false });
           return { success: true };
         } catch (error) {
@@ -145,7 +155,9 @@ export const useCart = create(
       clearCart: async () => {
         set({ isLoading: true, error: null });
         try {
-          await axios.delete('/api/cart/clear');
+          await axios.delete('https://lcnfyb0s62.execute-api.ap-south-1.amazonaws.com/api/cart/clear',{
+            withCredentials:true
+          });
           set({ cartItems: [], isLoading: false });
           return { success: true };
         } catch (error) {

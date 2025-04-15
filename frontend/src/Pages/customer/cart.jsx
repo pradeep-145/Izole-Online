@@ -68,10 +68,12 @@ const Cart = () => {
   const moveToWishlist = async (productId, color, size) => {
     try {
       // Add to wishlist API call
-      await axios.post('/api/wishlist/add', {
+      await axios.post('https://lcnfyb0s62.execute-api.ap-south-1.amazonaws.com/api/wishlist/add', {
         productId,
         color,
         size
+      },{
+        withCredentials:true
       });
       
       // Remove from cart

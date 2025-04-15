@@ -218,7 +218,9 @@ const AdminProductForm = () => {
       };
 
       console.log("Saving product data:", productData);
-      const response = await axios.post("/api/products/save", productData);
+      const response = await axios.post("https://lcnfyb0s62.execute-api.ap-south-1.amazonaws.com/api/products/save", productData,{
+        withCredentials:true
+      });
       
       setNotification({
         show: true,
