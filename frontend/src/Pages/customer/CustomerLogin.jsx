@@ -14,21 +14,25 @@ const CustomerLogin = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     await axios
-      .post("https://izole-online.onrender.com/api/auth/sign-in", {
+      .post("/api/auth/sign-in", {
         username: formData.username,
         password: formData.password,
       })
-      .then((res) => {
+      .then(async (res) => {
         console.log(res.data.authUser);
         localStorage.setItem("authUser", JSON.stringify(res.data.authUser));
-        console.log(res.data);
-        localStorage.setItem('token',res.data.token);
+        localStorage.setItem('token',res.data.token)
         if(res.data.authUser.isVerified){
-
           navigate("/");
         }
-        else
-        navigate('/customer/otp-verification')
+        else{
+
+          await axios.post('/api/auth/otp-verification', {
+            customerId: req.data.authUser._id,
+            email: req.data.authUser.email,
+          })
+          navigate('/customer/otp-verification')
+        }
       })
       .catch((err) => {
         console.log(err);

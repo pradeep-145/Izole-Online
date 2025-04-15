@@ -4,7 +4,7 @@ import AdminLogin from "./Pages/Admin/AdminLogin";
 import CustomerLogin from "./Pages/customer/CustomerLogin";
 import CustomerSignUp from "./Pages/customer/CustomerSignUp";
 import LandingPage from "./Pages/customer/LandingPage";
-import OtpVerification from "./Pages/customer/OtpVerification";
+import OtpVerification from "./Pages/customer/otpVerification";
 import ProductList from "./Pages/customer/ProductList";
 import CustomerLayout from "./Pages/customer/CustomerLayout";
 import AdminLayout from "./Pages/Admin/AdminLayout";
@@ -28,9 +28,12 @@ function App() {
       fetchProductsIfEmpty();
       initialized.current = true;
     }
-    fetchCart();
-    fetchWishlist()
+    if(localStorage.getItem('token')){
 
+      fetchCart();
+      fetchWishlist()
+    }
+      
   }, [fetchProductsIfEmpty,fetchCart,fetchWishlist]);
 
   return (
