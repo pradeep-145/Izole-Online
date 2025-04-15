@@ -13,7 +13,7 @@ const CustomerLogin = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     await axios
-      .post("https://lcnfyb0s62.execute-api.ap-south-1.amazonaws.com/api/auth/sign-in", {
+      .post("https://izole-online.onrender.com/api/auth/sign-in", {
         username: formData.username,
         password: formData.password,
       })

@@ -68,7 +68,7 @@ const Cart = () => {
   const moveToWishlist = async (productId, color, size) => {
     try {
       // Add to wishlist API call
-      await axios.post('https://lcnfyb0s62.execute-api.ap-south-1.amazonaws.com/api/wishlist/add', {
+      await axios.post('https://izole-online.onrender.com/api/wishlist/add', {
         productId,
         color,
         size

@@ -17,7 +17,7 @@ export const useOrders = create((set, get) => ({
   fetchOrders: async () => {
     try {
       set({ isLoading: true });
-      const response = await axios.get('https://lcnfyb0s62.execute-api.ap-south-1.amazonaws.com/api/orders',{
+      const response = await axios.get('https://izole-online.onrender.com/api/orders',{
         withCredentials:true
       });
       set({ orders: response.data, isLoading: false });
@@ -29,7 +29,7 @@ export const useOrders = create((set, get) => ({
   // Update order status
   updateOrderStatus: async (orderId, status) => {
     try {
-      const response = await axios.patch(`https://lcnfyb0s62.execute-api.ap-south-1.amazonaws.com/api/orders/${orderId}/status`, { status },{
+      const response = await axios.patch(`https://izole-online.onrender.com/api/orders/${orderId}/status`, { status },{
         withCredentials:true
       });
       if (response.data) {
@@ -46,7 +46,7 @@ export const useOrders = create((set, get) => ({
   // Update delivery status
   updateDeliveryStatus: async (orderId, delivery) => {
     try {
-      const response = await axios.patch(`https://lcnfyb0s62.execute-api.ap-south-1.amazonaws.com/api/orders/${orderId}/delivery`, { delivery },{
+      const response = await axios.patch(`https://izole-online.onrender.com/api/orders/${orderId}/delivery`, { delivery },{
         withCredentials:true
       });
       if (response.data) {

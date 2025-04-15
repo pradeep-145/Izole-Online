@@ -14,7 +14,7 @@ export const useWishlist = create(
         set({ isLoading: true, error: null });
         try {
           // First add to backend
-          const response = await axios.post('https://lcnfyb0s62.execute-api.ap-south-1.amazonaws.com/api/wishlist/add', { productId: product._id },{
+          const response = await axios.post('https://izole-online.onrender.com/api/wishlist/add', { productId: product._id },{
             headers:{
               Authorization:localStorage.getItem('token')
             },
@@ -48,7 +48,7 @@ export const useWishlist = create(
         set({ isLoading: true, error: null });
         try {
           // First remove from backend
-          await axios.delete('https://lcnfyb0s62.execute-api.ap-south-1.amazonaws.com/api/wishlist/remove', { 
+          await axios.delete('https://izole-online.onrender.com/api/wishlist/remove', { 
             data: { productId } 
           },{
             headers:{
@@ -86,7 +86,7 @@ export const useWishlist = create(
         try {
           var response=null;
           if(!response)
-          response = await axios.get('https://lcnfyb0s62.execute-api.ap-south-1.amazonaws.com/api/wishlist/get',{
+          response = await axios.get('https://izole-online.onrender.com/api/wishlist/get',{
             headers:{
               Authorization:localStorage.getItem('token')
             },
@@ -106,8 +106,9 @@ export const useWishlist = create(
       // Clear wishlist with API integration
       clearWishlist: async () => {
         set({ isLoading: true, error: null });
+        console.log(localStorage.getItem('token'));
         try {
-          await axios.delete('https://lcnfyb0s62.execute-api.ap-south-1.amazonaws.com/api/wishlist/clear',{
+          await axios.delete('https://izole-online.onrender.com/api/wishlist/clear',{
             headers:{
               Authorization: `Bearer ${localStorage.getItem('token')}`,
             },

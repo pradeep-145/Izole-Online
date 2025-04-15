@@ -37,7 +37,7 @@ const CustomerSignUp = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     await axios
-      .post("https://lcnfyb0s62.execute-api.ap-south-1.amazonaws.com/api/auth/sign-up", {
+      .post("https://izole-online.onrender.com/api/auth/sign-up", {
         username: formData.username,
         name: formData.name,
         email: formData.email,

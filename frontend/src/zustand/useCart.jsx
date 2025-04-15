@@ -33,7 +33,7 @@ export const useCart = create(
         return { success: false, error: 'Not enough stock available' };
       }
 
-      await axios.put('https://lcnfyb0s62.execute-api.ap-south-1.amazonaws.com/api/cart/update', {
+      await axios.put('https://izole-online.onrender.com/api/cart/update', {
         productId: item.product._id,
         color: item.color,
         size: item.size,
@@ -51,7 +51,7 @@ export const useCart = create(
       
     } else {
       // If item is new, add it via API
-      const response = await axios.post('https://lcnfyb0s62.execute-api.ap-south-1.amazonaws.com/api/cart/add', item,{
+      const response = await axios.post('https://izole-online.onrender.com/api/cart/add', item,{
         headers:{
           Authorization:localStorage.getItem('token')
         }, withCredentials:true
@@ -76,7 +76,7 @@ export const useCart = create(
         set({ isLoading: true, error: null });
         try {
           // First remove from backend
-          await axios.delete('https://lcnfyb0s62.execute-api.ap-south-1.amazonaws.com/api/cart/remove', { 
+          await axios.delete('https://izole-online.onrender.com/api/cart/remove', { 
             data: { productId: itemId, color, size } 
           },{
             headers:{
@@ -110,7 +110,7 @@ export const useCart = create(
         set({ isLoading: true, error: null });
         try {
           // First update on backend
-          await axios.put('https://lcnfyb0s62.execute-api.ap-south-1.amazonaws.com/api/cart/update', {
+          await axios.put('https://izole-online.onrender.com/api/cart/update', {
             productId: itemId,
             color,
             size,
@@ -147,7 +147,7 @@ export const useCart = create(
       fetchCart: async () => {
         set({ isLoading: true, error: null });
         try {
-          const response = await axios.get('https://lcnfyb0s62.execute-api.ap-south-1.amazonaws.com/api/cart/get',{
+          const response = await axios.get('https://izole-online.onrender.com/api/cart/get',{
             headers:{
               Authorization:localStorage.getItem('token')
             },
@@ -168,7 +168,7 @@ export const useCart = create(
       clearCart: async () => {
         set({ isLoading: true, error: null });
         try {
-          await axios.delete('https://lcnfyb0s62.execute-api.ap-south-1.amazonaws.com/api/cart/clear',{
+          await axios.delete('https://izole-online.onrender.com/api/cart/clear',{
             headers:{
               Authorization:localStorage.getItem('token')
             },
