@@ -26,8 +26,6 @@ app.use((req, res, next) => {
 connectToDB().catch(err => console.error("Failed to connect to DB:", err));
 
 app.use(cors({
-  origin: '*',
-  credentials: true
 }));
 app.use(cookieParser());
 app.use(express.json());
