@@ -11,11 +11,22 @@ const wishlistRoutes = require('./routes/wishlist.route.js');
 const app = express();
 require("dotenv").config();
 
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "http://izole.s3-website.ap-south-1.amazonaws.com");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.setHeader("Access-Control-Allow-Credentials", "true");
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(200);
+  }
+  next();
+});
+
 // Connect to DB at startup (will be invoked once per container)
 connectToDB().catch(err => console.error("Failed to connect to DB:", err));
 
 app.use(cors({
-  origin: 'http://izole.s3-website.ap-south-1.amazonaws.com',
+  origin: '*',
   credentials: true
 }));
 app.use(cookieParser());
