@@ -8,8 +8,8 @@ provider:
   timeout: 30
   environment:
   # Direct file references for key content
-    MONGO_URI: ${env:MONGO_URI, ''}
-    SECRET_KEY: ${env:SECRET_key, ''}
+    MONGO_URI: ${env:MONGO_URI}
+    SECRET_KEY: ${env:SECRET_KEY}
     
 functions:
   api:
