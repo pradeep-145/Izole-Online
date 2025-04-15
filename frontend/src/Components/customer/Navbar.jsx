@@ -52,6 +52,7 @@ const Navbar = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("authUser");
+    localStorage.removeItem("token");
     setLogin(null);
     navigate("/customer/login");
   };

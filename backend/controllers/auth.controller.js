@@ -61,12 +61,13 @@ const AuthController = {
     }
   },
   sendMail: async (req, res) => {
-    const { customerId,email } = req.body;
+    const { customerId, email } = req.body;
     const otp = crypto.randomInt(10 ** 5, 10 ** 6);
-    await otpModel.storeOTP(customerId,otp);
-    //nodemailer code
+  
+    await otpModel.storeOTP(customerId, otp);
+  
     const transporter = nodemailer.createTransport({
-      service: "gmail",
+      service: "gmail", 
       auth: {
         user: process.env.EMAIL,
         pass: process.env.PASSWORD,
@@ -81,16 +82,14 @@ const AuthController = {
       },
       (error, info) => {
         if (error) {
-          console.log("Error sending email:", error);
-          res.status(500).json("Error sending email");
+          console.error("Error sending email:", error);
+          return res.status(500).json({ error: "Failed to send email" });
         } else {
           console.log("Email sent:", info.response);
+          return res.status(200).json({ message: `Email sent to ${email}` });
         }
       }
     );
-    
-
-    res.status(200).json(`Email Sent to ${email}`);
   },
 
   confirmUser: async (req, res) => {

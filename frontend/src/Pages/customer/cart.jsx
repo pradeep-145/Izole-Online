@@ -68,12 +68,16 @@ const Cart = () => {
   const moveToWishlist = async (productId, color, size) => {
     try {
       // Add to wishlist API call
-      await axios.post('https://izole-online.onrender.com/api/wishlist/add', {
+      await axios.post('/api/wishlist/add', {
         productId,
         color,
         size
-      },{
-        withCredentials:true
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+          'Content-Type': 'application/json'
+        }
       });
       
       // Remove from cart

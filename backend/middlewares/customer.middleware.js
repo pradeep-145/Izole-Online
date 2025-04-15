@@ -3,10 +3,11 @@ const customerModel = require('../models/customer.model.js');
 
 const authenticateJWT = async (req, res, next) => {
   try {
+    console.log(req.headers);
     const authHeader = req.headers['authorization'];
-    
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      throw new Error('Authorization header missing or malformed');
+        throw new Error('Authorization header missing or malformed');
+
     }
 
     const token = authHeader.split(' ')[1];
