@@ -1,6 +1,7 @@
 import axios from "axios";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { ChevronLeft } from 'lucide-react';
 
 const CustomerLogin = () => {
   const [formData, setFormData] = useState({
@@ -37,9 +38,13 @@ const CustomerLogin = () => {
   return (
     <div className="hero bg-wineRed min-h-screen flex justify-center items-center">
       <div className="card bg-mustard w-full max-w-md shadow-2xl shadow-mustard/45 p-6 border border-mustard">
+        <div className="flex items-center gap-32">
+          <a href="/">
+        <ChevronLeft className="text-wineRed font-bold hover:bg-wineRed hover:text-mustard hover:rounded-md "/></a>
         <h1 className="text-3xl font-bold text-center text-wineRed mb-4">
           Login
         </h1>
+        </div>
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div className="form-control">
             <label className="label">
