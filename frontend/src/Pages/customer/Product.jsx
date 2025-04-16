@@ -14,6 +14,8 @@ import ReviewDialog from "../../Components/customer/ReviewDialog";
 import { useCart } from "../../zustand/useCart";
 import { useAuth } from "../../context/AuthContext";
 import { useWishlist } from "../../zustand/useWishlist";
+import axios from "axios";
+
 
 const Product = () => {
   const location = useLocation();
@@ -227,6 +229,11 @@ const Product = () => {
       </div>
     );
   }
+  const calculateAverageRating = (reviews) => {
+    if (!reviews || reviews.length === 0) return 0;
+    const sum = reviews.reduce((acc, review) => acc + review.rating, 0);
+    return (sum / reviews.length).toFixed(1);
+  };    
 
   return (
     <div className="bg-[#F5F1E0] min-h-screen">
@@ -319,9 +326,10 @@ const Product = () => {
               {/* Ratings */}
               <div className="flex items-center gap-2 mt-2">
                 <div className="flex">{renderStars(product.rating)}</div>
-                <span className="text-sm text-wineRed">
-                  {product.rating} ({product.reviewCount} review)
-                </span>
+                <span className="text-sm text-wineRed flex justify-center items-center gap-2">
+                 <Star className="inline-flex w-4 text-yellow-600 fill-yellow-500 "></Star> { calculateAverageRating(product.review)} ({product.review.length} review)
+                
+            </span>
               </div>
 
               {/* Price */}
@@ -594,7 +602,7 @@ const Product = () => {
               </div>
               <div className="flex mt-2">{renderStars(product.rating)}</div>
               <div className="mt-1 text-sm text-wineRed">
-                {product.reviewCount} reviews
+                {product.review.length} reviews
               </div>
             </div>
 
@@ -638,16 +646,19 @@ const Product = () => {
                 <div key={index} className="border-b pb-6 last:border-0">
                   <div className="flex justify-between items-start">
                     <div>
-                      <h3 className="font-medium text-wineRed">{review.name}</h3>
+                      <h3 className="font-medium text-wineRed">{review.customerName}</h3>
                       <div className="flex items-center mt-1">
                         <div className="flex">{renderStars(review.rating)}</div>
                         <span className="ml-2 text-sm text-wineRed">
-                          {review.date}
-                        </span>
+                          {new Date(review.createdAt).toLocaleDateString('en-US', { 
+  year: 'numeric',
+  month: 'long', 
+  day: 'numeric'
+})                        }</span>
                       </div>
                     </div>
                   </div>
-                  <div className="mt-4 text-wineRed">{review.comment}</div>
+                  <div className="mt-4 text-wineRed">{review.review}</div>
                   <div className="mt-4 flex gap-2">
                     <button className="text-sm text-wineRed hover:text-gray-700">
                       Helpful
@@ -683,8 +694,14 @@ const Product = () => {
         open={open}
         setOpen={setOpen}
         productName={product.name}
-        onSubmit={(reviewData) => {
+        onSubmit={async(reviewData) => {
           // Implement review submission
+          await axios.post('/api/products/add-review',{
+            productId: product._id,
+            review:reviewData.review,
+            rating:reviewData.rating,
+            customerName:authUser.username
+          })
           console.log("Review submitted:", reviewData);
           setOpen(false);
         }}

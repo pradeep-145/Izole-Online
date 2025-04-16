@@ -20,18 +20,18 @@ const CustomerLogin = () => {
       })
       .then(async (res) => {
         console.log(res.data.authUser);
-        localStorage.setItem("authUser", JSON.stringify(res.data.authUser));
-        localStorage.setItem('token',res.data.token)
         if(res.data.authUser.isVerified){
+          localStorage.setItem("authUser", JSON.stringify(res.data.authUser));
+          localStorage.setItem('token',res.data.token)
           navigate("/");
         }
         else{
-
-          await axios.post('/api/auth/otp-verification', {
-            customerId: req.data.authUser._id,
-            email: req.data.authUser.email,
-          })
-          navigate('/customer/otp-verification')
+          console.log("Hello")
+          // await axios.post('/api/auth/send-otp', {
+          //   customerId: res.data.authUser._id,
+          //   email: res.data.authUser.email,
+          // })
+          navigate('/customer/otp-verification',{state:{source:'login'}});
         }
       })
       .catch((err) => {
@@ -79,7 +79,9 @@ const CustomerLogin = () => {
             />
           </div>
           <div className="flex justify-between items-center">
-            <a className="link link-hover text-sm text-wineRed">
+            <a onClick={()=>{
+              navigate('/customer/otp-verification',{state:{source:'forgot-password'}})
+            }} className="link link-hover text-sm text-wineRed">
               Forgot password?
             </a>
           </div>

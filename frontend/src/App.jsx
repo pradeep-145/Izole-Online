@@ -41,7 +41,7 @@ function App() {
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={<Navigate to={'/customer'}/>} />
-
+        
         {/* Customer Routes */}
         <Route path="/customer" element={<CustomerLayout />}>
           <Route index element={<LandingPage />} /> 

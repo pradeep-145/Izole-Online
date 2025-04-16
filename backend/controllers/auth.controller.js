@@ -6,16 +6,20 @@ const nodemailer = require('nodemailer')
 
 const AuthController = {
   signUp: async (req, res) => {
-    const { username, password, email, phoneNumber, name } = req.body;
+    const { username, password, email,gender, phoneNumber, name } = req.body;
     console.log("Sign-up request received:", { username, email, phoneNumber });
 
     try {
+      const avatar=`https://avatar.iran.liara.run/public/${gender=='Male'?'boy':'girl'}?username=${username}`
       const response = await customerModel.create({
         username,
         password,
         email,
         phoneNumber,
-        name
+        gender,
+        name,
+        avatar
+        
       }
       );
       const { password: _, ...userWithoutPassword } = response.toObject();

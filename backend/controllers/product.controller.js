@@ -27,7 +27,7 @@ const ProductController = {
 
   getProducts: async (req, res) => {
     try {
-      const response = await Product.find({});
+      const response = await Product.find({}).populate('review');
       res.status(200).json({ result: response });
     } catch (error) {
       console.log("Error ar getProducts", error);
@@ -36,7 +36,7 @@ const ProductController = {
   },
   addReview: async (req, res) => {
     try {
-      const { productId, review } = req.body;
+      const { productId} = req.body;
       const product = await Product.findById(productId);
       const response = await reviewModel.create(req.body);
       if (response) {

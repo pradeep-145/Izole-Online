@@ -2,6 +2,10 @@ const mongoose = require("mongoose");
 
 const customerSchema = mongoose.Schema(
   {
+    avatar:{
+      type:String,
+
+    },
     username: {
       type: String,
       unique: true,
@@ -34,6 +38,10 @@ const customerSchema = mongoose.Schema(
       type:String,
 
     }],
+    gender:{
+      type:String,
+      enum:["Male","Female","Other"]
+    },
     expiresAt: {
       type: Date,
       default: Date.now,

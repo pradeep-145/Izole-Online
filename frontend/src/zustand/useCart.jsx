@@ -51,7 +51,13 @@ export const useCart = create(
       
     } else {
       // If item is new, add it via API
-      const response = await axios.post('/api/cart/add', item);
+      const response = await axios.post('/api/cart/add', item,{
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+          'Content-Type': 'application/json'
+        }
+
+      });
       set({ 
         cartItems: [...cartItems, response.data.item || item], 
         isLoading: false 

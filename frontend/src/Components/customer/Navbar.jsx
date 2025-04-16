@@ -7,6 +7,12 @@ import {
   Menu,
   X,
   ChevronDown,
+  Home,
+  SearchIcon,
+  UserCircle,
+  ShoppingBag,
+  Info,
+  Mail,
   Bell,
   Package,
   LogOut,
@@ -16,6 +22,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import logo from "../../assets/logo.jpg";
 import { useCart } from "../../zustand/useCart"; // Adjust the path according to your store location
 import { useWishlist } from "../../zustand/useWishlist";
+import { useAuth } from "../../context/AuthContext";
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -28,6 +35,7 @@ const Navbar = () => {
   );
   const [wishlistCount, setWishlistCount] = useState(wishlistItems.length);
   const [totalPrice, setTotalPrice] = useState(0);
+  const {authUser}= useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -44,6 +52,7 @@ const Navbar = () => {
   // Function to get cart data from localStorage
   useEffect(() => {
     console.log(cartCount);
+    console.log(authUser.avatar)
     setCartCount(cartItems.reduce((sum, item) => sum + item.quantity, 0));
   }, [cartItems]);
   useEffect(() => {
@@ -135,117 +144,116 @@ const Navbar = () => {
           </div>
         </div>
 
-        {isMobileMenuOpen && (
-          <div className="lg:hidden fixed inset-0 top-16 z-20 bg-base-100 p-4 overflow-y-auto">
-            <div className="flex flex-col space-y-2">
-              <Link
-                to="/customer"
-                className="btn btn-ghost justify-start"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                Home
-              </Link>
+       
+  <div className={`lg:hidden fixed inset-0 ${isMobileMenuOpen?'translate-y-[72px]':'-translate-y-[700px]'} z-50 bg-gradient-to-b from-green-50 to-yellow-50 h-96 p-4 overflow-y-auto transition-all duration-200 ease-in-out shadow-lg`}>
+    <div className="flex flex-col space-y-2 max-w-md mx-auto">
+      <Link
+        to="/customer"
+        className="btn bg-green-600 hover:bg-green-700 text-white justify-start rounded-lg py-3 transition-all duration-200"
+        onClick={() => setIsMobileMenuOpen(false)}
+      >
+        <Home className="h-5 w-5 mr-2" /> Home
+      </Link>
 
-              {/* Mobile categories dropdown */}
-              <div className="collapse collapse-arrow border-b border-base-300">
-                <input type="checkbox" />
-                <div className="collapse-title px-0 py-2 text-lg font-medium">
-                  Products
-                </div>
-                <div className="collapse-content px-0">
-                  <ul className="menu menu-sm">
-                    {categories.map((category) => (
-                      <li key={category.name}>
-                        <Link
-                          to={category.path}
-                          onClick={() => setIsMobileMenuOpen(false)}
-                        >
-                          {category.name}
-                        </Link>
-                      </li>
-                    ))}
-                    <li>
-                      <a
-                        href="/customer/products"
-                        className="font-medium"
-                        onClick={() => setIsMobileMenuOpen(false)}
-                      >
-                        View All Products
-                      </a>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-
+      {/* Mobile categories dropdown */}
+      <div className="collapse z-50 collapse-arrow border-b border-yellow-200">
+        <input type="checkbox" />
+        <div className="collapse-title px-0 py-3 text-lg font-medium text-green-800 flex items-center">
+          <ShoppingBag className="h-5 w-5 mr-2" /> Products
+        </div>
+        <div className="collapse-content px-0">
+          <ul className="menu menu-sm pl-2 space-y-1">
+            {categories.map((category) => (
+              <li key={category.name}>
+                <Link
+                  to={category.path}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="hover:bg-yellow-200 hover:text-green-800 rounded-md py-2 pl-4 transition-colors duration-200"
+                >
+                  {category.name}
+                </Link>
+              </li>
+            ))}
+            <li>
               <a
-                href
-                to="/customer#about"
-                className="btn btn-ghost justify-start"
+                href="/customer/products"
+                className="font-medium text-green-700 hover:bg-yellow-200 rounded-md py-2 pl-4 transition-colors duration-200"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
-                About
+                View All Products
               </a>
-              <a
-                href
-                to="/customer#contact"
-                className="btn btn-ghost justify-start"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                Contact
-              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
 
-              {/* Mobile user actions */}
-              {login && (
-                <>
-                  <div className="divider my-2"></div>
-                  <Link
-                    to="/customer/profile"
-                    className="btn btn-ghost justify-start"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    <User className="h-5 w-5 mr-2" /> My Profile
-                  </Link>
-                  <Link
-                    to="/customer/orders"
-                    className="btn btn-ghost justify-start"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    <Package className="h-5 w-5 mr-2" /> My Orders
-                  </Link>
-                  <Link
-                    to="/customer/wishlist"
-                    className="btn btn-ghost justify-start"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    <Heart className="h-5 w-5 mr-2" /> Wishlist
-                  </Link>
-                  <button
-                    onClick={() => {
-                      handleLogout();
-                      setIsMobileMenuOpen(false);
-                    }}
-                    className="btn btn-ghost justify-start"
-                  >
-                    <LogOut className="h-5 w-5 mr-2" /> Logout
-                  </button>
-                </>
-              )}
+      <Link
+        to="/customer#about"
+        className="btn bg-yellow-400 hover:bg-yellow-500 text-green-800 justify-start rounded-lg py-3 transition-all duration-200"
+        onClick={() => setIsMobileMenuOpen(false)}
+      >
+        <Info className="h-5 w-5 mr-2" /> About
+      </Link>
+      <Link
+        to="/customer#contact"
+        className="btn bg-yellow-400 hover:bg-yellow-500 text-green-800 justify-start rounded-lg py-3 transition-all duration-200"
+        onClick={() => setIsMobileMenuOpen(false)}
+      >
+        <Mail className="h-5 w-5 mr-2" /> Contact
+      </Link>
 
-              {login === null && (
-                <>
-                  <div className="divider my-2"></div>
-                  <Link
-                    to="/customer/login"
-                    className="btn btn-primary btn-block mt-4"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    Login / Sign Up
-                  </Link>
-                </>
-              )}
-            </div>
-          </div>
-        )}
+      {/* Mobile user actions */}
+      {login && (
+        <>
+          <div className="divider my-4 before:bg-green-200 after:bg-green-200"></div>
+          <Link
+            to="/customer/profile"
+            className="btn btn-outline border-green-600 text-green-700 hover:bg-green-100 justify-start rounded-lg py-3 transition-all duration-200"
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
+            <User className="h-5 w-5 mr-2" /> My Profile
+          </Link>
+          <Link
+            to="/customer/orders"
+            className="btn btn-outline border-green-600 text-green-700 hover:bg-green-100 justify-start rounded-lg py-3 transition-all duration-200"
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
+            <Package className="h-5 w-5 mr-2" /> My Orders
+          </Link>
+          <Link
+            to="/customer/wishlist"
+            className="btn btn-outline border-green-600 text-green-700 hover:bg-green-100 justify-start rounded-lg py-3 transition-all duration-200"
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
+            <Heart className="h-5 w-5 mr-2" /> Wishlist
+          </Link>
+          <button
+            onClick={() => {
+              handleLogout();
+              setIsMobileMenuOpen(false);
+            }}
+            className="btn btn-outline border-green-600 text-green-700 hover:bg-green-100 justify-start rounded-lg py-3 transition-all duration-200"
+          >
+            <LogOut className="h-5 w-5 mr-2" /> Logout
+          </button>
+        </>
+      )}
+
+      {login === null && (
+        <>
+          <div className="divider my-4 before:bg-green-200 after:bg-green-200"></div>
+          <Link
+            to="/customer/login"
+            className="btn bg-green-600 hover:bg-green-700 text-white btn-block mt-4 rounded-lg py-3 shadow-md hover:shadow-lg transition-all duration-200"
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
+            <LogIn className="h-5 w-5 mr-2" /> Login / Sign Up
+          </Link>
+        </>
+      )}
+    </div>
+    
+  </div>
 
         {/* Search bar and user actions */}
         <div className="flex items-center gap-2">
@@ -276,73 +284,95 @@ const Navbar = () => {
 
           {/* User Account */}
           {login && (
-            <div className="dropdown dropdown-end">
-              <div
-                tabIndex={0}
-                role="button"
-                className="btn btn-ghost btn-circle avatar"
-              >
-                <div className="w-10 rounded-full ring ring-[#1A3B2A] ring-offset-base-100 ring-offset-2">
-                  <img
-                    alt="User avatar"
-                    src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
-                  />
-                </div>
-              </div>
-              <ul
-                tabIndex={0}
-                className="menu menu-sm dropdown-content bg-[#1A3B2A] text-[#D6AF36] rounded-box z-30 mt-3 w-60 p-3 shadow-lg"
-              >
-                <li className="mb-2">
-                  <div className="flex flex-col hover:bg-transparent cursor-default">
-                    <span className="font-bold">Sarah Johnson</span>
-                    <span className="text-xs text-base-content/70">
-                      sarah.j@example.com
-                    </span>
-                  </div>
-                </li>
-                <div className="divider my-1"></div>
-                <li>
-                  <Link to="/customer/profile" className="flex gap-2">
-                    <User className="h-4 w-4" />
-                    Profile
-                    <span className="badge badge-[#1A3B2A] badge-sm ml-auto">
-                      New
-                    </span>
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/customer/orders" className="flex gap-2">
-                    <Package className="h-4 w-4" />
-                    My Orders
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/customer/wishlist" className="flex gap-2">
-                    <Heart className="h-4 w-4" />
-                    Wishlist
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/customer/notifications" className="flex gap-2">
-                    <Bell className="h-4 w-4" />
-                    Notifications
-                    <span className="badge badge-sm ml-auto">5</span>
-                  </Link>
-                </li>
-                <div className="divider my-1"></div>
-                <li>
-                  <button
-                    onClick={handleLogout}
-                    className="flex gap-2 text-error"
-                  >
-                    <LogOut className="h-4 w-4" />
-                    Logout
-                  </button>
-                </li>
-              </ul>
-            </div>
-          )}
+  <div className="dropdown dropdown-end">
+    <div
+      tabIndex={0}
+      role="button"
+      className="btn btn-ghost btn-circle avatar transition-all duration-200 hover:scale-105"
+    >
+      <div className="w-10 rounded-full ring ring-[#1A3B2A] ring-offset-base-100 ring-offset-2 hover:ring-[#D6AF36]">
+        <img
+          alt="User avatar"
+          src={authUser?.avatar}
+        />
+      </div>
+    </div>
+    <ul
+      tabIndex={0}
+      className="menu menu-sm dropdown-content bg-gradient-to-b from-[#1A3B2A] to-[#2a4d3a] text-[#D6AF36] rounded-xl z-30 mt-3 w-64 p-4 shadow-xl overflow-hidden"
+    >
+      <li className="mb-3">
+        <div className="flex flex-col hover:bg-transparent cursor-default px-2">
+          <span className="font-bold text-[#D6AF36] text-lg">{authUser.name}</span>
+          <span className="text-xs text-[#D6AF36]/80">
+            {authUser.email}
+          </span>
+        </div>
+      </li>
+      <div className="divider my-1 before:bg-[#D6AF36]/20 after:bg-[#D6AF36]/20"></div>
+      
+      <li>
+        <Link 
+          to="/customer/profile" 
+          className="flex gap-2 hover:bg-[#D6AF36]/10 rounded-lg transition-colors duration-200 mb-1"
+        >
+          <User className="h-4 w-4" />
+          Profile
+          <span className="badge bg-[#D6AF36] text-[#1A3B2A] border-none badge-sm ml-auto font-medium">
+            New
+          </span>
+        </Link>
+      </li>
+      <li>
+        <Link 
+          to="/customer/orders" 
+          className="flex gap-2 hover:bg-[#D6AF36]/10 rounded-lg transition-colors duration-200 mb-1"
+        >
+          <Package className="h-4 w-4" />
+          My Orders
+        </Link>
+      </li>
+      <li>
+        <Link 
+          to="/customer/wishlist" 
+          className="flex gap-2 hover:bg-[#D6AF36]/10 rounded-lg transition-colors duration-200 mb-1"
+        >
+          <Heart className="h-4 w-4" />
+          Wishlist
+        </Link>
+      </li>
+      <li>
+        <Link 
+          to="/customer/notifications" 
+          className="flex gap-2 hover:bg-[#D6AF36]/10 rounded-lg transition-colors duration-200 mb-1"
+        >
+          <Bell className="h-4 w-4" />
+          Notifications
+          <span className="badge bg-[#D6AF36] text-[#1A3B2A] border-none badge-sm ml-auto font-medium">5</span>
+        </Link>
+      </li>
+      
+      <div className="divider my-1 before:bg-[#D6AF36]/20 after:bg-[#D6AF36]/20"></div>
+      
+      <li>
+        <button
+          onClick={handleLogout}
+          className="flex gap-2 text-[#FF6B6B] hover:bg-[#FF6B6B]/10 rounded-lg transition-colors duration-200"
+        >
+          <LogOut className="h-4 w-4" />
+          Logout
+        </button>
+      </li>
+      
+      <div className="mt-3 pt-2 border-t border-[#D6AF36]/20">
+        <div className="flex justify-between items-center px-2">
+          <span className="text-xs text-[#D6AF36]/60">Last login: Today, 14:30</span>
+          <Link to="/customer/settings" className="text-xs text-[#D6AF36] hover:underline">Settings</Link>
+        </div>
+      </div>
+    </ul>
+  </div>
+)}
 
           {/* Login Button */}
           {login === null && (

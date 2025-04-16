@@ -16,9 +16,9 @@ const ReviewDialog = ({ open, setOpen, productName, onSubmit }) => {
     // Simulate an API call
     setTimeout(() => {
       const reviewData = {
-        productName,
-        rating,
-        reviewText,
+        
+        rating:rating,
+        review:reviewText,
       };
       onSubmit(reviewData);
       setIsSubmitting(false);
