@@ -16,6 +16,7 @@ import {
   Bell,
   Package,
   LogOut,
+  LogIn,
   ShoppingCartIcon,
 } from "lucide-react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
@@ -51,8 +52,6 @@ const Navbar = () => {
 
   // Function to get cart data from localStorage
   useEffect(() => {
-    console.log(cartCount);
-    console.log(authUser.avatar)
     setCartCount(cartItems.reduce((sum, item) => sum + item.quantity, 0));
   }, [cartItems]);
   useEffect(() => {
