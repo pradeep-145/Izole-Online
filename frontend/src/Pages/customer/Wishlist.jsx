@@ -21,9 +21,7 @@ const Wishlist = () => {
   const { addToCart } = useCart();
   const [notification, setNotification] = useState({ show: false, message: "", type: "" });
 
-  useEffect(() => {
-    fetchWishlist();
-  }, [fetchWishlist]);
+
 
   const handleRemoveFromWishlist = async (productId) => {
     const result = await removeFromWishlist(productId);
@@ -96,7 +94,7 @@ const Wishlist = () => {
         </div>
       )}
 
-      <main className="max-w-6xl mx-auto pt-20 px-4 lg:px-0">
+      <main className="max-w-6xl mx-auto pt-20 px-4 lg:px-0 scroll-p-0">
         <div className="flex justify-between items-center mb-8">
           <h1 style={{ color: COLORS.darkGreen }} className="text-2xl font-bold">My Wishlist</h1>
           <div className="flex items-center">
