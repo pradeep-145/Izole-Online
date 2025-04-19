@@ -19,23 +19,7 @@ import Cart from "./Pages/customer/cart";
 import Wishlist from "./Pages/customer/Wishlist";
 import { useWishlist } from "./zustand/useWishlist";
 function App() {
-  const fetchProductsIfEmpty = useProduct(state => state.fetchProductsIfEmpty);
-  const initialized = useRef(false);
-  const { fetchCart } = useCart();
-  const {fetchWishlist}=useWishlist()
-  useEffect(() => {
-    if (!initialized.current) {
-      fetchProductsIfEmpty();
-      initialized.current = true;
-    }
-    if(localStorage.getItem('token')){
-
-      fetchCart();
-      fetchWishlist()
-    }
-      
-  }, [fetchProductsIfEmpty,fetchCart,fetchWishlist]);
-
+  
   return (
     <Router>
       <Routes>

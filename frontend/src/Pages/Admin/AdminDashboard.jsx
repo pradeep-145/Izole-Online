@@ -107,7 +107,7 @@ useEffect(() => {
             {/* Sidebar */}
             <div className="hidden md:flex flex-col w-64 bg-white border-r border-gray-200">
                 <div className="flex items-center justify-center h-16 border-b border-gray-200">
-                    <h1 className="text-xl font-bold text-gray-800">FASHION ADMIN</h1>
+                    <h1 className="text-xl font-bold text-gray-800">IZOLE ADMIN</h1>
                 </div>
                 <div className="flex flex-col flex-1 overflow-y-auto">
                 <nav className="flex-1 px-2 py-4 space-y-1">

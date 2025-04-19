@@ -31,7 +31,6 @@ const Cart = () => {
     removeFromCart, 
     updateQuantity, 
     getCartTotal, 
-    fetchCart, 
     isLoading 
   } = useCart();
   
@@ -39,10 +38,6 @@ const Cart = () => {
   const [promoApplied, setPromoApplied] = useState(false);
   const [discount, setDiscount] = useState(0);
 
-  // Fetch cart data on component mount
-  useEffect(() => {
-    fetchCart();
-  }, [fetchCart]);
 
   // Calculate cart summary values
   const subtotal = getCartTotal();

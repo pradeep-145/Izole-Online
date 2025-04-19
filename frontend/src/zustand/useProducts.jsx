@@ -10,6 +10,7 @@ export const useProduct = create(
       setProducts: (products) => set({ products }),
       fetchProductsIfEmpty: async () => {
         // Get the persisted state
+        console.log("Product getting...")
         const state = get();
         
         // Check if we already have data in localStorage

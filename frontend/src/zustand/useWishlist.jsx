@@ -89,7 +89,7 @@ export const useWishlist = create(
               'Content-Type': 'application/json'
             }
           });
-          
+          console.log(response.data);
           set({ wishlistItems: response.data.items || [], isLoading: false });
           return { success: true };
         } catch (error) {
@@ -122,7 +122,7 @@ export const useWishlist = create(
         }
       },
 
-      logout:async()=>{
+      wishListLogout:async()=>{
         set({wishlistItems:[]})
       }
     }),

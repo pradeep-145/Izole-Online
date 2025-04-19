@@ -2,6 +2,9 @@ import axios from "axios";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from 'lucide-react';
+import { useAuth } from "../../context/AuthContext";
+import { useCart } from "../../zustand/useCart";
+import { useWishlist } from "../../zustand/useWishlist";
 
 const CustomerLogin = () => {
   const [formData, setFormData] = useState({
@@ -10,7 +13,9 @@ const CustomerLogin = () => {
   });
 
   const navigate = useNavigate();
-
+  const {fetchCart}=useCart()
+  const {fetchWishlist}=useWishlist()
+  const {setAuthUser} = useAuth()
   const handleSubmit = async (e) => {
     e.preventDefault();
     await axios
@@ -21,8 +26,11 @@ const CustomerLogin = () => {
       .then(async (res) => {
         console.log(res.data.authUser);
         if(res.data.authUser.isVerified){
-          localStorage.setItem("authUser", JSON.stringify(res.data.authUser));
-          localStorage.setItem('token',res.data.token)
+          await localStorage.setItem("authUser", JSON.stringify(res.data.authUser));
+          setAuthUser(res.data.authUser);
+          await localStorage.setItem('token',res.data.token)
+          fetchCart();
+          fetchWishlist();
           navigate("/");
         }
         else{

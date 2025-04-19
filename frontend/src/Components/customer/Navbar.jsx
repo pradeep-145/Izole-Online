@@ -41,7 +41,8 @@ const Navbar = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [categoryDropdownOpen, setCategoryDropdownOpen] = useState(false);
-
+  const {wishListLogout}=useWishlist();
+  const {cartLogout}=useCart()
   // Check if a navigation item is active
   const isActive = (path) => {
     return (
@@ -62,6 +63,9 @@ const Navbar = () => {
     localStorage.removeItem("authUser");
     localStorage.removeItem("token");
     setLogin(null);
+    wishListLogout();
+    cartLogout();
+
     navigate("/customer/login");
   };
 
@@ -115,31 +119,31 @@ const Navbar = () => {
               Home
             </Link>
 
-            <a
-              href="/customer/products"
+            <Link
+              to="/customer/products"
               className={`font-semibold ${
                 isActive("/customer/products") ? " font-bold" : ""
               }`}
             >
               Products
-            </a>
+            </Link>
 
-            <a
-              href="/customer#about"
+            <Link
+              to="/customer#about"
               className={` font-semibold ${
                 isActive("/customer/about") ? " font-bold" : ""
               }`}
             >
               About
-            </a>
-            <a
-              href="/customer#contact"
+            </Link>
+            <Link
+              to="/customer#contact"
               className={`font-semibold ${
                 isActive("/customer/contact") ? " font-bold" : ""
               }`}
             >
               Contact
-            </a>
+            </Link>
           </div>
         </div>
 
@@ -174,13 +178,13 @@ const Navbar = () => {
               </li>
             ))}
             <li>
-              <a
-                href="/customer/products"
+              <Link
+                to="/customer/products"
                 className="font-medium text-green-700 hover:bg-yellow-200 rounded-md py-2 pl-4 transition-colors duration-200"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 View All Products
-              </a>
+              </Link>
             </li>
           </ul>
         </div>

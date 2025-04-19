@@ -158,6 +158,8 @@ export const useCart = create(
               'Content-Type': 'application/json'
             }
           });
+
+          console.log(response.data)
           set({ cartItems: response.data.items || [], isLoading: false });
           return { success: true };
         } catch (error) {
@@ -196,7 +198,7 @@ export const useCart = create(
           return total + (item.price * item.quantity);
         }, 0);
       },
-      logout:async()=>{
+      cartLogout:async()=>{
         set({cartItems:[]})
       }
     }),
