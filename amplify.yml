@@ -1,17 +1,23 @@
 version: 1
-frontend:
-  appRoot: frontend       # ✅ Must be a string path to frontend
-  phases:
-    preBuild:
-      commands:
-        - npm install
-    build:
-      commands:
-        - npm run build
-  artifacts:
-    baseDirectory: dist   # or build, depending on your project
-    files:
-      - '**/*'
-  cache:
-    paths:
-      - node_modules/**    # If your frontend uses this
+applications:
+  - appRoot: frontend  # 👈 folder where your frontend app exists
+    frontend:
+      phases:
+        preBuild:
+          commands:
+            - npm ci
+        build:
+          commands:
+            - npm run build
+      artifacts:
+        baseDirectory: build  # 👈 Change to 'dist' if you're using Vite or Next.js static export
+        files:
+          - '**/*'
+      cache:
+        paths:
+          - node_modules/**
+
+    # Optional: if using a custom domain or environment variables
+    environment:
+      variables:
+        NODE_ENV: production
