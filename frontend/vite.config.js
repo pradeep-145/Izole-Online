@@ -7,7 +7,6 @@ export default defineConfig({
   server:{
     proxy:{
       '/api':"https://6wceq59nse.execute-api.ap-south-1.amazonaws.com/"
-
     }
   }
 })
