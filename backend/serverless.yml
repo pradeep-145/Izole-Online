@@ -7,49 +7,21 @@ provider:
   memorySize: 512
   timeout: 30
   environment:
+  # Direct file references for key content
     MONGO_URI: ${env:MONGO_URI}
     SECRET_KEY: ${env:SECRET_KEY}
     
-# Remove the original package section since esbuild will handle packaging
-# package:
-#   patterns:
-#     - '!node_modules/.cache/**'
-#     - '!.git/**'
-#     - '!.github/**'
-#     - '!tests/**'
-#     - 'node_modules/**' # Include node_modules
-#     - 'package-lock.json'
-
 functions:
   api:
-    # name: 'izole-api'
-    handler: main.handler
+    name: 'izole-api'
+    image: ${env:ECR_IMAGE_URI}
     events:
-      - http:
-          path: /{proxy+}
-          method: any
-
-plugins:
-  - serverless-esbuild
-  - serverless-dotenv-plugin  # Keep this if you were using it before
-
+      - httpApi: '*'
 custom:
+  
   dotenv:
     path: .env
     include:
       - MONGO_URI
       - SECRET_KEY
-  
-  # Add esbuild configuration
-  esbuild:
-    bundle: true
-    minify: false  # Set to true in production for smaller packages
-    sourcemap: false
-    exclude:
-      - aws-sdk  # AWS SDK is provided by Lambda
-    target: 'node18'
-    platform: 'node'
-    concurrency: 10
-    # If you have external modules that can't be bundled properly, list them here
-    # external:
-    #   - 'some-problematic-module'
+   

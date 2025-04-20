@@ -21,22 +21,32 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: 'ap-south-1'
+          
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
       
-      - name: Install dependencies
+      - name: Build, tag, and push image to Amazon ECR
+        id: build-image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY_NAME }}
+          IMAGE_TAG: ${{ github.sha }}
         run: |
-          cd backend
-          npm ci
-          npm install --save-dev serverless-esbuild esbuild
+          docker build -f backend/DockerFile -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG backend
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
       
       - name: Install Serverless Framework
         run: npm install -g serverless
       
-      - name: Package and deploy with Serverless
+      - name: Deploy to Lambda with Serverless
         env:
+          ECR_IMAGE_URI: ${{ steps.build-image.outputs.image }}
           SERVERLESS_ACCESS_KEY: ${{secrets.SERVERLESS_ACCESS_KEY}}
           MONGO_URI: ${{secrets.MONGO_URI}}
           SECRET_KEY: ${{secrets.SECRET_KEY}}
-          NODE_OPTIONS: "--max-old-space-size=16384"
         run: |
           cd backend
           serverless deploy
