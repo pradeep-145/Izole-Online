@@ -22,11 +22,12 @@ package:
 functions:
   api:
     name: 'izole-api'
-    image: ${env:ECR_IMAGE_URI}
+    handler: main.handler
     events:
-      - httpApi: '*'
+      - http:
+          path: /{proxy+}
+          method: any
 custom:
-  
   dotenv:
     path: .env
     include:
