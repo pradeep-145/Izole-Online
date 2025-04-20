@@ -22,7 +22,7 @@ provider:
 
 functions:
   api:
-    name: 'izole-api'
+    # name: 'izole-api'
     handler: main.handler
     events:
       - http:
