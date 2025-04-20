@@ -35,6 +35,7 @@ jobs:
           SERVERLESS_ACCESS_KEY: ${{secrets.SERVERLESS_ACCESS_KEY}}
           MONGO_URI: ${{secrets.MONGO_URI}}
           SECRET_KEY: ${{secrets.SECRET_KEY}}
+          NODE_OPTIONS: "--max-old-space-size=8192"
         run: |
           cd backend
           serverless deploy
