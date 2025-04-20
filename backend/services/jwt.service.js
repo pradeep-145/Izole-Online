@@ -11,10 +11,7 @@ exports.JwtService = {
     
     return token;
   },
-
   verifyToken: async (token) => {
-   
-
     const decoded = await jwt.verify(token, process.env.SECRET_KEY);
     
     return decoded;

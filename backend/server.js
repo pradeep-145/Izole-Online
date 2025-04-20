@@ -25,8 +25,7 @@ require("dotenv").config();
 // Connect to DB at startup (will be invoked once per container)
 connectToDB().catch(err => console.error("Failed to connect to DB:", err));
 
-app.use(cors({
-}));
+app.use(cors());
 app.use(cookieParser());
 app.use(express.json());
 

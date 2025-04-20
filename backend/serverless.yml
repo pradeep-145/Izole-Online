@@ -7,10 +7,18 @@ provider:
   memorySize: 512
   timeout: 30
   environment:
-  # Direct file references for key content
     MONGO_URI: ${env:MONGO_URI}
     SECRET_KEY: ${env:SECRET_KEY}
     
+package:
+  patterns:
+    - '!node_modules/.cache/**'
+    - '!.git/**'
+    - '!.github/**'
+    - '!tests/**'
+    - 'node_modules/**' # Include node_modules
+    - 'package-lock.json'
+
 functions:
   api:
     name: 'izole-api'
