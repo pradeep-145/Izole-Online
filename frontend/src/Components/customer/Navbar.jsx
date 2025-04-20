@@ -109,7 +109,7 @@ const Navbar = () => {
           {/* Desktop navigation */}
           <div className="hidden lg:flex items-center ml-12 space-x-10">
             <Link
-              to="/customer"
+              to="/"
               className={`font-semibold ${
                 isActive("/customer") && !isActive("/customer/products")
                   ? " font-bold"
