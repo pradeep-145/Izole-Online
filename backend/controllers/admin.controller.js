@@ -4,11 +4,11 @@ const customer=require('../models/customer.model.js')
 const adminController={
     get:async(req,res)=>{
         try{
-            const response=await orders.find({})
+            const orderResponse=await orders.find({})
             const productsResponse=await products.find({})
             const customerResponse=await customer.find({})
             res.status(200).json({
-                orders:response,
+                orders:orderResponse,
                 products:productsResponse,
                 customers:customerResponse
             })
@@ -26,7 +26,29 @@ const adminController={
             console.log("Error in admin update", error);
             res.status(500).json({error:"Internal server error"})
         }
-    }
+    }, saveProduct: async (req, res) => {
+        try {
+          const { name, description, price, quantity, images, category } = req.body;
+          console.log(req.body);
+    
+          const product = new Product({
+            name,
+            description,
+            price,
+            quantity,
+            images,
+            category,
+          });
+    
+          await product.save();
+          res
+            .status(200)
+            .json({ message: "Product added successfully", product: product });
+        } catch (error) {
+          console.log("Error at saveProduct", error);
+          res.status(500).json("Internal server Error");
+        }
+      },
 
 }
 

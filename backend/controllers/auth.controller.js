@@ -46,8 +46,9 @@ const AuthController = {
           };
           const token = await JwtService.generateToken(payload);
           const { password: _, ...userWithoutPassword } = response.toObject();
-
-          
+          res.setHeader('Set-Cookie', [
+            `jwt=${token}; HttpOnly; Path=/; SameSite=Lax`
+          ]);
           res.json({
             message: "Login successful",
             authUser: userWithoutPassword, 
