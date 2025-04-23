@@ -18,6 +18,8 @@ import { useRef } from "react";
 import Cart from "./Pages/customer/cart";
 import Wishlist from "./Pages/customer/Wishlist";
 import { useWishlist } from "./zustand/useWishlist";
+import ShippingStatus from "./Pages/customer/ShippingStatus";
+
 function App() {
   
   return (
@@ -37,6 +39,7 @@ function App() {
           <Route path='cart' element={<Cart/>}/>
           <Route path='checkout' element={<Checkout/>}/>
           <Route path='wishlist' element={<Wishlist />} />
+          <Route path='shipping-status' element={<ShippingStatus/>}/>
         </Route>
 
         {/* Admin Routes */}
