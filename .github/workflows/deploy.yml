@@ -2,7 +2,11 @@ name: Deploy to AWS Lambda
 
 on:
   push:
-    branches: [ abcd ]
+    branches: 
+      - main
+    paths:
+      - 'backend/**'
+
 
 jobs:
   deploy:
