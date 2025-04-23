@@ -7,7 +7,7 @@ const Home = () => {
   return (
     <div id="home">
       {/* Hero Section */}
-      <div className="relative min-h-screen md:py-20  overflow-hidden bg-wineRed text-mustard">
+      <div className="relative min-h-screen md:py-20 overflow-hidden bg-yellow-50 text-wineRed">
         <div className="container mx-auto relative z-10">
           <div className="flex flex-col lg:flex-row-reverse lg:gap-16 items-center justify-between">
             {/* Image Section */}
@@ -28,7 +28,7 @@ const Home = () => {
                 <a href="/customer/products" className="btn bg-mustard text-wineRed hover:bg-mustard/90">
                   Shop Now <ArrowRight className="h-5 w-5 ml-1" />
                 </a>
-                <a href="/customer/sign-up" className="btn border border-mustard text-mustard">
+                <a href="/customer/sign-up" className="btn border border-mustard bg-wineRed text-mustard">
                   Get Started
                 </a>
               </div>
@@ -60,7 +60,7 @@ const Home = () => {
           {/* </div>  */}
 
       {/* Highlights Section */}
-      <div className="bg-wineRed py-12 md:py-16 text-mustard">
+      <div className="bg-wineRed py-12 md:py-16 px-16">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6 md:gap-8">
             {[

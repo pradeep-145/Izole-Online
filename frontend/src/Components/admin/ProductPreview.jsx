@@ -34,7 +34,7 @@ const ProductPreview = () => {
   };
 
   return (
-    <div id="products" className="bg-wineRed text-mustard py-24">
+    <div id="products" className="bg-yellow-50 text-wineRed py-24">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <h2 className="text-5xl font-bold font-serif mb-4">Featured Products</h2>

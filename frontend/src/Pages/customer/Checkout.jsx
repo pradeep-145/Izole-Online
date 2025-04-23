@@ -168,7 +168,7 @@ const CheckoutPage = () => {
                           name="firstName" 
                           value={formData.firstName}
                           onChange={handleInputChange}
-                          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                          className="w-full px-4 py-2 border border-gray-300 bg-transparent text-wineRed rounded-md focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                           required 
                         />
                       </div>
@@ -179,7 +179,7 @@ const CheckoutPage = () => {
                           name="lastName" 
                           value={formData.lastName}
                           onChange={handleInputChange}
-                          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                          className="w-full px-4 py-2 border border-gray-300 bg-transparent text-wineRed rounded-md focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                           required 
                         />
                       </div>
@@ -192,7 +192,7 @@ const CheckoutPage = () => {
                         name="email" 
                         value={formData.email}
                         onChange={handleInputChange}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                        className="w-full px-4 py-2 border border-gray-300 bg-transparent text-wineRed rounded-md focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                         required 
                       />
                     </div>
@@ -204,7 +204,7 @@ const CheckoutPage = () => {
                         name="address" 
                         value={formData.address}
                         onChange={handleInputChange}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                        className="w-full px-4 py-2 border border-gray-300 bg-transparent text-wineRed rounded-md focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                         required 
                       />
                     </div>
@@ -217,7 +217,7 @@ const CheckoutPage = () => {
                           name="city" 
                           value={formData.city}
                           onChange={handleInputChange}
-                          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                          className="w-full px-4 py-2 border border-gray-300 bg-transparent text-wineRed rounded-md focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                           required 
                         />
                       </div>
@@ -228,7 +228,7 @@ const CheckoutPage = () => {
                           name="zipCode" 
                           value={formData.zipCode}
                           onChange={handleInputChange}
-                          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                          className="w-full px-4 py-2 border bg-transparent text-wineRed border-gray-300 rounded-md focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                           required 
                         />
                       </div>
@@ -265,7 +265,7 @@ const CheckoutPage = () => {
                                   <p>Qty: {item.quantity}</p>
                                   <p>Size: {item.size}</p>
                                 </div>
-                                <p className="font-medium">₹{(item.price * item.quantity).toFixed(2)}</p>
+                                <p className="font-medium text-gray-600">₹{(item.price * item.quantity).toFixed(2)}</p>
                               </div>
                             </div>
                           </div>
@@ -273,19 +273,19 @@ const CheckoutPage = () => {
                       </div>
                       
                       <div className="border-t border-gray-200 pt-4 space-y-2">
-                        <div className="flex justify-between">
-                          <span className="text-gray-600">Subtotal</span>
+                        <div className="flex justify-between text-gray-600">
+                          <span>Subtotal</span>
                           <span>₹{subtotal.toFixed(2)}</span>
                         </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-600">Shipping</span>
+                        <div className="flex justify-between text-gray-600">
+                          <span>Shipping</span>
                           <span>{shipping === 0 ? 'Free' : `₹${shipping.toFixed(2)}`}</span>
                         </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-600">Tax (18%)</span>
+                        <div className="flex justify-between text-gray-600">
+                          <span>Tax (18%)</span>
                           <span>₹{tax.toFixed(2)}</span>
                         </div>
-                        <div className="flex justify-between font-bold text-lg pt-2 border-t border-gray-200">
+                        <div className="flex text-black justify-between font-bold text-lg pt-2 border-t border-gray-200">
                           <span>Total</span>
                           <span>₹{total.toFixed(2)}</span>
                         </div>
@@ -295,7 +295,7 @@ const CheckoutPage = () => {
                         <button 
                           type="submit"
                           form="shipping-form"
-                          className="w-full py-3 bg-amber-400 text-gray-800 font-bold rounded-md hover:bg-amber-500 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 shadow-md flex items-center justify-center"
+                          className="w-full py-3 bg-mustard text-gray-800 font-bold rounded-md hover:bg-amber-500 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 shadow-md flex items-center justify-center"
                         >
                           <Lock className="mr-2 h-5 w-5" />
                           Proceed to Payment
@@ -336,7 +336,7 @@ const CheckoutPage = () => {
                 <ShoppingCart className="h-4 w-4 text-amber-500" />
               </div>
               <div>
-                <h3 className="font-medium">Free shipping on orders over ₹500</h3>
+                <h3 className="font-medium text-wineRed">Free shipping on orders over ₹500</h3>
                 <p className="text-sm text-gray-600">You've qualified for free shipping!</p>
               </div>
             </div>
@@ -346,7 +346,7 @@ const CheckoutPage = () => {
                 <Lock className="h-4 w-4 text-amber-500" />
               </div>
               <div>
-                <h3 className="font-medium">Secure checkout</h3>
+                <h3 className="font-medium text-wineRed">Secure checkout</h3>
                 <p className="text-sm text-gray-600">Your payment information is protected</p>
               </div>
             </div>
