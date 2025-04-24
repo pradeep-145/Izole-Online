@@ -48,9 +48,11 @@ jobs:
       - name: Deploy to Lambda with Serverless
         env:
           ECR_IMAGE_URI: ${{ steps.build-image.outputs.image }}
-          SERVERLESS_ACCESS_KEY: ${{secrets.SERVERLESS_ACCESS_KEY}}
-          MONGO_URI: ${{secrets.MONGO_URI}}
-          SECRET_KEY: ${{secrets.SECRET_KEY}}
+          SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
+          MONGO_URI: ${{ secrets.MONGO_URI }}
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          SCHEDULER_ROLE_ARN: ${{ secrets.SCHEDULER_ROLE_ARN }} # Add the scheduler role ARN
+          LAMBDA_ARN: ${{ secrets.LAMBDA_ARN }} # Add the Lambda ARN
         run: |
           cd backend
           serverless deploy

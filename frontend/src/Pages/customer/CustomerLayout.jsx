@@ -5,7 +5,7 @@ import { useCart } from '../../zustand/useCart';
 import { useWishlist } from '../../zustand/useWishlist';
 
 const CustomerLayout = () => {
-  const fetchProductsIfEmpty = useProduct(state => state.fetchProductsIfEmpty);
+  const {fetchProductsIfEmpty} = useProduct();
   const initialized = useRef(false);
   const { fetchCart } = useCart();
   const {fetchWishlist}=useWishlist()

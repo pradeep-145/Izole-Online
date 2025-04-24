@@ -21,7 +21,11 @@ const WishlistSchema = new Schema({
     }
   ]
 }, {
-  timestamps: true
+  timestamps: {
+    currentTime: () => new Date().toLocaleString('en-US', {
+      timeZone: 'Asia/Kolkata'
+    })
+  }
 });
 
 // Ensure each product only appears once per user's wishlist
