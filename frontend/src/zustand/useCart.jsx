@@ -199,6 +199,7 @@ export const useCart = create(
         }, 0);
       },
       cartLogout:async()=>{
+        console.log("cart logging out");
         set({cartItems:[]})
       }
     }),

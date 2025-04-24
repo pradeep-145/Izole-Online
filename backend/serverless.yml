@@ -6,22 +6,50 @@ provider:
   region: ap-south-1  # Change to your preferred region
   memorySize: 512
   timeout: 30
+  stage: dev  # Define the stage (e.g., dev, prod)
   environment:
-  # Direct file references for key content
     MONGO_URI: ${env:MONGO_URI}
     SECRET_KEY: ${env:SECRET_KEY}
-    
+   
+    SCHEDULER_ROLE_ARN: ${env:SCHEDULER_ROLE_ARN}
+    LAMBDA_ARN: ${env:LAMBDA_ARN}
+
 functions:
   api:
     name: 'izole-api'
     image: ${env:ECR_IMAGE_URI}
     events:
-      - httpApi: '*'
+      - httpApi: '*'  # API Gateway event
+
+resources:
+  Resources:
+    SchedulerRole:
+      Type: AWS::IAM::Role
+      Properties:
+        RoleName: ${self:service}-${self:provider.stage}-scheduler-role
+        AssumeRolePolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service: scheduler.amazonaws.com
+              Action: sts:AssumeRole
+        Policies:
+          - PolicyName: SchedulerInvokeLambda
+            PolicyDocument:
+              Version: '2012-10-17'
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - lambda:InvokeFunction
+                  Resource:
+                    - arn:aws:lambda:${self:provider.region}:*:function:${self:service}-${self:provider.stage}-api
+
 custom:
-  
   dotenv:
     path: .env
     include:
       - MONGO_URI
       - SECRET_KEY
-   
+      - SCHEDULER_ROLE_ARN
+      - LAMBDA_ARN

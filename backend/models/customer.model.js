@@ -4,7 +4,6 @@ const customerSchema = mongoose.Schema(
   {
     avatar:{
       type:String,
-
     },
     username: {
       type: String,
@@ -38,13 +37,17 @@ const customerSchema = mongoose.Schema(
       type:String,
 
     }],
+    orders:[{
+      type:mongoose.Schema.Types.ObjectId,
+      ref:"Order"
+    }],
     gender:{
       type:String,
       enum:["Male","Female","Other"]
     },
     expiresAt: {
       type: Date,
-      default: Date.now,
+      default:new Date( Date.now()),
       expires:10*24*60*60,
     },
   },

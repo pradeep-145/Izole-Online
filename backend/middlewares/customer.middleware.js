@@ -4,13 +4,13 @@ const customerModel = require('../models/customer.model.js');
 const authenticateJWT = async (req, res, next) => {
   try {
     console.log(req.headers);
-    const authHeader = req.headers['authorization'];
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    const authHeader = req.headers['cookie'];
+    if (!authHeader || !authHeader.startsWith('jwt')) {
         throw new Error('Authorization header missing or malformed');
 
     }
 
-    const token = authHeader.split(' ')[1];
+    const token = authHeader.split('=')[1];
     if (!token) {
       throw new Error('Token not found');
     }
@@ -21,6 +21,7 @@ const authenticateJWT = async (req, res, next) => {
     }
 
     const user = await customerModel.findById(decoded.userId);
+    console.log(user)
     if (!user) {
       throw new Error('User not found');
     }

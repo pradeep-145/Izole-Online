@@ -12,8 +12,6 @@ export const useProduct = create(
         // Get the persisted state
         console.log("Product getting...")
         const state = get();
-        
-        // Check if we already have data in localStorage
         if (state.isInitialized && state.products.length > 0) {
           return; // Exit if we already have data
         }
