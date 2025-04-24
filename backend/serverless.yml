@@ -6,6 +6,7 @@ provider:
   region: ap-south-1  # Change to your preferred region
   memorySize: 512
   timeout: 30
+  stage: dev  # Define the stage (e.g., dev, prod)
   environment:
     MONGO_URI: ${env:MONGO_URI}
     SECRET_KEY: ${env:SECRET_KEY}
@@ -21,14 +22,12 @@ functions:
     events:
       - httpApi: '*'  # API Gateway event
 
-  # No need to define a separate function for EventBridge since it's routed dynamically in the handler
-
 resources:
   Resources:
     SchedulerRole:
       Type: AWS::IAM::Role
       Properties:
-        RoleName: ${self:service}-scheduler-role
+        RoleName: ${self:service}-${self:provider.stage}-scheduler-role
         AssumeRolePolicyDocument:
           Version: '2012-10-17'
           Statement:
@@ -53,3 +52,7 @@ custom:
     include:
       - MONGO_URI
       - SECRET_KEY
+      - AWS_REGION
+      - SCHEDULER_ROLE_ARN
+      - LAMBDA_ARN
+      
