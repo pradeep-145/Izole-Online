@@ -13,7 +13,7 @@ const eventBridgeHandler = async (event) => {
         console.log(`Processing timeout for order: ${orderId}`);
         const response= await orderModel.findById(orderId);
         await orderModel.findByIdAndDelete(orderId); 
-        
+
     
     }
 
@@ -23,10 +23,10 @@ const eventBridgeHandler = async (event) => {
     };
 };
 
-// Main Lambda handler
+
 module.exports.handler = async (event, context) => {
-    // Check if the event is from API Gateway (HTTP request)
-    if (event.httpMethod) {
+    console.log('Lambda function invoked:', event);
+    if (event.routeKey=='$default') {
         return expressHandler(event, context);
     }
 

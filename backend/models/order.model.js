@@ -7,10 +7,10 @@ const Order = new mongoose.Schema(
       ref: "Product",
       required: true,
     },
-    color: {
-      type: String,
-      required: true,
-    },
+    // color: {
+    //   type: String,
+    //   required: true,
+    // },
     customerId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Customer",
