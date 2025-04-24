@@ -105,9 +105,9 @@ useEffect(() => {
     return (
         <div className="flex h-screen bg-gray-50">
             {/* Sidebar */}
-            <div className="hidden md:flex flex-col w-64 bg-white border-r border-gray-200">
+            <div className="hidden md:flex flex-col w-64 bg-yellow-50 border-r border-gray-200">
                 <div className="flex items-center justify-center h-16 border-b border-gray-200">
-                    <h1 className="text-xl font-bold text-gray-800">IZOLE ADMIN</h1>
+                    <h1 className="text-2xl font-bold text-black">IZOLE ADMIN</h1>
                 </div>
                 <div className="flex flex-col flex-1 overflow-y-auto">
                 <nav className="flex-1 px-2 py-4 space-y-1">
@@ -244,8 +244,7 @@ useEffect(() => {
             {/* Main Content */}
             <div className="flex-1 flex flex-col overflow-hidden">
                 {/* Top Bar */}
-                <header className="flex items-center justify-between h-16 px-6 bg-white border-b border-gray-200">
-    <h2 className="text-lg font-medium md:hidden">FASHION ADMIN</h2>
+                <header className="flex items-center justify-between h-16 px-6 bg-yellow-50 shadow-2xl border-gray-200">
     <div className="relative w-full max-w-md hidden md:block">
         <div className="absolute inset-y-0 left-0 flex items-center pl-3">
             <Search className="w-5 h-5 text-gray-400" />
@@ -435,8 +434,8 @@ useEffect(() => {
                                 </div>
 
                                 {/* Alert Cards */}
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
-                                    <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg flex items-center">
+                                <div className="flex flex-col gap-10 mb-6">
+                                    <div className="p-4 bg-yellow-100 border border-yellow-300 rounded-lg flex items-center">
                                         <div className="p-2 bg-yellow-100 rounded-full mr-4">
                                             <AlertCircle className="w-5 h-5 text-yellow-600" />
                                         </div>

@@ -447,7 +447,7 @@ const Product = () => {
                       className={`py-2 px-4 text-sm font-medium rounded-md border ${
                         selectedSize === size
                           ? "bg-wineRed text-mustard border-transparent"
-                          : "bg-white text-wineRed border-gray-300 hover:bg-wineRed"
+                          : "bg-white text-wineRed border-gray-300 hover:bg-wineRed hover:text-mustard"
                       }`}
                     >
                       {size}
