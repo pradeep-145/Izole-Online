@@ -17,7 +17,6 @@ provider:
 functions:
   api:
     name: 'izole-api'
-    handler: main.handler  # Main handler for both API Gateway and EventBridge
     image: ${env:ECR_IMAGE_URI}
     events:
       - httpApi: '*'  # API Gateway event
@@ -55,4 +54,3 @@ custom:
       - AWS_REGION
       - SCHEDULER_ROLE_ARN
       - LAMBDA_ARN
-      
