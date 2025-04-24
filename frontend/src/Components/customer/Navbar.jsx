@@ -381,7 +381,7 @@ const Navbar = () => {
           {login === null && (
             <Link
               to="/customer/login"
-              className="btn btn-wineRed btn-sm md:btn-md rounded-full"
+              className="btn btn-wineRed btn-sm md:btn-md rounded-3xl"
             >
               Login/SignUp
             </Link>

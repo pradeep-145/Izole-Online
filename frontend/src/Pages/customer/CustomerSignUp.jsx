@@ -56,8 +56,8 @@ const CustomerSignUp = () => {
   };
 
   return (
-    <div className="hero bg-wineRed min-h-screen flex justify-center items-center">
-      <div className="card bg-mustard w-full max-w-md shadow-2xl shadow-mustard/45 p-6 border border-mustard">
+    <div className="hero bg-yellow-50 min-h-screen flex justify-center items-center">
+      <div className="card bg-white w-full max-w-md shadow-xl p-6 border border-yellow-50">
       <div>
           <a href="/">
         <ArrowLeft className="text-wineRed font-bold hover:bg-wineRed hover:text-mustard hover:rounded-md "/></a>
@@ -73,7 +73,7 @@ const CustomerSignUp = () => {
             <input
               type="text"
               placeholder="Enter name"
-              className="input input-bordered w-full bg-mustard border border-wineRed text-wineRed placeholder:text-wineRed"
+              className="input input-bordered w-full border-yellow-300 focus:border-yellow-500 focus:ring focus:ring-yellow-200"
               onChange={(e) =>
                 setFormData({ ...formData, name: e.target.value })
               }
@@ -87,7 +87,7 @@ const CustomerSignUp = () => {
             <input
               type="text"
               placeholder="Enter username"
-              className="input input-bordered w-full bg-mustard border border-wineRed text-wineRed placeholder:text-wineRed"
+              className="input input-bordered w-full border-yellow-300 focus:border-yellow-500 focus:ring focus:ring-yellow-200"
               onChange={(e) =>
                 setFormData({ ...formData, username: e.target.value })
               }
@@ -101,7 +101,7 @@ const CustomerSignUp = () => {
             <input
               type="email"
               placeholder="Enter email"
-              className="input input-bordered w-full bg-mustard border border-wineRed text-wineRed placeholder:text-wineRed"
+              className="input input-bordered w-full border-yellow-300 focus:border-yellow-500 focus:ring focus:ring-yellow-200"
               onChange={(e) =>
                 setFormData({ ...formData, email: e.target.value })
               }
@@ -117,7 +117,7 @@ const CustomerSignUp = () => {
             <input
               type="number"
               placeholder="Enter phone number"
-              className="input input-bordered w-full bg-mustard border border-wineRed text-wineRed placeholder:text-wineRed"
+              className="input input-bordered w-full border-yellow-300 focus:border-yellow-500 focus:ring focus:ring-yellow-200"
               onChange={(e) =>
                 setFormData({ ...formData, phone: e.target.value })
               }
@@ -131,17 +131,17 @@ const CustomerSignUp = () => {
             <input
               type="password"
               placeholder="Enter password"
-              className="input input-bordered w-full bg-mustard border border-wineRed text-wineRed placeholder:text-wineRed"
+              className="input input-bordered w-full border-yellow-300 focus:border-yellow-500 focus:ring focus:ring-yellow-200"
               onChange={(e) =>
                 setFormData({ ...formData, password: e.target.value })
               }
               required
             />
           </div>
-
+              <br/>
           <button
             type="submit"
-            className="btn w-full mt-2 bg-wineRed text-mustard font-bold hover:bg-opacity-90"
+            className="btn w-full mt-2 rounded-lg bg-yellow-500 text-xl hover:bg-yellow-600 text-white font-bold hover:bg-opacity-90"
           >
             Sign Up
           </button>
@@ -149,7 +149,7 @@ const CustomerSignUp = () => {
             Already have an account?{" "}
             <a
               href="/customer/login"
-              className="link link-hover text-wineRed underline"
+              className="link link-hover font-bold text-wineRed underline"
             >
               Login
             </a>

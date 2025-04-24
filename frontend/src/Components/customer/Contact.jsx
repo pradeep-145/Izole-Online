@@ -30,7 +30,7 @@ const Contact = () => {
   };
 
   return (
-    <div id="contact" className="text-mustard bg-wineRed py-24">
+    <div id="contact" className="text-wineRed bg-white py-24">
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-16">
@@ -45,8 +45,8 @@ const Contact = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Contact Information */}
           <div className="lg:col-span-1">
-            <div className="bg-wineRed rounded-xl shadow-lg p-8 h-full">
-              <h3 className="text-2xl font-bold mb-6">Get In Touch</h3>
+            <div className="bg-white rounded-lg shadow-2xl p-8 h-full">
+              <h3 className="text-2xl text-black font-bold mb-6">Get In Touch</h3>
 
               <div className="space-y-6">
                 {[
@@ -81,7 +81,7 @@ const Contact = () => {
                     <div className="bg-mustard p-3 rounded-full flex-shrink-0">
                       <Icon className="h-6 w-6 text-wineRed" />
                     </div>
-                    <div>
+                    <div className="text-wineRed">
                       <h4 className="font-bold text-lg">{title}</h4>
                       <p className="whitespace-pre-line">{details}</p>
                     </div>
@@ -93,15 +93,15 @@ const Contact = () => {
 
           {/* Contact Form */}
           <div className="lg:col-span-2">
-            <div className="bg-wineRed rounded-xl shadow-lg p-8">
-              <h3 className="text-2xl font-bold mb-6">Send a Message</h3>
+            <div className="bg-white rounded-lg shadow-2xl p-8">
+              <h3 className="text-2xl text-black font-bold mb-6">Send a Message</h3>
 
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="form-control w-full">
                     <label className="label">
-                      <span className="label-text font-medium text-mustard">
-                        Your Name
+                    <span className="label-text font-semibold text-lg text-wineRed">
+                      Name
                       </span>
                     </label>
                     <input
@@ -110,14 +110,14 @@ const Contact = () => {
                       value={formData.name}
                       onChange={handleChange}
                       placeholder="Enter your name"
-                      className="input input-bordered w-full bg-wineRed border border-mustard placeholder:text-mustard focus:outline-none"
+                      className="input input-bordered text-white rounded-lg w-full border border-mustard focus:outline-none"
                       required
                     />
                   </div>
 
                   <div className="form-control w-full">
                     <label className="label">
-                      <span className="label-text font-medium text-mustard">
+                    <span className="label-text font-semibold text-lg text-wineRed">
                         Email Address
                       </span>
                     </label>
@@ -127,7 +127,7 @@ const Contact = () => {
                       value={formData.email}
                       onChange={handleChange}
                       placeholder="Enter your email"
-                      className="input input-bordered w-full bg-wineRed border border-mustard placeholder:text-mustard focus:outline-none"
+                      className="input input-bordered text-white rounded-lg w-full border border-mustard focus:outline-none"
                       required
                     />
                   </div>
@@ -135,8 +135,8 @@ const Contact = () => {
 
                 <div className="form-control w-full">
                   <label className="label">
-                    <span className="label-text font-medium text-mustard">
-                      Subject
+                  <span className="label-text font-semibold text-lg text-wineRed">
+                  Subject
                     </span>
                   </label>
                   <input
@@ -145,14 +145,14 @@ const Contact = () => {
                     value={formData.subject}
                     onChange={handleChange}
                     placeholder="How can we help you?"
-                    className="input input-bordered w-full bg-wineRed border border-mustard placeholder:text-mustard focus:outline-none"
+                    className="input input-bordered text-white rounded-lg w-full border border-mustard focus:outline-none"
                     required
                   />
                 </div>
 
                 <div className="form-control w-full">
                   <label className="label">
-                    <span className="label-text font-medium text-mustard">
+                    <span className="label-text font-semibold text-lg text-wineRed">
                       Message
                     </span>
                   </label>
@@ -161,14 +161,14 @@ const Contact = () => {
                     value={formData.message}
                     onChange={handleChange}
                     placeholder="Type your message here..."
-                    className="textarea textarea-bordered w-full h-32 bg-wineRed border border-mustard placeholder:text-mustard focus:outline-none"
+                    className="textarea textarea-bordered w-full h-32 border border-mustard text-white rounded-lg focus:outline-none"
                     required
                   ></textarea>
                 </div>
 
                 <button
                   type="submit"
-                  className="btn bg-mustard text-wineRed hover:bg-mustard/90 btn-lg gap-2 rounded-lg"
+                  className="btn bg-wineRed text-mustard hover:bg-mustard hover:text-wineRed btn-lg gap-2 rounded-lg"
                 >
                   Send Message <Send className="h-5 w-5" />
                 </button>

@@ -48,12 +48,12 @@ const CustomerLogin = () => {
   };
 
   return (
-    <div className="hero bg-wineRed min-h-screen flex justify-center items-center">
-      <div className="card bg-mustard w-full max-w-md shadow-2xl shadow-mustard/45 p-6 border border-mustard">
+    <div className="hero bg-yellow-50 min-h-screen flex justify-center items-center">
+      <div className="card bg-white border border-yellow-50 w-full max-w-md shadow-xl p-6">
         <div>
           <a href="/">
         <ArrowLeft className="text-wineRed font-bold hover:bg-wineRed hover:text-mustard hover:rounded-md "/></a>
-        <h1 className="text-3xl font-bold text-center text-wineRed mb-4">
+        <h1 className="text-4xl font-bold text-center text-black mb-4">
           Login
         </h1>
         </div>
@@ -65,7 +65,7 @@ const CustomerLogin = () => {
             <input
               type="text"
               placeholder="Enter username"
-              className="input input-bordered w-full bg-mustard border border-wineRed text-wineRed placeholder:text-wineRed"
+              className="input input-bordered w-full border-yellow-300 focus:border-yellow-500 focus:ring focus:ring-yellow-200"
               onChange={(e) =>
                 setFormData({ ...formData, username: e.target.value })
               }
@@ -79,29 +79,29 @@ const CustomerLogin = () => {
             <input
               type="password"
               placeholder="Enter password"
-              className="input input-bordered w-full bg-mustard border border-wineRed text-wineRed placeholder:text-wineRed"
+              className="input input-bordered w-full border-yellow-300 focus:border-yellow-500 focus:ring focus:ring-yellow-200"
               onChange={(e) =>
                 setFormData({ ...formData, password: e.target.value })
               }
               required
             />
           </div>
-          <div className="flex justify-between items-center">
+          <div className="flex justify-end items-center">
             <a onClick={()=>{
               navigate('/customer/otp-verification',{state:{source:'forgot-password'}})
-            }} className="link link-hover text-sm text-wineRed">
+            }} className="link link-hover text-sm font-semibold text-wineRed">
               Forgot password?
             </a>
           </div>
           <button
             type="submit"
-            className="btn w-full mt-2 bg-wineRed text-mustard font-bold hover:bg-opacity-90"
+            className="btn w-full mt-2 rounded-lg bg-yellow-500 text-xl hover:bg-yellow-600 text-white font-bold hover:bg-opacity-90"
           >
             Login
           </button>
           <p className="text-sm text-center mt-2 text-wineRed">
             Don't have an account?{" "}
-            <a href="/customer/sign-up" className="link link-hover text-wineRed underline">
+            <a href="/customer/sign-up" className="link link-hover text-wineRed font-bold underline">
               Sign Up
             </a>
           </p>

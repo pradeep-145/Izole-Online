@@ -441,11 +441,10 @@ const Cart = () => {
                 {/* Checkout button */}
                 <div className="mt-6">
                   <button
-                    style={{ 
-                      backgroundColor: COLORS.mustardGold, 
+                    style={{  
                       color: COLORS.darkGreen,
                     }}
-                    className="w-full px-6 py-3 rounded-md font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity"
+                    className="w-full px-6 py-3 rounded-md bg-mustard font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity"
                     onClick={proceedToCheckout}
                     disabled={cartItems.length === 0}
                   >
