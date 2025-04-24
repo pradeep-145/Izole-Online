@@ -3,7 +3,7 @@ const reviewModel = require("../models/review.model.js");
 const ProductController = {
   getProducts: async (req, res) => {
     try {
-      const response = await Product.find({}).populate('review');
+      const response = await Product.find({}).populate("review");
       res.status(200).json({ result: response });
     } catch (error) {
       console.log("Error ar getProducts", error);
@@ -12,7 +12,7 @@ const ProductController = {
   },
   addReview: async (req, res) => {
     try {
-      const { productId} = req.body;
+      const { productId } = req.body;
       const product = await Product.findById(productId);
       const response = await reviewModel.create(req.body);
       if (response) {
@@ -28,8 +28,17 @@ const ProductController = {
     }
   },
   getProduct: async (req, res) => {
-    const response = await Product.find({ "images._id": req.params.id });
-    res.json(response);
+    try {
+      // Updated to find by product ID instead of image ID
+      const response = await Product.findById(req.params.id).populate("review");
+      if (!response) {
+        return res.status(404).json({ message: "Product not found" });
+      }
+      res.json(response);
+    } catch (error) {
+      console.log("Error at getProduct", error);
+      res.status(500).json("Internal server Error");
+    }
   },
 };
 

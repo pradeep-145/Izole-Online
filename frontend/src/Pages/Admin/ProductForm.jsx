@@ -9,7 +9,8 @@ import {
   AlertCircle,
   Info,
   Check,
-  Edit
+  Edit,
+  ListPlus
 } from "lucide-react";
 
 // Import image compression library
@@ -25,15 +26,26 @@ const AdminProductForm = () => {
   const [imageVariants, setImageVariants] = useState([]);
   const [currentVariant, setCurrentVariant] = useState({
     color: "",
-    quantity: 0,
-    sizes: [],
     images: [],
-    price: "",
-    originalPrice: "",
+    sizeOptions: [],
+    details: []
   });
+
+  // State for edited size option
+  const [currentSizeOption, setCurrentSizeOption] = useState({
+    size: "",
+    quantity: 0,
+    price: "",
+    originalPrice: ""
+  });
+
+  // State for new detail
+  const [newDetail, setNewDetail] = useState("");
 
   // New state for editing variants
   const [editingVariantIndex, setEditingVariantIndex] = useState(null);
+  // State for editing specific size option within a variant
+  const [editingSizeOptionIndex, setEditingSizeOptionIndex] = useState(null);
 
   const [loading, setLoading] = useState(false);
   const [notification, setNotification] = useState({ 
@@ -198,11 +210,9 @@ const AdminProductForm = () => {
         if (uploadedImageLinks.length > 0) {
           processedVariants.push({
             color: variant.color,
-            quantity: variant.quantity,
-            image: uploadedImageLinks,
-            size: variant.sizes,
-            price: variant.price,
-            originalPrice: variant.originalPrice,
+            images: uploadedImageLinks,
+            sizeOptions: variant.sizeOptions,
+            details: variant.details || [],
           });
         }
       }
@@ -214,7 +224,7 @@ const AdminProductForm = () => {
 
       const productData = {
         ...formData,
-        images: processedVariants,
+        variants: processedVariants,
       };
 
       console.log("Saving product data:", productData);
@@ -251,15 +261,80 @@ const AdminProductForm = () => {
     }
   };
 
+  // Handle adding a product detail to the current variant
+  const handleAddDetail = () => {
+    if (!newDetail.trim()) return;
+    
+    setCurrentVariant({
+      ...currentVariant,
+      details: [...(currentVariant.details || []), newDetail.trim()]
+    });
+    setNewDetail("");
+  };
+
+  // Handle removing a detail from the current variant
+  const handleRemoveDetail = (index) => {
+    const updatedDetails = [...(currentVariant.details || [])];
+    updatedDetails.splice(index, 1);
+    setCurrentVariant({
+      ...currentVariant,
+      details: updatedDetails
+    });
+  };
+
+  // Handle adding or updating a size option
+  const handleAddSizeOption = () => {
+    if (!currentSizeOption.size || currentSizeOption.quantity <= 0 || !currentSizeOption.price || !currentSizeOption.originalPrice) return;
+    
+    if (editingSizeOptionIndex !== null) {
+      // Update existing size option
+      const updatedSizeOptions = [...currentVariant.sizeOptions];
+      updatedSizeOptions[editingSizeOptionIndex] = { ...currentSizeOption };
+      setCurrentVariant({
+        ...currentVariant,
+        sizeOptions: updatedSizeOptions
+      });
+      setEditingSizeOptionIndex(null);
+    } else {
+      // Add new size option
+      setCurrentVariant({
+        ...currentVariant,
+        sizeOptions: [...currentVariant.sizeOptions, { ...currentSizeOption }]
+      });
+    }
+
+    // Reset current size option
+    setCurrentSizeOption({
+      size: "",
+      quantity: 0,
+      price: "",
+      originalPrice: ""
+    });
+  };
+
+  // Handle editing a size option
+  const handleEditSizeOption = (index) => {
+    const sizeOptionToEdit = currentVariant.sizeOptions[index];
+    setCurrentSizeOption({ ...sizeOptionToEdit });
+    setEditingSizeOptionIndex(index);
+  };
+
+  // Handle removing a size option
+  const handleRemoveSizeOption = (index) => {
+    const updatedSizeOptions = [...currentVariant.sizeOptions];
+    updatedSizeOptions.splice(index, 1);
+    setCurrentVariant({
+      ...currentVariant,
+      sizeOptions: updatedSizeOptions
+    });
+  };
+
   const handleAddVariant = (e) => {
     e.preventDefault();
     
     // Validate current variant
     if (!currentVariant.color || 
-        currentVariant.quantity <= 0 || 
-        currentVariant.sizes.length === 0 ||
-        !currentVariant.price ||
-        !currentVariant.originalPrice ||
+        currentVariant.sizeOptions.length === 0 ||
         currentVariant.images.length === 0) return;
 
     if (editingVariantIndex !== null) {
@@ -282,28 +357,27 @@ const AdminProductForm = () => {
     // Reset current variant
     setCurrentVariant({
       color: "",
-      quantity: 0,
-      sizes: [],
       images: [],
-      price: "",
-      originalPrice: "",
+      sizeOptions: [],
+      details: []
     });
+    
+    // Reset current size option
+    setCurrentSizeOption({
+      size: "",
+      quantity: 0,
+      price: "",
+      originalPrice: ""
+    });
+    
+    // Reset editing states
+    setEditingSizeOptionIndex(null);
   };
 
   const handleEditVariant = (index) => {
     const variantToEdit = imageVariants[index];
     setCurrentVariant({ ...variantToEdit });
     setEditingVariantIndex(index);
-  };
-
-  const handleToggleSize = (selectedSize) => {
-    const currentSizes = currentVariant.sizes;
-    setCurrentVariant({
-      ...currentVariant,
-      sizes: currentSizes.includes(selectedSize)
-        ? currentSizes.filter(s => s !== selectedSize)
-        : [...currentSizes, selectedSize]
-    });
   };
 
   const handleAddImage = async (e) => {
@@ -430,156 +504,262 @@ const AdminProductForm = () => {
           <div className="bg-gray-50 p-4 rounded-md">
             <h2 className="text-lg font-medium text-gray-800 mb-4">Product Variants</h2>
             
-            {/* Variant Input Form */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-              <div>
-                <label htmlFor="color" className="block text-sm font-medium text-gray-700 mb-1">
-                  Color*
+            {/* Variant Color Input */}
+            <div className="mb-4">
+              <label htmlFor="color" className="block text-sm font-medium text-gray-700 mb-1">
+                Color*
+              </label>
+              <input
+                type="text"
+                id="color"
+                value={currentVariant.color}
+                onChange={(e) => setCurrentVariant({ ...currentVariant, color: e.target.value })}
+                className="w-full px-3 py-2 border bg-white border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="e.g., Black, Red, Blue"
+              />
+            </div>
+            
+            {/* Image Upload Section */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Upload Images*
+              </label>
+              <div className="flex items-center">
+                <label
+                  htmlFor="variant-images"
+                  className="cursor-pointer flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200"
+                >
+                  <Upload className="h-4 w-4 mr-2" />
+                  Select Images
                 </label>
+                <input
+                  id="variant-images"
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleAddImage}
+                />
+              </div>
+              
+              {/* Image Preview */}
+              {currentVariant.images.length > 0 && (
+                <div className="mt-3">
+                  <p className="text-sm font-medium text-gray-700 mb-2">
+                    Selected Images ({currentVariant.images.length})
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {currentVariant.images.map((img, imgIndex) => (
+                      <div key={imgIndex} className="relative w-20 h-20">
+                        <img
+                          src={typeof img === 'string' ? img : URL.createObjectURL(img)}
+                          alt={`Variant image ${imgIndex}`}
+                          className="w-full h-full object-cover rounded-md"
+                          onError={(e) => {
+                            console.error("Image failed to load", img);
+                            e.target.src = "https://via.placeholder.com/80?text=Error";
+                          }}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveImage(imgIndex)}
+                          className="absolute -top-1 -right-1 bg-red-600 text-white rounded-full p-0.5 hover:bg-red-700"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                        {!(typeof img === 'string') && (
+                          <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-60 text-white text-xs p-0.5 text-center">
+                            {(img.size / (1024 * 1024)).toFixed(1)}MB
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+            
+            {/* Product Details Section */}
+            <div className="mb-4">
+              <h3 className="text-sm font-medium text-gray-700 mb-2">Product Details (Optional)</h3>
+              <div className="flex items-center space-x-2 mb-2">
                 <input
                   type="text"
-                  id="color"
-                  value={currentVariant.color}
-                  onChange={(e) => setCurrentVariant({ ...currentVariant, color: e.target.value })}
-                  className="w-full px-3 py-2 border bg-white border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="e.g., Black, Red, Blue"
+                  value={newDetail}
+                  onChange={(e) => setNewDetail(e.target.value)}
+                  className="flex-1 px-3 py-2 border bg-white border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Add product detail or feature"
+                  onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddDetail())}
                 />
+                <button
+                  type="button"
+                  onClick={handleAddDetail}
+                  className="px-3 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 focus:outline-none"
+                >
+                  <Plus className="h-4 w-4" />
+                </button>
               </div>
-              <div>
-                <label htmlFor="quantity" className="block text-sm font-medium text-gray-700 mb-1">
-                  Quantity*
-                </label>
-                <input
-                  type="number"
-                  id="quantity"
-                  value={currentVariant.quantity}
-                  onChange={(e) => setCurrentVariant({ ...currentVariant, quantity: parseInt(e.target.value) })}
-                  className="w-full px-3 py-2 border bg-white border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  min="0"
-                />
-              </div>
-              <div>
-                <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-1">
-                  Price*
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <span className="text-gray-500">₹</span>
-                  </div>
-                  <input
-                    type="number"
-                    id="price"
-                    value={currentVariant.price}
-                    onChange={(e) => setCurrentVariant({ ...currentVariant, price: parseFloat(e.target.value) })}
-                    className="w-full pl-7 pr-3 py-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    min="0"
-                    step="0.01"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Additional Variant Details */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-              <div>
-                <label htmlFor="originalPrice" className="block text-sm font-medium text-gray-700 mb-1">
-                  Original Price*
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <span className="text-gray-500">₹</span>
-                  </div>
-                  <input
-                    type="number"
-                    id="originalPrice"
-                    value={currentVariant.originalPrice}
-                    onChange={(e) => setCurrentVariant({ ...currentVariant, originalPrice: parseFloat(e.target.value) })}
-                    className="w-full pl-7 pr-3 py-2 border border-gray-300 bg-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    min="0"
-                    step="0.01"
-                  />
-                </div>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Available Sizes*
-                </label>
-                <div className="flex flex-wrap gap-2">
-                  {availableSizes.map((sizeOption) => (
-                    <button
-                      key={sizeOption}
-                      type="button"
-                      onClick={() => handleToggleSize(sizeOption)}
-                      className={`px-3 py-1 rounded-md text-sm font-medium ${
-                        currentVariant.sizes.includes(sizeOption)
-                          ? "bg-blue-600 text-white"
-                          : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                      }`}
-                    >
-                      {sizeOption}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Upload Images*
-                </label>
-                <div className="flex items-center">
-                  <label
-                    htmlFor="variant-images"
-                    className="cursor-pointer flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200"
-                  >
-                    <Upload className="h-4 w-4 mr-2" />
-                    Select Images
-                  </label>
-                  <input
-                    id="variant-images"
-                    type="file"
-                    multiple
-                    accept="image/*"
-                    className="hidden"
-                    onChange={handleAddImage}
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Image Preview */}
-            {currentVariant.images.length > 0 && (
-              <div className="mt-3">
-                <p className="text-sm font-medium text-gray-700 mb-2">
-                  Selected Images ({currentVariant.images.length})
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {currentVariant.images.map((img, imgIndex) => (
-                    <div key={imgIndex} className="relative w-20 h-20">
-                      <img
-                        src={typeof img === 'string' ? img : URL.createObjectURL(img)}
-                        alt={`Variant image ${imgIndex}`}
-                        className="w-full h-full object-cover rounded-md"
-                        onError={(e) => {
-                          console.error("Image failed to load", img);
-                          e.target.src = "https://via.placeholder.com/80?text=Error";
-                        }}
-                      />
+              
+              {currentVariant.details && currentVariant.details.length > 0 && (
+                <div className="mt-2 space-y-1">
+                  {currentVariant.details.map((detail, index) => (
+                    <div key={index} className="flex items-center justify-between py-1 px-3 bg-gray-50 rounded">
+                      <span className="text-sm">{detail}</span>
                       <button
                         type="button"
-                        onClick={() => handleRemoveImage(imgIndex)}
-                        className="absolute -top-1 -right-1 bg-red-600 text-white rounded-full p-0.5 hover:bg-red-700"
+                        onClick={() => handleRemoveDetail(index)}
+                        className="text-red-500 hover:text-red-700"
                       >
-                        <X className="h-3 w-3" />
+                        <X className="h-4 w-4" />
                       </button>
-                      {!(typeof img === 'string') && (
-                        <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-60 text-white text-xs p-0.5 text-center">
-                          {(img.size / (1024 * 1024)).toFixed(1)}MB
-                        </div>
-                      )}
                     </div>
                   ))}
                 </div>
+              )}
+            </div>
+            
+            {/* Size Options Section */}
+            <div className="bg-gray-100 p-4 rounded-md mb-4">
+              <h3 className="text-sm font-medium text-gray-700 mb-3">Size Options*</h3>
+              
+              {/* Size Option Form */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-3">
+                <div>
+                  <label htmlFor="size" className="block text-xs font-medium text-gray-700 mb-1">
+                    Size*
+                  </label>
+                  <select
+                    id="size"
+                    value={currentSizeOption.size}
+                    onChange={(e) => setCurrentSizeOption({ ...currentSizeOption, size: e.target.value })}
+                    className="w-full px-3 py-2 border bg-white border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                  >
+                    <option value="">Select size</option>
+                    {availableSizes.map((size) => (
+                      <option key={size} value={size}>{size}</option>
+                    ))}
+                  </select>
+                </div>
+                
+                <div>
+                  <label htmlFor="quantity" className="block text-xs font-medium text-gray-700 mb-1">
+                    Quantity*
+                  </label>
+                  <input
+                    type="number"
+                    id="quantity"
+                    value={currentSizeOption.quantity}
+                    onChange={(e) => setCurrentSizeOption({ ...currentSizeOption, quantity: parseInt(e.target.value) })}
+                    className="w-full px-3 py-2 border bg-white border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                    min="0"
+                  />
+                </div>
+                
+                <div>
+                  <label htmlFor="sizePrice" className="block text-xs font-medium text-gray-700 mb-1">
+                    Price*
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <span className="text-gray-500">₹</span>
+                    </div>
+                    <input
+                      type="number"
+                      id="sizePrice"
+                      value={currentSizeOption.price}
+                      onChange={(e) => setCurrentSizeOption({ ...currentSizeOption, price: parseFloat(e.target.value) })}
+                      className="w-full pl-7 pr-3 py-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                      min="0"
+                      step="0.01"
+                    />
+                  </div>
+                </div>
+                
+                <div>
+                  <label htmlFor="sizeOriginalPrice" className="block text-xs font-medium text-gray-700 mb-1">
+                    Original Price*
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <span className="text-gray-500">₹</span>
+                    </div>
+                    <input
+                      type="number"
+                      id="sizeOriginalPrice"
+                      value={currentSizeOption.originalPrice}
+                      onChange={(e) => setCurrentSizeOption({ ...currentSizeOption, originalPrice: parseFloat(e.target.value) })}
+                      className="w-full pl-7 pr-3 py-2 border border-gray-300 bg-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                      min="0"
+                      step="0.01"
+                    />
+                  </div>
+                </div>
               </div>
-            )}
+              
+              {/* Add/Update Size Option Button */}
+              <div className="flex justify-end mt-2">
+                <button
+                  type="button"
+                  onClick={handleAddSizeOption}
+                  className="flex items-center px-3 py-1 bg-blue-500 text-white text-sm rounded hover:bg-blue-600 focus:outline-none"
+                  disabled={
+                    !currentSizeOption.size || 
+                    currentSizeOption.quantity <= 0 || 
+                    !currentSizeOption.price ||
+                    !currentSizeOption.originalPrice
+                  }
+                >
+                  {editingSizeOptionIndex !== null ? (
+                    <>
+                      <Check className="h-3 w-3 mr-1" />
+                      Update Size
+                    </>
+                  ) : (
+                    <>
+                      <Plus className="h-3 w-3 mr-1" />
+                      Add Size
+                    </>
+                  )}
+                </button>
+              </div>
+              
+              {/* Size Options List */}
+              {currentVariant.sizeOptions.length > 0 && (
+                <div className="mt-3">
+                  <h4 className="text-xs font-medium text-gray-700 mb-2">Added Sizes:</h4>
+                  <div className="space-y-2">
+                    {currentVariant.sizeOptions.map((sizeOpt, index) => (
+                      <div key={index} className="flex items-center justify-between bg-white p-2 rounded border border-gray-200">
+                        <div className="text-sm">
+                          <span className="font-medium">{sizeOpt.size}</span>
+                          <span className="mx-2 text-gray-500">|</span>
+                          <span>Qty: {sizeOpt.quantity}</span>
+                          <span className="mx-2 text-gray-500">|</span>
+                          <span>₹{sizeOpt.price}</span>
+                          <span className="mx-1 text-gray-400">(Original: ₹{sizeOpt.originalPrice})</span>
+                        </div>
+                        <div className="flex space-x-2">
+                          <button
+                            type="button"
+                            onClick={() => handleEditSizeOption(index)}
+                            className="text-blue-500 hover:text-blue-700"
+                          >
+                            <Edit className="h-4 w-4" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveSizeOption(index)}
+                            className="text-red-500 hover:text-red-700"
+                          >
+                            <X className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
 
             {/* Add/Update Variant Button */}
             <div className="flex justify-end mt-4">
@@ -589,10 +769,7 @@ const AdminProductForm = () => {
                 className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none"
                 disabled={
                   !currentVariant.color || 
-                  currentVariant.quantity <= 0 || 
-                  currentVariant.sizes.length === 0 ||
-                  !currentVariant.price ||
-                  !currentVariant.originalPrice ||
+                  currentVariant.sizeOptions.length === 0 ||
                   currentVariant.images.length === 0
                 }
               >
@@ -603,7 +780,7 @@ const AdminProductForm = () => {
                   </>
                 ) : (
                   <>
-                    <Plus className="h-4 w-4 mr-1" />
+                    <ListPlus className="h-4 w-4 mr-1" />
                     Add Variant
                   </>
                 )}
@@ -616,58 +793,72 @@ const AdminProductForm = () => {
                 <h3 className="text-sm font-medium text-gray-700 mb-2">Added Variants ({imageVariants.length})</h3>
                 {imageVariants.map((variant, index) => (
                   <div key={index} className="border border-gray-200 rounded-md p-4 mb-2">
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <span className="font-medium text-gray-700">
-                          {variant.color} - ₹{variant.price}
-                        </span>
-                        <div className="flex flex-wrap gap-1 mt-1">
-                          {variant.sizes.map((size) => (
-                            <span 
-                              key={size} 
-                              className="px-2 py-0.5 bg-gray-100 rounded-sm text-xs"
-                            >
-                              {size}
-                            </span>
-                          ))}
-                        </div>
-                        <div className="text-sm text-gray-600 mt-1">
-                          Quantity: {variant.quantity} | Images: {variant.images.length}
-                        </div>
+                    <div className="flex justify-between items-center mb-2">
+                      <div className="font-medium text-gray-800">
+                        {variant.color} ({variant.sizeOptions.length} sizes)
                       </div>
                       <div className="flex items-center space-x-2">
-                        <button
+                      <button
                           type="button"
                           onClick={() => handleEditVariant(index)}
-                          className="text-blue-600 hover:text-blue-800"
+                          className="text-blue-500 hover:text-blue-700"
                         >
                           <Edit className="h-4 w-4" />
                         </button>
                         <button
                           type="button"
                           onClick={() => handleRemoveVariant(index)}
-                          className="text-red-600 hover:text-red-800"
+                          className="text-red-500 hover:text-red-700"
                         >
                           <X className="h-4 w-4" />
                         </button>
                       </div>
                     </div>
-                    {/* Preview of variant images */}
-                    {variant.images.length > 0 && (
-                      <div className="mt-2 flex flex-wrap gap-1">
-                        {variant.images.slice(0, 4).map((img, imgIndex) => (
-                          <img
-                            key={imgIndex}
-                            src={typeof img === 'string' ? img : URL.createObjectURL(img)}
-                            alt={`${variant.color} preview ${imgIndex}`}
-                            className="w-10 h-10 object-cover rounded-sm"
-                          />
-                        ))}
-                        {variant.images.length > 4 && (
-                          <div className="w-10 h-10 bg-gray-100 rounded-sm flex items-center justify-center text-xs text-gray-500">
-                            +{variant.images.length - 4}
-                          </div>
-                        )}
+                    
+                    <div className="grid grid-cols-2 gap-4 mt-3">
+                      <div>
+                        <h4 className="text-xs font-medium text-gray-700 mb-1">Images:</h4>
+                        <div className="flex flex-wrap gap-2">
+                          {variant.images.slice(0, 3).map((img, imgIndex) => (
+                            <div key={imgIndex} className="relative w-12 h-12">
+                              <img
+                                src={typeof img === 'string' ? img : URL.createObjectURL(img)}
+                                alt={`Image ${imgIndex}`}
+                                className="w-full h-full object-cover rounded-md"
+                              />
+                            </div>
+                          ))}
+                          {variant.images.length > 3 && (
+                            <div className="w-12 h-12 bg-gray-200 rounded-md flex items-center justify-center">
+                              <span className="text-xs text-gray-600">+{variant.images.length - 3}</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <h4 className="text-xs font-medium text-gray-700 mb-1">Sizes:</h4>
+                        <div className="flex flex-wrap gap-1">
+                          {variant.sizeOptions.map((sizeOpt, sizeIndex) => (
+                            <span key={sizeIndex} className="px-2 py-1 bg-gray-100 text-xs rounded">
+                              {sizeOpt.size}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {variant.details && variant.details.length > 0 && (
+                      <div className="mt-3">
+                        <h4 className="text-xs font-medium text-gray-700 mb-1">Details:</h4>
+                        <ul className="text-xs text-gray-600 list-disc list-inside">
+                          {variant.details.slice(0, 3).map((detail, detailIndex) => (
+                            <li key={detailIndex}>{detail}</li>
+                          ))}
+                          {variant.details.length > 3 && (
+                            <li>+{variant.details.length - 3} more details</li>
+                          )}
+                        </ul>
                       </div>
                     )}
                   </div>
@@ -677,49 +868,58 @@ const AdminProductForm = () => {
           </div>
 
           {/* Submit Button */}
-          <div className="pt-4">
-            {loading && uploadProgress > 0 && (
-              <div className="mb-4">
-                <div className="w-full bg-gray-200 rounded-full h-2.5 mb-1">
-                  <div 
-                    className="bg-blue-600 h-2.5 rounded-full" 
-                    style={{ width: `${uploadProgress}%` }}
-                  ></div>
+          {imageVariants.length > 0 ? (
+            <div className="flex flex-col">
+              {uploadProgress > 0 && uploadProgress < 100 && (
+                <div className="mb-4">
+                  <div className="flex justify-between mb-1">
+                    <span className="text-sm font-medium text-gray-700">Uploading images...</span>
+                    <span className="text-sm font-medium text-gray-700">{uploadProgress}%</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div
+                      className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                      style={{ width: `${uploadProgress}%` }}
+                    ></div>
+                  </div>
                 </div>
-                <p className="text-sm text-gray-600 text-center">
-                  Uploading images... {uploadProgress}%
-                </p>
-              </div>
-            )}
-            
-            <button
-              type="submit"
-              disabled={loading || productAdded || imageVariants.length === 0}
-              className={`w-full flex items-center justify-center px-4 py-2 rounded-md text-white ${
-                (loading || productAdded || imageVariants.length === 0)
-                  ? "bg-gray-400 hover:cursor-not-allowed"
-                  : "bg-blue-600 hover:bg-blue-700"
-              }`}
-            >
-              {loading ? (
-                <span className="flex items-center">
-                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Saving Product...
-                </span>
-              ) : productAdded ? (
-                <span className="flex items-center">
-                  <Check className="h-4 w-4 mr-2" /> Product Added
-                </span>
-              ) : (
-                <span className="flex items-center">
-                  <Save className="h-4 w-4 mr-2" /> Save Product
-                </span>
               )}
-            </button>
-          </div>
+              
+              <button
+                type="submit"
+                className={`flex items-center justify-center px-6 py-3 ${
+                  loading
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-green-600 hover:bg-green-700"
+                } text-white rounded-md focus:outline-none`}
+                disabled={loading || productAdded}
+              >
+                {loading ? (
+                  <div className="flex items-center">
+                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Processing...
+                  </div>
+                ) : productAdded ? (
+                  <div className="flex items-center">
+                    <Check className="h-5 w-5 mr-2" />
+                    Product Added
+                  </div>
+                ) : (
+                  <div className="flex items-center">
+                    <Save className="h-5 w-5 mr-2" />
+                    Save Product
+                  </div>
+                )}
+              </button>
+            </div>
+          ) : (
+            <div className="text-center text-gray-500 py-4">
+              <p>Add at least one product variant to submit</p>
+            </div>
+          )}
         </form>
       </div>
     </div>

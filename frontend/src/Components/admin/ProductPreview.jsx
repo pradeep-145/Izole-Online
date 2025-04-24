@@ -47,10 +47,17 @@ const ProductPreview = () => {
               <div className="relative max-w-md mx-auto rounded-xl shadow-lg overflow-hidden">
                 <div className="relative aspect-square">
                   {products.map((product, index) => {
-                    const previewImage = product.images[0]?.image[0]; // first image from first color variant
+                    // Safely access first variant's first image
+                    const previewImage = product.variants && 
+                      product.variants.length > 0 && 
+                      product.variants[0].images && 
+                      product.variants[0].images.length > 0 
+                        ? product.variants[0].images[0] 
+                        : 'https://placehold.co/400x400?text=No+Image';
+                    
                     return (
                       <div
-                        key={product._id}
+                        key={product._id.$oid || product._id}
                         className={`absolute inset-0 transition-opacity duration-500 ${
                           currentIndex === index ? "opacity-100" : "opacity-0 pointer-events-none"
                         }`}

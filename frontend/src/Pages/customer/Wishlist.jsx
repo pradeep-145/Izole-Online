@@ -1,9 +1,9 @@
 import { Heart, ShoppingCart, Trash2, X } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../../Components/customer/Navbar";
-import { useWishlist } from "../../zustand/useWishlist";
 import { useCart } from "../../zustand/useCart";
+import { useWishlist } from "../../zustand/useWishlist";
 
 // IZOLE brand colors
 const COLORS = {
@@ -17,30 +17,51 @@ const COLORS = {
 
 const Wishlist = () => {
   const navigate = useNavigate();
-  const { wishlistItems, removeFromWishlist, fetchWishlist, isLoading, error } = useWishlist();
+  const { wishlistItems, removeFromWishlist, fetchWishlist, isLoading, error } =
+    useWishlist();
   const { addToCart } = useCart();
-  const [notification, setNotification] = useState({ show: false, message: "", type: "" });
-
-
+  const [notification, setNotification] = useState({
+    show: false,
+    message: "",
+    type: "",
+  });
 
   const handleRemoveFromWishlist = async (productId) => {
     const result = await removeFromWishlist(productId);
     if (result.success) {
-      showNotification(<span style={{ color: COLORS.darkGreen }}>"Item removed from wishlist"</span>, "success");
+      showNotification(
+        <span style={{ color: COLORS.darkGreen }}>
+          "Item removed from wishlist"
+        </span>,
+        "success"
+      );
     } else {
       showNotification(result.error || "Failed to remove item", "error");
     }
   };
 
   const handleAddToCart = async (item) => {
+    // Get first variant and its first size option
+    const firstVariant = item.product.variants?.[0];
+    if (!firstVariant) {
+      showNotification("Product configuration error", "error");
+      return;
+    }
+
+    const firstSizeOption = firstVariant.sizeOptions?.[0];
+    if (!firstSizeOption || firstSizeOption.quantity <= 0) {
+      showNotification("Product is out of stock", "error");
+      return;
+    }
+
     const cartItem = {
       product: item.product,
       productId: item.product._id,
       quantity: 1,
-      color: item.product.images[0].color,
-      size: item.product.images[0].size[0],
-      price: item.product.images[0].price,
-      image: item.product.images[0].image[0]
+      color: firstVariant.color,
+      size: firstSizeOption.size,
+      price: firstSizeOption.price,
+      image: firstVariant.images[0],
     };
 
     const result = await addToCart(cartItem);
@@ -68,8 +89,13 @@ const Wishlist = () => {
         <Navbar />
         <div className="max-w-6xl mx-auto pt-20 px-4 lg:px-0 flex justify-center items-center">
           <div className="text-center">
-            <div style={{ borderColor: COLORS.darkGreen }} className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto"></div>
-            <p style={{ color: COLORS.darkGreen }} className="mt-4 font-medium">Loading your wishlist...</p>
+            <div
+              style={{ borderColor: COLORS.darkGreen }}
+              className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto"
+            ></div>
+            <p style={{ color: COLORS.darkGreen }} className="mt-4 font-medium">
+              Loading your wishlist...
+            </p>
           </div>
         </div>
       </div>
@@ -82,13 +108,20 @@ const Wishlist = () => {
 
       {/* Notification */}
       {notification.show && (
-        <div className={`fixed top-20 right-4 z-50 p-4 rounded-md shadow-md flex items-center justify-between ${
-          notification.type === "success" 
-            ? `bg-opacity-90 bg-green-100 text-${COLORS.darkGreen}` 
-            : "bg-red-100 text-red-800"
-        }`}>
+        <div
+          className={`fixed top-20 right-4 z-50 p-4 rounded-md shadow-md flex items-center justify-between ${
+            notification.type === "success"
+              ? `bg-opacity-90 bg-green-100 text-${COLORS.darkGreen}`
+              : "bg-red-100 text-red-800"
+          }`}
+        >
           <span>{notification.message}</span>
-          <button onClick={() => setNotification({ show: false, message: "", type: "" })} className="ml-4">
+          <button
+            onClick={() =>
+              setNotification({ show: false, message: "", type: "" })
+            }
+            className="ml-4"
+          >
             <X size={16} />
           </button>
         </div>
@@ -96,10 +129,17 @@ const Wishlist = () => {
 
       <main className="max-w-6xl mx-auto pt-20 px-4 lg:px-0 scroll-p-0">
         <div className="flex justify-between items-center mb-8">
-          <h1 style={{ color: COLORS.darkGreen }} className="text-2xl font-bold">My Wishlist</h1>
+          <h1
+            style={{ color: COLORS.darkGreen }}
+            className="text-2xl font-bold"
+          >
+            My Wishlist
+          </h1>
           <div className="flex items-center">
             <Heart style={{ color: COLORS.mustardGold }} className="mr-2" />
-            <span style={{ color: COLORS.darkGreen }} className="font-medium">{wishlistItems.length} items</span>
+            <span style={{ color: COLORS.darkGreen }} className="font-medium">
+              {wishlistItems.length} items
+            </span>
           </div>
         </div>
 
@@ -110,15 +150,28 @@ const Wishlist = () => {
         )}
 
         {wishlistItems.length === 0 ? (
-          <div style={{ backgroundColor: COLORS.white }} className="rounded-lg shadow-md p-8 text-center">
-            <Heart style={{ color: COLORS.mustardGold }} className="w-16 h-16 mx-auto mb-4" />
-            <h2 style={{ color: COLORS.darkGreen }} className="text-xl font-semibold mb-2">Your wishlist is empty</h2>
-            <p style={{ color: COLORS.darkGreen + "CC" }} className="mb-6">Add items to your wishlist to keep track of products you love.</p>
+          <div
+            style={{ backgroundColor: COLORS.white }}
+            className="rounded-lg shadow-md p-8 text-center"
+          >
+            <Heart
+              style={{ color: COLORS.mustardGold }}
+              className="w-16 h-16 mx-auto mb-4"
+            />
+            <h2
+              style={{ color: COLORS.darkGreen }}
+              className="text-xl font-semibold mb-2"
+            >
+              Your wishlist is empty
+            </h2>
+            <p style={{ color: COLORS.darkGreen + "CC" }} className="mb-6">
+              Add items to your wishlist to keep track of products you love.
+            </p>
             <button
               onClick={() => navigate("/customer/products")}
-              style={{ 
-                backgroundColor: COLORS.mustardGold, 
-                color: COLORS.darkGreen 
+              style={{
+                backgroundColor: COLORS.mustardGold,
+                color: COLORS.darkGreen,
               }}
               className="px-6 py-3 rounded-md hover:opacity-90 font-medium transition-opacity"
             >
@@ -130,7 +183,10 @@ const Wishlist = () => {
             {wishlistItems.map((item) => (
               <div
                 key={item.product._id}
-                style={{ backgroundColor: COLORS.white, borderColor: "rgba(26, 59, 42, 0.1)" }}
+                style={{
+                  backgroundColor: COLORS.white,
+                  borderColor: "rgba(26, 59, 42, 0.1)",
+                }}
                 className="rounded-lg shadow-md overflow-hidden border relative group"
               >
                 <button
@@ -140,54 +196,98 @@ const Wishlist = () => {
                 >
                   <Trash2 size={16} />
                 </button>
-                
-                <div 
+
+                <div
                   className="h-64 overflow-hidden cursor-pointer"
                   onClick={() => navigateToProduct(item.product)}
                 >
                   <img
-                    src={item.product.images[0].image[0]}
+                    src={item.product.variants?.[0]?.images?.[0] || ""}
                     alt={item.product.name}
                     className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
                   />
                 </div>
-                
-                <div 
+
+                <div
                   className="p-4 cursor-pointer"
                   onClick={() => navigateToProduct(item.product)}
                 >
                   <div className="flex justify-between items-start">
-                    <h3 style={{ color: COLORS.darkGreen }} className="font-medium text-lg">{item.product.name}</h3>
-                    <span style={{ backgroundColor: COLORS.lightGold + "50", color: COLORS.darkGreen }} className="px-2 py-1 text-xs rounded-full">
-                      {item.product.images[0].color}
+                    <h3
+                      style={{ color: COLORS.darkGreen }}
+                      className="font-medium text-lg"
+                    >
+                      {item.product.name}
+                    </h3>
+                    <span
+                      style={{
+                        backgroundColor: COLORS.lightGold + "50",
+                        color: COLORS.darkGreen,
+                      }}
+                      className="px-2 py-1 text-xs rounded-full"
+                    >
+                      {item.product.variants?.[0]?.color || "N/A"}
                     </span>
                   </div>
-                  
+
                   <div className="mt-2 flex items-center">
-                    <span style={{ color: COLORS.darkGreen }} className="text-lg font-bold">₹{item.product.images[0].price}</span>
-                    {item.product.images[0].originalPrice !== item.product.images[0].price && (
-                      <span style={{ color: COLORS.darkGreen + "99" }} className="ml-2 text-sm line-through">
-                        ₹{item.product.images[0].originalPrice}
-                      </span>
+                    {item.product.variants?.[0]?.sizeOptions?.[0] && (
+                      <>
+                        <span
+                          style={{ color: COLORS.darkGreen }}
+                          className="text-lg font-bold"
+                        >
+                          ₹{item.product.variants[0].sizeOptions[0].price}
+                        </span>
+                        {item.product.variants[0].sizeOptions[0]
+                          .originalPrice !==
+                          item.product.variants[0].sizeOptions[0].price && (
+                          <span
+                            style={{ color: COLORS.darkGreen + "99" }}
+                            className="ml-2 text-sm line-through"
+                          >
+                            ₹
+                            {
+                              item.product.variants[0].sizeOptions[0]
+                                .originalPrice
+                            }
+                          </span>
+                        )}
+                      </>
                     )}
                   </div>
-                  
+
                   <div className="mt-2 flex items-center text-sm">
                     <span style={{ color: COLORS.darkGreen + "CC" }}>
-                      {item.product.images[0].quantity > 0
-                        ? `${item.product.images[0].quantity} in stock`
+                      {item.product.variants?.[0]?.sizeOptions?.[0]?.quantity >
+                      0
+                        ? `${item.product.variants[0].sizeOptions.reduce(
+                            (total, size) => total + size.quantity,
+                            0
+                          )} in stock`
                         : "Out of stock"}
                     </span>
                   </div>
                 </div>
-                
+
                 <div className="p-4 pt-0">
                   <button
                     onClick={() => handleAddToCart(item)}
-                    disabled={item.product.images[0].quantity <= 0}
-                    style={{ 
-                      backgroundColor: item.product.images[0].quantity > 0 ? COLORS.darkGreen : "#9E9E9E",
-                      color: item.product.images[0].quantity > 0 ? COLORS.mustardGold : "#E0E0E0"
+                    disabled={
+                      !item.product.variants?.[0]?.sizeOptions?.[0] ||
+                      item.product.variants[0].sizeOptions[0].quantity <= 0
+                    }
+                    style={{
+                      backgroundColor:
+                        item.product.variants?.[0]?.sizeOptions?.[0]?.quantity >
+                        0
+                          ? COLORS.darkGreen
+                          : "#9E9E9E",
+                      color:
+                        item.product.variants?.[0]?.sizeOptions?.[0]?.quantity >
+                        0
+                          ? COLORS.mustardGold
+                          : "#E0E0E0",
                     }}
                     className="w-full flex items-center justify-center px-4 py-2 rounded-md hover:opacity-90 transition-opacity"
                   >

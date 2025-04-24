@@ -3,46 +3,72 @@ const Product = require("../models/product.model.js");
 
 const getOrCreateCart = async (customerId) => {
   let cart = await Cart.findOne({ customerId }).populate({
-    path: 'products.productId',
-    model: 'Product'
+    path: "products.productId",
+    model: "Product",
   });
 
   if (!cart) {
     cart = new Cart({
       customerId,
-      products: []
+      products: [],
     });
     await cart.save();
   }
 
   return cart;
 };
+
 const CartController = {
   addToCart: async (req, res) => {
     try {
       const { product, quantity, color, size, price, image } = req.body;
       const customerId = req.user.userId;
-  
-      // Validate product exists
+
+      // Validate product exists with new structure
       const productExists = await Product.findById(product._id);
       if (!productExists) {
         return res.status(404).json({
           success: false,
-          message: "Product not found"
+          message: "Product not found",
         });
       }
-  
+
+      // Validate the selected variant and size exist
+      const variant = productExists.variants.find((v) => v.color === color);
+      if (!variant) {
+        return res.status(400).json({
+          success: false,
+          message: "Selected color variant not found",
+        });
+      }
+
+      const sizeOption = variant.sizeOptions.find((s) => s.size === size);
+      if (!sizeOption) {
+        return res.status(400).json({
+          success: false,
+          message: "Selected size not found for this color",
+        });
+      }
+
+      // Check if there's enough stock
+      if (sizeOption.quantity < quantity) {
+        return res.status(400).json({
+          success: false,
+          message: "Not enough stock available",
+        });
+      }
+
       // Get cart
       const cart = await getOrCreateCart(customerId);
-  
+
       // Check if product with same color and size already exists in cart
       const existingItemIndex = cart.products.findIndex(
-        item => 
-          item.productId.toString() === product._id && 
-          item.color === color && 
+        (item) =>
+          item.productId.toString() === product._id &&
+          item.color === color &&
           item.size === size
       );
-  
+
       if (existingItemIndex !== -1) {
         // Update quantity of existing item
         cart.products[existingItemIndex].quantity += quantity;
@@ -54,12 +80,12 @@ const CartController = {
           color,
           size,
           price,
-          image
+          image,
         });
       }
-  
+
       await cart.save();
-  
+
       res.status(200).json({
         success: true,
         message: "Item added to cart",
@@ -69,144 +95,147 @@ const CartController = {
           color,
           size,
           price,
-          image
-        }
+          image,
+        },
       });
     } catch (error) {
       console.error("Add to cart error:", error);
       res.status(500).json({
         success: false,
-        message: "Failed to add item to cart"
+        message: "Failed to add item to cart",
       });
-    }},
+    }
+  },
   getCart: async (req, res) => {
     try {
       const customerId = req.user.userId; // Assuming user is authenticated
       const cart = await getOrCreateCart(customerId);
-  
+
       // Format cart items to match frontend expectations
-      const items = cart.products.map(item => ({
+      const items = cart.products.map((item) => ({
         product: item.productId,
         quantity: item.quantity,
         color: item.color,
         size: item.size,
         price: item.price,
-        image: item.image
+        image: item.image,
       }));
-  
+
       res.status(200).json({
         success: true,
-        items
+        items,
       });
     } catch (error) {
       console.error("Get cart error:", error);
       res.status(500).json({
         success: false,
-        message: "Failed to retrieve cart"
+        message: "Failed to retrieve cart",
       });
     }
   },
-  updateCart:async(req,res)=>{
+  updateCart: async (req, res) => {
     try {
       const { productId, color, size, quantity } = req.body;
       const customerId = req.user.userId; // Assuming user is authenticated
-  
+
       const cart = await Cart.findOne({ customerId });
       if (!cart) {
         return res.status(404).json({
           success: false,
-          message: "Cart not found"
+          message: "Cart not found",
         });
       }
-  
+
       // Find item in cart
       const itemIndex = cart.products.findIndex(
-        item => 
-          item.productId.toString() === productId && 
-          item.color === color && 
+        (item) =>
+          item.productId.toString() === productId &&
+          item.color === color &&
           item.size === size
       );
-  
+
       if (itemIndex === -1) {
         return res.status(404).json({
           success: false,
-          message: "Item not found in cart"
+          message: "Item not found in cart",
         });
       }
-  
+
       // Update quantity
       cart.products[itemIndex].quantity = quantity;
       await cart.save();
-  
+
       res.status(200).json({
         success: true,
-        message: "Cart updated successfully"
+        message: "Cart updated successfully",
       });
     } catch (error) {
       console.error("Update cart error:", error);
       res.status(500).json({
         success: false,
-        message: "Failed to update cart"
+        message: "Failed to update cart",
       });
     }
   },
-  removeCart:async(req,res)=>{
+  removeCart: async (req, res) => {
     try {
       const { productId, color, size } = req.body;
       const customerId = req.user.userId; // Assuming user is authenticated
-  
+
       const cart = await Cart.findOne({ customerId });
       if (!cart) {
         return res.status(404).json({
           success: false,
-          message: "Cart not found"
+          message: "Cart not found",
         });
       }
-  
+
       // Remove item
       cart.products = cart.products.filter(
-        item => 
-          !(item.productId.toString() === productId && 
-            item.color === color && 
-            item.size === size)
+        (item) =>
+          !(
+            item.productId.toString() === productId &&
+            item.color === color &&
+            item.size === size
+          )
       );
-  
+
       await cart.save();
-  
+
       res.status(200).json({
         success: true,
-        message: "Item removed from cart"
+        message: "Item removed from cart",
       });
     } catch (error) {
       console.error("Remove from cart error:", error);
       res.status(500).json({
         success: false,
-        message: "Failed to remove item from cart"
+        message: "Failed to remove item from cart",
       });
     }
   },
-  cleanCart:async(req,res)=>{
+  cleanCart: async (req, res) => {
     try {
       const customerId = req.user.userId; // Assuming user is authenticated
-  
+
       const cart = await Cart.findOne({ customerId });
       if (cart) {
         cart.products = [];
         await cart.save();
       }
-  
+
       res.status(200).json({
         success: true,
-        message: "Cart cleared successfully"
+        message: "Cart cleared successfully",
       });
     } catch (error) {
       console.error("Clear cart error:", error);
       res.status(500).json({
         success: false,
-        message: "Failed to clear cart"
+        message: "Failed to clear cart",
       });
     }
-  }
+  },
 };
 
 module.exports = CartController;
