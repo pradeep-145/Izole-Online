@@ -19,6 +19,7 @@ import Cart from "./Pages/customer/cart";
 import Wishlist from "./Pages/customer/Wishlist";
 import { useWishlist } from "./zustand/useWishlist";
 import ShippingStatus from "./Pages/customer/ShippingStatus";
+import OrderHistoryPage from "./Pages/customer/OrderHistoryPage";
 
 function App() {
   
@@ -40,6 +41,7 @@ function App() {
           <Route path='checkout' element={<Checkout/>}/>
           <Route path='wishlist' element={<Wishlist />} />
           <Route path='shipping-status' element={<ShippingStatus/>}/>
+          <Route path='order-history' element={<OrderHistoryPage/>}/>
         </Route>
 
         {/* Admin Routes */}
