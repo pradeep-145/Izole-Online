@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { ShoppingBag, Heart, ArrowLeft, ArrowRight } from "lucide-react";
-import { useProduct } from "../../zustand/useProducts"; // adjust path if needed
+import { useProduct } from "../../zustand/useProducts.jsx"; // adjust path if needed
 
 const ProductPreview = () => {
   const { products, fetchProductsIfEmpty } = useProduct();

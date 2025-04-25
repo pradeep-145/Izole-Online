@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Footer from "../../Components/customer/Footer";
 import Navbar from "../../Components/customer/Navbar";
 import ProductCard from "../../Components/customer/ProductCard";
-import { useProduct } from "../../zustand/useProducts";
+import { useProduct } from "../../zustand/useProducts.jsx";
 
 const ProductList = () => {
   const [selectedCategory, setSelectedCategory] = useState("All");

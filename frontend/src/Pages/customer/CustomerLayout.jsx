@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react'
 import { Outlet } from 'react-router-dom'
-import { useProduct } from '../../zustand/useProducts';
+import { useProduct } from '../../zustand/useProducts.jsx';
 import { useCart } from '../../zustand/useCart';
 import { useWishlist } from '../../zustand/useWishlist';
 

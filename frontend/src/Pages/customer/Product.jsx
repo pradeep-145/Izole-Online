@@ -167,6 +167,7 @@ const Product = () => {
         color: currentVariant.color,
         size: currentSizeOption.size,
         price: currentSizeOption.price,
+        images: currentVariant.images,
       },
     });
   };

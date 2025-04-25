@@ -1,10 +1,19 @@
+import axios from "axios";
 import { ChevronDown, ChevronUp, Edit, Eye, Trash2 } from "lucide-react";
 import React, { useEffect, useState } from "react";
-import { useProduct } from "../../zustand/useProducts";
+import { toast } from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
+import { useProduct } from "../../zustand/useProducts.jsx";
 
 const ProductTable = () => {
-  const { products, fetchProductsIfEmpty } = useProduct();
+  const { products, fetchProductsIfEmpty, deleteProduct } = useProduct();
   const [expandedProducts, setExpandedProducts] = useState({});
+  const [deleteConfirmation, setDeleteConfirmation] = useState({
+    show: false,
+    productId: null,
+    variantIndex: null,
+  });
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchProductsIfEmpty();
@@ -66,6 +75,72 @@ const ProductTable = () => {
       (option) => option.price === minPrice
     );
     return correspondingOption ? correspondingOption.originalPrice : minPrice;
+  };
+
+  // View product variant in detail
+  const handleViewVariant = (productId, variantIndex) => {
+    navigate(`/admin/products/view/${productId}/${variantIndex}`);
+  };
+
+  // Navigate to edit page for a product variant
+  const handleEditVariant = (productId, variantIndex) => {
+    navigate(`/admin/products/edit/${productId}/${variantIndex}`);
+  };
+
+  // Show delete confirmation dialog
+  const showDeleteConfirmation = (productId, variantIndex) => {
+    setDeleteConfirmation({
+      show: true,
+      productId,
+      variantIndex,
+    });
+  };
+
+  // Delete a product variant
+  const confirmDelete = async () => {
+    const { productId, variantIndex } = deleteConfirmation;
+
+    try {
+      // Find the product from our products list
+      const product = products.find((p) => p._id === productId);
+
+      // If it's the only variant, delete entire product
+      if (product.variants.length === 1) {
+        await deleteProduct(productId);
+        toast.success("Product deleted successfully");
+      } else {
+        // Otherwise just delete the variant
+        const updatedProduct = { ...product };
+        updatedProduct.variants = updatedProduct.variants.filter(
+          (_, idx) => idx !== variantIndex
+        );
+
+        // API call to update product with removed variant
+        await axios.put(
+          `${import.meta.env.VITE_SERVER_URL}/api/products/${productId}`,
+          updatedProduct
+        );
+
+        // Update local state
+        await fetchProductsIfEmpty(true); // Force refresh
+        toast.success("Variant deleted successfully");
+      }
+    } catch (error) {
+      console.error("Error deleting product/variant:", error);
+      toast.error("Failed to delete. Please try again.");
+    } finally {
+      // Close confirmation dialog
+      setDeleteConfirmation({
+        show: false,
+        productId: null,
+        variantIndex: null,
+      });
+    }
+  };
+
+  // Cancel deletion
+  const cancelDelete = () => {
+    setDeleteConfirmation({ show: false, productId: null, variantIndex: null });
   };
 
   return (
@@ -250,18 +325,27 @@ const ProductTable = () => {
                         <td className="px-6 py-4">
                           <div className="flex space-x-2">
                             <button
+                              onClick={() =>
+                                handleViewVariant(product._id, index)
+                              }
                               className="text-blue-600 hover:text-blue-900 p-1 hover:bg-blue-50 rounded"
                               title="View Details"
                             >
                               <Eye className="w-4 h-4" />
                             </button>
                             <button
+                              onClick={() =>
+                                handleEditVariant(product._id, index)
+                              }
                               className="text-green-600 hover:text-green-900 p-1 hover:bg-green-50 rounded"
                               title="Edit Variant"
                             >
                               <Edit className="w-4 h-4" />
                             </button>
                             <button
+                              onClick={() =>
+                                showDeleteConfirmation(product._id, index)
+                              }
                               className="text-red-600 hover:text-red-900 p-1 hover:bg-red-50 rounded"
                               title="Delete Variant"
                             >
@@ -276,6 +360,35 @@ const ProductTable = () => {
             ))}
         </tbody>
       </table>
+
+      {/* Delete Confirmation Modal */}
+      {deleteConfirmation.show && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full">
+            <h3 className="text-lg font-medium text-gray-900 mb-4">
+              Confirm Deletion
+            </h3>
+            <p className="text-gray-500 mb-5">
+              Are you sure you want to delete this variant? This action cannot
+              be undone.
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={cancelDelete}
+                className="px-4 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDelete}
+                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

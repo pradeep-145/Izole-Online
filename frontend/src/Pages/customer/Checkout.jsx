@@ -1,72 +1,130 @@
-import React, { useState, useEffect } from 'react';
-import { Truck, MapPin, Package, ArrowLeft, ShoppingCart, Lock } from 'lucide-react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { useCart } from '../../zustand/useCart';
+import {
+  ArrowLeft,
+  Lock,
+  MapPin,
+  Package,
+  ShoppingCart,
+  Truck,
+} from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useCart } from "../../zustand/useCart";
 
 const CheckoutPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { cartItems, getCartTotal, clearCart } = useCart();
-  
+
   // Determine if we're coming from "Buy Now" or cart checkout
   const singleProduct = location.state?.product;
   const isBuyNow = !!singleProduct;
-  
+
   // Create a products array based on source
   const [products, setProducts] = useState([]);
   const [orderTotal, setOrderTotal] = useState(0);
-  
+
   useEffect(() => {
     if (isBuyNow && singleProduct) {
-      // Handle Buy Now flow with one product
-      const buyNowItem = {
-        id: singleProduct._id || Date.now(),
-        name: singleProduct.name,
-        price: singleProduct.images[0].price,
-        quantity: location.state?.quantity || 1,
-        image: location.state?.image || singleProduct.images[0].image[0], 
-        color: location.state?.color || singleProduct.images[0].color,
-        size: location.state?.size || singleProduct.images[0].size[0]
-      };
-      setProducts([buyNowItem]);
-      setOrderTotal(buyNowItem.price * buyNowItem.quantity);
+      console.log("product:", singleProduct);
+      try {
+        // Check if variants array exists and has at least one item
+        if (!singleProduct.variants || !singleProduct.variants.length) {
+          throw new Error("Product has no variants");
+        }
+
+        // Get selected variant or default to first variant
+        const variantIndex = location.state?.variantIndex || 0;
+        const variant = singleProduct.variants[variantIndex];
+
+        // Get selected size option or default to first size
+        const sizeIndex = location.state?.sizeIndex || 0;
+        const sizeOption = variant.sizeOptions[sizeIndex];
+
+        // Handle Buy Now flow with one product
+        const buyNowItem = {
+          id: singleProduct._id || Date.now(),
+          name: singleProduct.name || "Unnamed Product",
+          price: sizeOption?.price || variant.sizeOptions[0]?.price || 0,
+          quantity: location.state?.quantity || 1,
+          image:
+            location.state?.image ||
+            variant.images?.[0] ||
+            "https://placeholder.com/400",
+          color: location.state?.color || variant.color || "N/A",
+          size: location.state?.size || sizeOption?.size || "N/A",
+        };
+
+        setProducts([buyNowItem]);
+        setOrderTotal(buyNowItem.price * buyNowItem.quantity);
+      } catch (error) {
+        console.error("Error setting up Buy Now product:", error);
+        navigate("/customer/cart", { replace: true });
+      }
     } else {
       // Handle cart checkout flow with multiple products
       if (cartItems && cartItems.length > 0) {
-        const mappedCartItems = cartItems.map(item => ({
-          id: item.product._id || item.product.id,
-          name: item.product.name,
-          price: item.price || item.product.images[0].price,
-          quantity: item.quantity,
-          image: item.image || item.product.images[0].image[0],
-          color: item.color,
-          size: item.size
-        }));
-        setProducts(mappedCartItems);
-        setOrderTotal(getCartTotal ? getCartTotal() : calculateTotalManually(mappedCartItems));
+        try {
+          const mappedCartItems = cartItems.map((item) => {
+            // Safely access cart item properties
+            if (!item.product) {
+              throw new Error("Invalid cart item");
+            }
+
+            return {
+              id: item.product._id || item.product.id || Date.now(),
+              name: item.product.name || "Unnamed Product",
+              price:
+                item.price ||
+                item.product.variants?.[0]?.sizeOptions?.[0]?.price ||
+                0,
+              quantity: item.quantity || 1,
+              image:
+                item.image ||
+                item.product.variants?.[0]?.images?.[0] ||
+                "https://placeholder.com/400",
+              color: item.color || item.product.variants?.[0]?.color || "N/A",
+              size:
+                item.size ||
+                item.product.variants?.[0]?.sizeOptions?.[0]?.size ||
+                "N/A",
+            };
+          });
+
+          setProducts(mappedCartItems);
+          setOrderTotal(
+            getCartTotal
+              ? getCartTotal()
+              : calculateTotalManually(mappedCartItems)
+          );
+        } catch (error) {
+          console.error("Error processing cart items:", error);
+          // Handle gracefully with an empty cart
+          setProducts([]);
+          setOrderTotal(0);
+        }
       } else {
         // Redirect to cart if there are no items
-        navigate('/customer/cart');
+        navigate("/customer/cart");
       }
     }
-  }, [location, cartItems]);
+  }, [location, cartItems, navigate]);
 
   const calculateTotalManually = (items) => {
-    return items.reduce((total, item) => total + (item.price * item.quantity), 0);
+    return items.reduce((total, item) => total + item.price * item.quantity, 0);
   };
 
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    address: '',
-    city: '',
-    zipCode: ''
+    firstName: "",
+    lastName: "",
+    email: "",
+    address: "",
+    city: "",
+    zipCode: "",
   });
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleGoBack = () => {
@@ -75,44 +133,44 @@ const CheckoutPage = () => {
       navigate(-1);
     } else {
       // Go back to cart
-      navigate('/customer/cart');
+      navigate("/customer/cart");
     }
   };
 
   const proceedToPayment = async (e) => {
     e.preventDefault();
-    
+
     try {
       // Here you would save shipping details and prepare for payment
-      console.log('Proceeding to payment gateway with shipping details:', { 
-        items: products, 
+      console.log("Proceeding to payment gateway with shipping details:", {
+        items: products,
         shippingDetails: formData,
         totalAmount: total,
-        isBuyNow: isBuyNow
+        isBuyNow: isBuyNow,
       });
-      
+
       // In a real implementation, you would likely:
       // 1. Save the order with pending payment status
       // 2. Generate a unique order ID
       // 3. Redirect to the payment gateway with needed parameters
-      
+
       // For demo purposes, we're simulating this with an alert
-      alert('Redirecting to payment gateway...');
-      
+      alert("Redirecting to payment gateway...");
+
       // Redirect to external payment gateway (this would be your gateway URL)
       // window.location.href = 'https://your-payment-gateway.com/pay?order=123';
-      
+
       // For demo purposes, let's navigate to a simulated payment page
-      navigate('/payment-gateway', {
+      navigate("/payment-gateway", {
         state: {
           orderNumber: `ORD-${Date.now()}`,
           orderAmount: total,
-          customerName: `${formData.firstName} ${formData.lastName}`
-        }
+          customerName: `${formData.firstName} ${formData.lastName}`,
+        },
       });
     } catch (error) {
-      console.error('Error proceeding to payment:', error);
-      alert('Failed to proceed to payment. Please try again.');
+      console.error("Error proceeding to payment:", error);
+      alert("Failed to proceed to payment. Please try again.");
     }
   };
 
@@ -127,30 +185,30 @@ const CheckoutPage = () => {
       <div className="bg-amber-400 py-4 sticky top-0 z-10 shadow-md">
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-center">
-            <button 
+            <button
               onClick={handleGoBack}
               className="flex items-center text-gray-800 hover:text-gray-600 transition-colors"
             >
               <ArrowLeft size={20} className="mr-1" />
               <span>Back</span>
             </button>
-            
+
             <h1 className="text-2xl font-bold text-gray-800">
-              {isBuyNow ? 'Buy Now' : 'Checkout'}
+              {isBuyNow ? "Buy Now" : "Checkout"}
             </h1>
-            
-            <div className="w-8">
-              {/* Spacer for alignment */}
-            </div>
+
+            <div className="w-8">{/* Spacer for alignment */}</div>
           </div>
         </div>
       </div>
-      
+
       <div className="container mx-auto p-4 md:p-6">
         <div className="max-w-6xl mx-auto">
           <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
-            <h2 className="text-xl font-bold mb-4 text-gray-800 border-b pb-2">Checkout Details</h2>
-            
+            <h2 className="text-xl font-bold mb-4 text-gray-800 border-b pb-2">
+              Checkout Details
+            </h2>
+
             <div className="grid md:grid-cols-3 gap-6">
               {/* Column 1: Shipping Details */}
               <div className="md:col-span-2">
@@ -158,92 +216,108 @@ const CheckoutPage = () => {
                   <h3 className="text-lg font-semibold mb-4 flex items-center text-gray-800">
                     <MapPin className="mr-2 text-amber-500" /> Shipping Details
                   </h3>
-                  
-                  <form id="shipping-form" onSubmit={proceedToPayment} className="space-y-4">
+
+                  <form
+                    id="shipping-form"
+                    onSubmit={proceedToPayment}
+                    className="space-y-4"
+                  >
                     <div className="grid md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
-                        <input 
-                          type="text" 
-                          name="firstName" 
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          First Name
+                        </label>
+                        <input
+                          type="text"
+                          name="firstName"
                           value={formData.firstName}
                           onChange={handleInputChange}
                           className="w-full px-4 py-2 border border-gray-300 bg-transparent text-wineRed rounded-md focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                          required 
+                          required
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
-                        <input 
-                          type="text" 
-                          name="lastName" 
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Last Name
+                        </label>
+                        <input
+                          type="text"
+                          name="lastName"
                           value={formData.lastName}
                           onChange={handleInputChange}
                           className="w-full px-4 py-2 border border-gray-300 bg-transparent text-wineRed rounded-md focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                          required 
+                          required
                         />
                       </div>
                     </div>
-                    
+
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
-                      <input 
-                        type="email" 
-                        name="email" 
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Email Address
+                      </label>
+                      <input
+                        type="email"
+                        name="email"
                         value={formData.email}
                         onChange={handleInputChange}
                         className="w-full px-4 py-2 border border-gray-300 bg-transparent text-wineRed rounded-md focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                        required 
+                        required
                       />
                     </div>
-                    
+
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
-                      <input 
-                        type="text" 
-                        name="address" 
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Address
+                      </label>
+                      <input
+                        type="text"
+                        name="address"
                         value={formData.address}
                         onChange={handleInputChange}
                         className="w-full px-4 py-2 border border-gray-300 bg-transparent text-wineRed rounded-md focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                        required 
+                        required
                       />
                     </div>
-                    
+
                     <div className="grid md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
-                        <input 
-                          type="text" 
-                          name="city" 
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          City
+                        </label>
+                        <input
+                          type="text"
+                          name="city"
                           value={formData.city}
                           onChange={handleInputChange}
                           className="w-full px-4 py-2 border border-gray-300 bg-transparent text-wineRed rounded-md focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                          required 
+                          required
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">ZIP Code</label>
-                        <input 
-                          type="text" 
-                          name="zipCode" 
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          ZIP Code
+                        </label>
+                        <input
+                          type="text"
+                          name="zipCode"
                           value={formData.zipCode}
                           onChange={handleInputChange}
                           className="w-full px-4 py-2 border bg-transparent text-wineRed border-gray-300 rounded-md focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                          required 
+                          required
                         />
                       </div>
                     </div>
                   </form>
                 </div>
               </div>
-              
+
               {/* Column 2: Order Summary */}
               <div>
                 <div className="bg-white rounded-lg border border-gray-200 p-6">
                   <h3 className="text-lg font-semibold mb-4 flex items-center text-gray-800">
                     <Package className="mr-2 text-amber-500" /> Order Summary
                   </h3>
-                  
+
                   {products.length === 0 ? (
                     <div className="text-center py-8">
                       <p className="text-gray-500">No items in your order.</p>
@@ -251,11 +325,14 @@ const CheckoutPage = () => {
                   ) : (
                     <>
                       <div className="max-h-64 overflow-y-auto mb-4">
-                        {products.map(item => (
-                          <div key={item.id} className="flex items-center mb-4 pb-4 border-b border-gray-200 last:border-0">
-                            <img 
-                              src={item.image} 
-                              alt={item.name} 
+                        {products.map((item) => (
+                          <div
+                            key={item.id}
+                            className="flex items-center mb-4 pb-4 border-b border-gray-200 last:border-0"
+                          >
+                            <img
+                              src={item.image}
+                              alt={item.name}
                               className="w-16 h-16 object-cover rounded-md"
                             />
                             <div className="ml-4 flex-1">
@@ -265,13 +342,15 @@ const CheckoutPage = () => {
                                   <p>Qty: {item.quantity}</p>
                                   <p>Size: {item.size}</p>
                                 </div>
-                                <p className="font-medium text-gray-600">₹{(item.price * item.quantity).toFixed(2)}</p>
+                                <p className="font-medium text-gray-600">
+                                  ₹{(item.price * item.quantity).toFixed(2)}
+                                </p>
                               </div>
                             </div>
                           </div>
                         ))}
                       </div>
-                      
+
                       <div className="border-t border-gray-200 pt-4 space-y-2">
                         <div className="flex justify-between text-gray-600">
                           <span>Subtotal</span>
@@ -279,7 +358,11 @@ const CheckoutPage = () => {
                         </div>
                         <div className="flex justify-between text-gray-600">
                           <span>Shipping</span>
-                          <span>{shipping === 0 ? 'Free' : `₹${shipping.toFixed(2)}`}</span>
+                          <span>
+                            {shipping === 0
+                              ? "Free"
+                              : `₹${shipping.toFixed(2)}`}
+                          </span>
                         </div>
                         <div className="flex justify-between text-gray-600">
                           <span>Tax (18%)</span>
@@ -290,9 +373,9 @@ const CheckoutPage = () => {
                           <span>₹{total.toFixed(2)}</span>
                         </div>
                       </div>
-                      
+
                       <div className="mt-6">
-                        <button 
+                        <button
                           type="submit"
                           form="shipping-form"
                           className="w-full py-3 bg-mustard text-gray-800 font-bold rounded-md hover:bg-amber-500 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 shadow-md flex items-center justify-center"
@@ -301,23 +384,27 @@ const CheckoutPage = () => {
                           Proceed to Payment
                         </button>
                       </div>
-                      
+
                       <div className="mt-4 text-center">
                         <p className="text-xs text-gray-500 flex items-center justify-center">
                           <Lock className="w-3 h-3 mr-1" /> Secure Payment
                         </p>
                       </div>
-                      
+
                       {/* Estimated Delivery */}
                       <div className="mt-6 bg-gray-50 p-4 rounded-md flex items-start">
                         <Truck className="w-5 h-5 text-amber-500 mr-2 mt-1" />
                         <div>
-                          <h4 className="font-medium text-gray-800">Estimated Delivery</h4>
+                          <h4 className="font-medium text-gray-800">
+                            Estimated Delivery
+                          </h4>
                           <p className="text-sm text-gray-600">
-                            {new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', {
-                              weekday: 'long',
-                              month: 'long',
-                              day: 'numeric'
+                            {new Date(
+                              Date.now() + 5 * 24 * 60 * 60 * 1000
+                            ).toLocaleDateString("en-US", {
+                              weekday: "long",
+                              month: "long",
+                              day: "numeric",
                             })}
                           </p>
                         </div>
@@ -328,7 +415,7 @@ const CheckoutPage = () => {
               </div>
             </div>
           </div>
-          
+
           {/* Additional information */}
           <div className="bg-white rounded-lg shadow-lg p-6">
             <div className="flex items-center mb-4">
@@ -336,18 +423,24 @@ const CheckoutPage = () => {
                 <ShoppingCart className="h-4 w-4 text-amber-500" />
               </div>
               <div>
-                <h3 className="font-medium text-wineRed">Free shipping on orders over ₹500</h3>
-                <p className="text-sm text-gray-600">You've qualified for free shipping!</p>
+                <h3 className="font-medium text-wineRed">
+                  Free shipping on orders over ₹500
+                </h3>
+                <p className="text-sm text-gray-600">
+                  You've qualified for free shipping!
+                </p>
               </div>
             </div>
-            
+
             <div className="flex items-center">
               <div className="h-8 w-8 rounded-full bg-amber-100 flex items-center justify-center mr-3">
                 <Lock className="h-4 w-4 text-amber-500" />
               </div>
               <div>
                 <h3 className="font-medium text-wineRed">Secure checkout</h3>
-                <p className="text-sm text-gray-600">Your payment information is protected</p>
+                <p className="text-sm text-gray-600">
+                  Your payment information is protected
+                </p>
               </div>
             </div>
           </div>

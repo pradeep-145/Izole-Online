@@ -20,7 +20,7 @@ import {
 import React, { useEffect, useState } from "react";
 import OrderManagement from "../../Components/admin/Ordermanagement";
 import ProductTable from "../../Components/admin/ProductTable";
-import { useProduct } from "../../zustand/useProducts";
+import { useProduct } from "../../zustand/useProducts.jsx";
 import AdminProductForm from "./ProductForm";
 
 const AdminDashboard = () => {
