@@ -433,7 +433,7 @@ const ProductList = () => {
                 <select
                   value={sortOption}
                   onChange={(e) => setSortOption(e.target.value)}
-                  className="bg-wineRed border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-wineRed "
+                  className="bg-wineRed border text-mustard border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-wineRed "
                 >
                   <option value="featured">Featured</option>
                   <option value="price-low-high">Price: Low to High</option>
@@ -617,7 +617,7 @@ const FilterSidebar = ({
             <input
               type="number"
               placeholder="Min"
-              className="w-full p-2 border text-wineRed border-gray-300 rounded"
+              className="w-full bg-white p-2 border text-wineRed border-gray-300 rounded"
               value={filters.price.min}
               onChange={(e) =>
                 handleFilterChange("price", { min: e.target.value })
@@ -628,7 +628,7 @@ const FilterSidebar = ({
             <input
               type="number"
               placeholder="Max"
-              className="w-full p-2 border border-gray-300 text-wineRed rounded"
+              className="w-full p-2 bg-white border border-gray-300 text-wineRed rounded"
               value={filters.price.max}
               onChange={(e) =>
                 handleFilterChange("price", { max: e.target.value })
@@ -666,7 +666,7 @@ const FilterSidebar = ({
           {filterOptions.colors.map((color) => (
             <FilterCheckbox
               key={color}
-              className="text-wineRed"
+              className="text-wineRed "
               label={color}
               isChecked={filters.colors.includes(color)}
               onChange={() => handleFilterChange("color", color)}
