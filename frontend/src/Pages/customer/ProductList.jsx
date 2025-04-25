@@ -332,7 +332,7 @@ const ProductList = () => {
       </div>
 
       {/* Main Content */}
-      <div className="container mx-auto px-4 py-6 md:py-8">
+      <div className="container text-wineRed mx-auto px-4 py-6 md:py-8">
         {/* Mobile Filter Button */}
         <div className="md:hidden flex justify-between items-center mb-4">
           <button
@@ -433,7 +433,7 @@ const ProductList = () => {
                 <select
                   value={sortOption}
                   onChange={(e) => setSortOption(e.target.value)}
-                  className="border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-wineRed"
+                  className="bg-wineRed border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-wineRed "
                 >
                   <option value="featured">Featured</option>
                   <option value="price-low-high">Price: Low to High</option>
@@ -576,8 +576,8 @@ const FilterSidebar = ({
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <h3 className="text-lg font-bold">Filters</h3>
+      <div className="flex justify-between text-wineRed items-center">
+        <h3 className="text-lg font-bold ">Filters</h3>
         {totalActiveFilters > 0 && (
           <button
             onClick={resetFilters}
@@ -590,13 +590,13 @@ const FilterSidebar = ({
 
       {/* Categories Filter */}
       <FilterSection
-        title="Categories"
+        title="Categories" className="text-wineRed"
         isOpen={openSections.categories}
         toggleOpen={() => toggleSection("categories")}
       >
         <div className="space-y-2">
           {filterOptions.categories.map((category) => (
-            <FilterCheckbox
+            <FilterCheckbox className="text-wineRed"
               key={category}
               label={category}
               isChecked={filters.categories.includes(category)}
@@ -612,23 +612,23 @@ const FilterSidebar = ({
         isOpen={openSections.price}
         toggleOpen={() => toggleSection("price")}
       >
-        <div className="space-y-2">
+        <div className="space-y-2 text-wineRed">
           <div className="flex items-center gap-2">
             <input
               type="number"
               placeholder="Min"
-              className="w-full p-2 border border-gray-300 rounded"
+              className="w-full p-2 border text-wineRed border-gray-300 rounded"
               value={filters.price.min}
               onChange={(e) =>
                 handleFilterChange("price", { min: e.target.value })
               }
               min={0}
             />
-            <span>to</span>
+            <span className="text-wineRed">to</span>
             <input
               type="number"
               placeholder="Max"
-              className="w-full p-2 border border-gray-300 rounded"
+              className="w-full p-2 border border-gray-300 text-wineRed rounded"
               value={filters.price.max}
               onChange={(e) =>
                 handleFilterChange("price", { max: e.target.value })
@@ -666,6 +666,7 @@ const FilterSidebar = ({
           {filterOptions.colors.map((color) => (
             <FilterCheckbox
               key={color}
+              className="text-wineRed"
               label={color}
               isChecked={filters.colors.includes(color)}
               onChange={() => handleFilterChange("color", color)}
@@ -679,9 +680,10 @@ const FilterSidebar = ({
       <FilterSection
         title="Sizes"
         isOpen={openSections.sizes}
+        className="text-wineRed"
         toggleOpen={() => toggleSection("sizes")}
       >
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2 text-wineRed">
           {filterOptions.sizes.map((size) => (
             <SizeButton
               key={size}
@@ -805,7 +807,7 @@ const SortOptions = ({ sortOption, setSortOption, setIsOpen }) => {
       {options.map((option) => (
         <button
           key={option.value}
-          className={`block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 
+          className={`block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 text-wineRed
             ${sortOption === option.value ? "bg-gray-100 font-medium" : ""}`}
           onClick={() => {
             setSortOption(option.value);

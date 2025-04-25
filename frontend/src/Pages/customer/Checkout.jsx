@@ -182,15 +182,15 @@ const CheckoutPage = () => {
   return (
     <div className="mx-auto bg-gray-50 min-h-screen">
       {/* Header with logo and title */}
-      <div className="bg-amber-400 py-4 sticky top-0 z-10 shadow-md">
+      <div className="bg-mustard py-4 sticky top-0 z-10 shadow-md">
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-center">
             <button
               onClick={handleGoBack}
-              className="flex items-center text-gray-800 hover:text-gray-600 transition-colors"
+              className="flex items-center border border-white p-1 rounded-lg text-white  hover:text-gray-600 transition-colors"
             >
               <ArrowLeft size={20} className="mr-1" />
-              <span>Back</span>
+              <span>Back to Cart</span>
             </button>
 
             <h1 className="text-2xl font-bold text-gray-800">
@@ -336,7 +336,7 @@ const CheckoutPage = () => {
                               className="w-16 h-16 object-cover rounded-md"
                             />
                             <div className="ml-4 flex-1">
-                              <h4 className="font-medium">{item.name}</h4>
+                              <h4 className="font-medium text-wineRed">{item.name}</h4>
                               <div className="flex justify-between items-center mt-1">
                                 <div className="text-sm text-gray-600">
                                   <p>Qty: {item.quantity}</p>

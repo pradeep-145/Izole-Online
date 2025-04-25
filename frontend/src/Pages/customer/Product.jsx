@@ -397,7 +397,7 @@ const Product = () => {
                         : "hover:bg-gray-100"
                     }`}
                   >
-                    <ArrowLeft size={20} />
+                    <ArrowLeft size={20} className="text-wineRed"/>
                   </button>
 
                   <button
@@ -409,7 +409,7 @@ const Product = () => {
                         : "hover:bg-gray-100"
                     }`}
                   >
-                    <ArrowRight size={20} />
+                    <ArrowRight size={20} className="text-wineRed"/>
                   </button>
 
                   {/* Add Wishlist Button in top-right corner */}
@@ -464,11 +464,11 @@ const Product = () => {
                 </h1>
 
                 {/* Ratings */}
-                <div className="flex items-center gap-2 mt-2">
+                <div className="flex items-center gap-2 mt-2 text-wineRed">
                   <div className="flex items-center">
                     {renderStars(calculateAverageRating(product.review))}
                   </div>
-                  <span className="badge badge-outline text-wineRed">
+                  <span className="text-wineRed font-semibold">
                     {calculateAverageRating(product.review)} (
                     {product.review.length} reviews)
                   </span>
@@ -597,7 +597,7 @@ const Product = () => {
                         className={`join-item btn ${
                           index === currentSizeIndex
                             ? "btn-primary text-mustard bg-wineRed"
-                            : "btn-outline text-wineRed"
+                            : "btn-outline text-wineRed hover:bg-mustard hover:text-wineRed"
                         } ${sizeOption.quantity === 0 ? "btn-disabled" : ""}`}
                         disabled={sizeOption.quantity === 0}
                       >
@@ -674,7 +674,7 @@ const Product = () => {
                   <button
                     onClick={handleWishlistToggle}
                     disabled={isWishlistLoading}
-                    className={`btn btn-sm btn-outline flex-1 ${
+                    className={`btn bg-yellow-50 flex-1 ${
                       inWishlist
                         ? "text-red-500 border-red-500"
                         : "text-wineRed"
@@ -689,7 +689,7 @@ const Product = () => {
                       ? "Remove from Wishlist"
                       : "Add to Wishlist"}
                   </button>
-                  <button className="btn btn-sm btn-outline text-wineRed flex-1">
+                  <button className="bg-yellow-50 btn text-wineRed flex-1">
                     <Share2 className="h-5 w-5" />
                     Share
                   </button>
