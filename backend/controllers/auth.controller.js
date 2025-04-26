@@ -1,16 +1,18 @@
 const crypto = require("crypto");
 const customerModel = require("../models/customer.model.js");
 const { JwtService } = require("../services/jwt.service.js");
-const otpModel=require('../models/otp.model.js')
-const nodemailer = require('nodemailer')
+const otpModel = require("../models/otp.model.js");
+const nodemailer = require("nodemailer");
 
 const AuthController = {
   signUp: async (req, res) => {
-    const { username, password, email,gender, phoneNumber, name } = req.body;
+    const { username, password, email, gender, phoneNumber, name } = req.body;
     console.log("Sign-up request received:", { username, email, phoneNumber });
 
     try {
-      const avatar=`https://avatar.iran.liara.run/public/${gender=='Male'?'boy':'girl'}?username=${username}`
+      const avatar = `https://avatar.iran.liara.run/public/${
+        gender == "Male" ? "boy" : "girl"
+      }?username=${username}`;
       const response = await customerModel.create({
         username,
         password,
@@ -18,10 +20,8 @@ const AuthController = {
         phoneNumber,
         gender,
         name,
-        avatar
-        
-      }
-      );
+        avatar,
+      });
       const { password: _, ...userWithoutPassword } = response.toObject();
       console.log("Sign-up successful:", userWithoutPassword);
       res.json(userWithoutPassword);
@@ -36,7 +36,7 @@ const AuthController = {
     console.log("Login request received:", req.body);
 
     try {
-      const response = await customerModel.findOne({username});
+      const response = await customerModel.findOne({ username });
       if (response) {
         if (response.password == password) {
           const payload = {
@@ -46,13 +46,18 @@ const AuthController = {
           };
           const token = await JwtService.generateToken(payload);
           const { password: _, ...userWithoutPassword } = response.toObject();
-          res.setHeader('Set-Cookie', [
-            `jwt=${token}; HttpOnly; Path=/; SameSite=Lax`
+
+          // Calculate 150 days in seconds: 150 days × 24 hours × 60 minutes × 60 seconds
+          const maxAge = 150 * 24 * 60 * 60;
+
+          res.setHeader("Set-Cookie", [
+            `jwt=${token}; HttpOnly; Path=/; SameSite=Lax; Max-Age=${maxAge};`,
           ]);
+
           res.json({
             message: "Login successful",
-            authUser: userWithoutPassword, 
-            token:token
+            authUser: userWithoutPassword,
+            token: token,
           });
         } else {
           res.status(400).json("Invalid Password");
@@ -68,11 +73,11 @@ const AuthController = {
   sendMail: async (req, res) => {
     const { customerId, email } = req.body;
     const otp = crypto.randomInt(10 ** 5, 10 ** 6);
-  
+
     await otpModel.storeOTP(customerId, otp);
-  
+
     const transporter = nodemailer.createTransport({
-      service: "gmail", 
+      service: "gmail",
       auth: {
         user: process.env.EMAIL,
         pass: process.env.PASSWORD,
@@ -114,32 +119,33 @@ const AuthController = {
       res.status(500).json("Internal server Error");
     }
   },
-  verifyOTP:async(req,res)=>{
-    const {customerId, code }= req.body;
-    try{
-      const verified=await otpModel.passwordResetVerification(customerId, code);
-      if(verified){
+  verifyOTP: async (req, res) => {
+    const { customerId, code } = req.body;
+    try {
+      const verified = await otpModel.passwordResetVerification(
+        customerId,
+        code
+      );
+      if (verified) {
         res.status(200).json("user verified");
-
-      }
-      else{
+      } else {
         res.status(400).json("Re-Enter OTP");
       }
-    }catch(error){
-      console.log("verifyOtp error",error);
+    } catch (error) {
+      console.log("verifyOtp error", error);
       res.status(500).json("Internal server Error");
     }
   },
-  resetPassword:async(req,res)=>{
-    const {email, password}=req.body;
+  resetPassword: async (req, res) => {
+    const { email, password } = req.body;
     try {
-      await customerModel.findOneAndUpdate({email},{password});
+      await customerModel.findOneAndUpdate({ email }, { password });
       res.status(200).json("Password updated successfully");
     } catch (error) {
       console.log("Error at reset Password", error);
       res.status(500).json("Internal server error");
     }
-  }
+  },
 };
 
 module.exports = AuthController;

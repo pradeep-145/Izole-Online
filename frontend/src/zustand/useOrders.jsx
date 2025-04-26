@@ -1,164 +1,228 @@
+import axios from "axios";
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
-import { create } from 'zustand';
-import axios from 'axios';
+// Configuration values
+const ORDERS_CACHE_TTL = 10 * 60 * 1000; // 10 minutes
+let fetchOrdersPromise = null;
+let fetchOrderDetailsPromise = {};
 
-export const useOrders = create((set, get) => ({
-  orders: [],
-  isLoading: false,
-  error: null,
-  activeTab: 'all',
-  searchQuery: '',
-  statusFilter: 'all',
-  dateFilter: 'all',
-  selectedOrders: [],
-  allSelected: false,
+export const useOrders = create(
+  persist(
+    (set, get) => ({
+      orders: [],
+      currentOrder: null,
+      isLoading: false,
+      error: null,
+      ordersLastFetched: null,
 
-  // Fetch orders
-  fetchOrders: async () => {
-    try {
-      set({ isLoading: true });
-      const response = await axios.get('/api/orders',{
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-          'Content-Type': 'application/json'
+      // Fetch user orders with optimization
+      fetchOrders: async (forceRefresh = false) => {
+        const { orders, ordersLastFetched, isLoading } = get();
+        const now = Date.now();
+
+        // Use cached data if available and fresh
+        if (
+          isLoading ||
+          (!forceRefresh &&
+            orders.length > 0 &&
+            ordersLastFetched &&
+            now - ordersLastFetched < ORDERS_CACHE_TTL)
+        ) {
+          return { success: true, orders };
         }
-      });
-      set({ orders: response.data, isLoading: false });
-    } catch (error) {
-      set({ error: error.message, isLoading: false });
-    }
-  },
 
-  // Update order status
-  updateOrderStatus: async (orderId, status) => {
-    try {
-      const response = await axios.patch(`/api/orders/${orderId}/status`,{
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-          'Content-Type': 'application/json'
+        // Debounce multiple simultaneous requests
+        if (fetchOrdersPromise) {
+          return fetchOrdersPromise;
         }
-      }, { status });
-      if (response.data) {
-        const updatedOrders = get().orders.map(order => 
-          order._id === orderId ? { ...order, status } : order
-        );
-        set({ orders: updatedOrders });
-      }
-    } catch (error) {
-      console.error('Error updating order status:', error);
-    }
-  },
 
-  // Update delivery status
-  updateDeliveryStatus: async (orderId, delivery) => {
-    try {
-      const response = await axios.patch(`/api/orders/${orderId}/delivery`,{
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-          'Content-Type': 'application/json'
+        set({ isLoading: true, error: null });
+
+        fetchOrdersPromise = new Promise(async (resolve) => {
+          try {
+            const response = await axios.get("/api/orders", {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                "Content-Type": "application/json",
+              },
+            });
+
+            set({
+              orders: response.data.orders || [],
+              isLoading: false,
+              ordersLastFetched: Date.now(),
+            });
+
+            resolve({ success: true, orders: response.data.orders });
+          } catch (error) {
+            set({
+              error: error.response?.data?.message || "Failed to fetch orders",
+              isLoading: false,
+            });
+            resolve({
+              success: false,
+              error: error.response?.data?.message || "Failed to fetch orders",
+            });
+          } finally {
+            fetchOrdersPromise = null;
+          }
+        });
+
+        return fetchOrdersPromise;
+      },
+
+      // Fetch single order details with caching
+      fetchOrderDetails: async (orderId, forceRefresh = false) => {
+        const { currentOrder, isLoading } = get();
+
+        // Use current order if it's the one we want
+        if (!forceRefresh && currentOrder && currentOrder._id === orderId) {
+          return { success: true, order: currentOrder };
         }
-      }, { delivery });
-      if (response.data) {
-        const updatedOrders = get().orders.map(order => 
-          order._id === orderId ? { ...order, delivery } : order
-        );
-        set({ orders: updatedOrders });
-      }
-    } catch (error) {
-      console.error('Error updating delivery status:', error);
-    }
-  },
 
-  // Set active tab
-  setActiveTab: (tab) => set({ activeTab: tab }),
-
-  // Set search query
-  setSearchQuery: (query) => set({ searchQuery: query }),
-
-  // Set status filter
-  setStatusFilter: (status) => set({ statusFilter: status }),
-
-  // Set date filter
-  setDateFilter: (date) => set({ dateFilter: date }),
-
-  // Toggle order selection
-  toggleOrderSelection: (orderId) => {
-    const { selectedOrders } = get();
-    if (selectedOrders.includes(orderId)) {
-      set({ selectedOrders: selectedOrders.filter(id => id !== orderId) });
-    } else {
-      set({ selectedOrders: [...selectedOrders, orderId] });
-    }
-  },
-
-  // Toggle select all
-  toggleSelectAll: (filteredOrders) => {
-    const { allSelected } = get();
-    if (allSelected) {
-      set({ selectedOrders: [], allSelected: false });
-    } else {
-      set({ 
-        selectedOrders: filteredOrders.map(order => order._id), 
-        allSelected: true 
-      });
-    }
-  },
-
-  // Get filtered orders
-  getFilteredOrders: () => {
-    const { orders, activeTab, searchQuery, statusFilter, dateFilter } = get();
-    
-    return orders.filter(order => {
-      // Filter by tab
-      if (activeTab !== 'all' && order.status.toLowerCase() !== activeTab.toLowerCase()) {
-        return false;
-      }
-      
-      // Filter by search
-      if (searchQuery && 
-         !order._id.toLowerCase().includes(searchQuery.toLowerCase()) && 
-         !order.productId.name.toLowerCase().includes(searchQuery.toLowerCase())) {
-        return false;
-      }
-      
-      // Filter by status
-      if (statusFilter !== 'all' && order.status !== statusFilter) {
-        return false;
-      }
-      
-      // Filter by date
-      if (dateFilter !== 'all') {
-        const orderDate = new Date(order.createdAt);
-        const today = new Date();
-        
-        switch (dateFilter) {
-          case 'today':
-            return orderDate.toDateString() === today.toDateString();
-          case 'yesterday':
-            const yesterday = new Date(today);
-            yesterday.setDate(yesterday.getDate() - 1);
-            return orderDate.toDateString() === yesterday.toDateString();
-          case 'last7days':
-            const lastWeek = new Date(today);
-            lastWeek.setDate(lastWeek.getDate() - 7);
-            return orderDate >= lastWeek;
-          case 'thisMonth':
-            return orderDate.getMonth() === today.getMonth() && 
-                   orderDate.getFullYear() === today.getFullYear();
-          default:
-            return true;
+        // Debounce multiple requests for same order
+        if (fetchOrderDetailsPromise[orderId]) {
+          return fetchOrderDetailsPromise[orderId];
         }
-      }
-      
-      return true;
-    });
-  },
 
-  // Get status count
-  getStatusCount: (status) => {
-    const { orders } = get();
-    return orders.filter(order => 
-      status === 'all' ? true : order.status.toLowerCase() === status.toLowerCase()
-    ).length;
-  }
-}));
+        set({ isLoading: true, error: null });
+
+        fetchOrderDetailsPromise[orderId] = new Promise(async (resolve) => {
+          try {
+            const response = await axios.get(`/api/orders/${orderId}`, {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                "Content-Type": "application/json",
+              },
+            });
+
+            set({
+              currentOrder: response.data.order,
+              isLoading: false,
+            });
+
+            resolve({ success: true, order: response.data.order });
+          } catch (error) {
+            set({
+              error:
+                error.response?.data?.message ||
+                "Failed to fetch order details",
+              isLoading: false,
+            });
+            resolve({
+              success: false,
+              error:
+                error.response?.data?.message ||
+                "Failed to fetch order details",
+            });
+          } finally {
+            delete fetchOrderDetailsPromise[orderId];
+          }
+        });
+
+        return fetchOrderDetailsPromise[orderId];
+      },
+
+      // Place order
+      placeOrder: async (orderData) => {
+        set({ isLoading: true, error: null });
+        try {
+          const response = await axios.post("/api/orders", orderData, {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+              "Content-Type": "application/json",
+            },
+          });
+
+          // Update orders list with new order
+          set((state) => ({
+            orders: [response.data.order, ...state.orders],
+            currentOrder: response.data.order,
+            isLoading: false,
+          }));
+
+          return { success: true, order: response.data.order };
+        } catch (error) {
+          set({
+            error: error.response?.data?.message || "Failed to place order",
+            isLoading: false,
+          });
+          return {
+            success: false,
+            error: error.response?.data?.message || "Failed to place order",
+          };
+        }
+      },
+
+      // Cancel order
+      cancelOrder: async (orderId, reason) => {
+        set({ isLoading: true, error: null });
+        try {
+          const response = await axios.post(
+            `/api/orders/${orderId}/cancel`,
+            { reason },
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                "Content-Type": "application/json",
+              },
+            }
+          );
+
+          // Update order status in both orders list and current order
+          set((state) => ({
+            orders: state.orders.map((order) =>
+              order._id === orderId
+                ? { ...order, status: "Cancelled", cancelReason: reason }
+                : order
+            ),
+            currentOrder:
+              state.currentOrder && state.currentOrder._id === orderId
+                ? {
+                    ...state.currentOrder,
+                    status: "Cancelled",
+                    cancelReason: reason,
+                  }
+                : state.currentOrder,
+            isLoading: false,
+          }));
+
+          return { success: true };
+        } catch (error) {
+          set({
+            error: error.response?.data?.message || "Failed to cancel order",
+            isLoading: false,
+          });
+          return {
+            success: false,
+            error: error.response?.data?.message || "Failed to cancel order",
+          };
+        }
+      },
+
+      // Clear order data (e.g., on logout)
+      clearOrderData: () => {
+        set({
+          orders: [],
+          currentOrder: null,
+          ordersLastFetched: null,
+        });
+      },
+
+      // Check if data is stale
+      isDataStale: () => {
+        const { ordersLastFetched } = get();
+        const now = Date.now();
+        return !ordersLastFetched || now - ordersLastFetched > ORDERS_CACHE_TTL;
+      },
+    }),
+    {
+      name: "orders-storage",
+      partialize: (state) => ({
+        orders: state.orders,
+        ordersLastFetched: state.ordersLastFetched,
+      }),
+    }
+  )
+);
