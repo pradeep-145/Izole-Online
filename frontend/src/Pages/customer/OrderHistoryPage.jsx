@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Box, Calendar, Clock, Package, ChevronRight, Truck, Check } from 'lucide-react';
+import Navbar from '../../Components/customer/Navbar';
 
 const OrderHistoryPage = () => {
   const [selectedOrder, setSelectedOrder] = useState(null);
@@ -103,7 +104,9 @@ const OrderHistoryPage = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-6 bg-gray-50">
+      <div>
+      <Navbar/>
+    <div className="max-w-6xl mx-auto p-6 lg:mt-28 bg-yellow-50">
       <h1 className="text-3xl font-bold mb-8 text-center text-wineRed">Order History</h1>
       
       <div className="grid md:grid-cols-3 gap-6">
@@ -114,7 +117,7 @@ const OrderHistoryPage = () => {
               {orders.map(order => (
                 <div
                   key={order.id}
-                  className={`p-3 rounded-md cursor-pointer transition-all hover:bg-gray-100 flex justify-between items-center ${selectedOrder?.id === order.id ? 'bg-gray-100 border-l-4 border-[#8B0000]' : ''}`}
+                  className={`p-3 rounded-md cursor-pointer transition-all hover:bg-mustard flex justify-between items-center ${selectedOrder?.id === order.id ? 'bg-gray-100 border-l-4 border-wineRed ' : ''}`}
                   onClick={() => setSelectedOrder(order)}
                 >
                   <div>
@@ -207,14 +210,14 @@ const OrderHistoryPage = () => {
                 </div>
               </div>
               
-              <div className="mt-8 flex justify-end space-x-4">
+              {/* <div className="mt-8 flex justify-end space-x-4">
                 <button className="px-4 py-2 border border-[#8B0000] text-wineRed rounded-md hover:bg-gray-50">
                   Need Help?
                 </button>
                 <button className="px-4 py-2 bg-[#FFC107] text-white rounded-md hover:bg-amber-500">
                   Re-order Items
                 </button>
-              </div>
+              </div> */}
             </div>
           ) : (
             <div className="bg-white p-6 rounded-lg shadow-md flex flex-col items-center justify-center h-full">
@@ -224,6 +227,7 @@ const OrderHistoryPage = () => {
           )}
         </div>
       </div>
+    </div>
     </div>
   );
 };

@@ -187,7 +187,7 @@ const CheckoutPage = () => {
           <div className="flex justify-between items-center">
             <button
               onClick={handleGoBack}
-              className="flex items-center border border-white p-1 rounded-lg text-white  hover:text-gray-600 transition-colors"
+              className="flex items-center border-2 border-wineRed font-semibold p-1 rounded-lg text-wineRed hover:text-gray-600 transition-colors"
             >
               <ArrowLeft size={20} className="mr-1" />
               <span>Back to Cart</span>

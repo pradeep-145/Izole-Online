@@ -386,7 +386,7 @@ const ProductList = () => {
               <div className="mt-6 grid grid-cols-2 gap-2">
                 <button
                   onClick={resetFilters}
-                  className="py-2 border border-gray-300 rounded text-center"
+                  className="py-2 border border-black rounded text-center"
                 >
                   Clear All
                 </button>
@@ -433,7 +433,7 @@ const ProductList = () => {
                 <select
                   value={sortOption}
                   onChange={(e) => setSortOption(e.target.value)}
-                  className="bg-wineRed border text-mustard border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-wineRed "
+                  className="bg-wineRed border text-mustard border-black rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-wineRed "
                 >
                   <option value="featured">Featured</option>
                   <option value="price-low-high">Price: Low to High</option>
@@ -447,7 +447,7 @@ const ProductList = () => {
 
             {/* Active Filters Display */}
             {totalActiveFilters > 0 && (
-              <div className="flex flex-wrap gap-2 mb-4 pb-3 border-b border-gray-200">
+              <div className="flex flex-wrap gap-2 mb-4 pb-3 border-b border-wineRed">
                 {filters.categories.map((category) => (
                   <FilterTag
                     key={`cat-${category}`}
@@ -576,6 +576,7 @@ const FilterSidebar = ({
 
   return (
     <div className="space-y-4">
+      <div className="bg-mustard p-4 rounded-md ">
       <div className="flex justify-between text-wineRed items-center">
         <h3 className="text-lg font-bold ">Filters</h3>
         {totalActiveFilters > 0 && (
@@ -617,7 +618,7 @@ const FilterSidebar = ({
             <input
               type="number"
               placeholder="Min"
-              className="w-full bg-white p-2 border text-wineRed border-gray-300 rounded"
+              className="w-full bg-white p-2 border text-wineRed border-black rounded"
               value={filters.price.min}
               onChange={(e) =>
                 handleFilterChange("price", { min: e.target.value })
@@ -628,7 +629,7 @@ const FilterSidebar = ({
             <input
               type="number"
               placeholder="Max"
-              className="w-full p-2 bg-white border border-gray-300 text-wineRed rounded"
+              className="w-full p-2 bg-white border border-black text-wineRed rounded"
               value={filters.price.max}
               onChange={(e) =>
                 handleFilterChange("price", { max: e.target.value })
@@ -715,6 +716,7 @@ const FilterSidebar = ({
         </div>
       </FilterSection>
     </div>
+    </div>
   );
 };
 
@@ -747,12 +749,12 @@ const FilterCheckbox = ({ label, isChecked, onChange, colorSquare }) => {
         type="checkbox"
         checked={isChecked}
         onChange={onChange}
-        className="form-checkbox h-4 w-4 text-wineRed rounded focus:ring-wineRed border-gray-300"
+        className="form-checkbox h-4 w-4 text-wineRed rounded focus:ring-wineRed border-black"
       />
       <span className="ml-2 flex items-center">
         {colorSquare && (
           <span
-            className="inline-block w-3 h-3 mr-1 border border-gray-300 rounded-sm"
+            className="inline-block w-3 h-3 mr-1 border border-black rounded-sm"
             style={{ backgroundColor: colorSquare }}
           ></span>
         )}
@@ -771,7 +773,7 @@ const SizeButton = ({ size, isSelected, onClick }) => {
         ${
           isSelected
             ? "bg-wineRed text-white border-wineRed"
-            : "bg-white text-gray-700 border-gray-300 hover:border-gray-400"
+            : "bg-white text-gray-700 border-black hover:border-wineRed"
         }`}
     >
       {size}
@@ -784,7 +786,7 @@ const PriceRangeButton = ({ range, label, handleFilterChange }) => {
   return (
     <button
       onClick={() => handleFilterChange("price", range)}
-      className="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-100"
+      className="px-3 py-1 text-sm border border-black rounded-md hover:bg-gray-100"
     >
       {label || `₹${range.min} - ₹${range.max}`}
     </button>

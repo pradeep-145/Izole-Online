@@ -110,7 +110,7 @@ const Contact = () => {
                       value={formData.name}
                       onChange={handleChange}
                       placeholder="Enter your name"
-                      className="input input-bordered text-white rounded-lg w-full border border-mustard focus:outline-none"
+                      className="input input-bordered  rounded-lg w-full border border-mustard focus:outline-none"
                       required
                     />
                   </div>
@@ -127,7 +127,7 @@ const Contact = () => {
                       value={formData.email}
                       onChange={handleChange}
                       placeholder="Enter your email"
-                      className="input input-bordered text-white rounded-lg w-full border border-mustard focus:outline-none"
+                      className="input input-bordered  rounded-lg w-full border border-mustard focus:outline-none"
                       required
                     />
                   </div>
@@ -145,7 +145,7 @@ const Contact = () => {
                     value={formData.subject}
                     onChange={handleChange}
                     placeholder="How can we help you?"
-                    className="input input-bordered text-white rounded-lg w-full border border-mustard focus:outline-none"
+                    className="input input-bordered  rounded-lg w-full border border-mustard focus:outline-none"
                     required
                   />
                 </div>
@@ -161,7 +161,7 @@ const Contact = () => {
                     value={formData.message}
                     onChange={handleChange}
                     placeholder="Type your message here..."
-                    className="textarea textarea-bordered w-full h-32 border border-mustard text-white rounded-lg focus:outline-none"
+                    className="textarea textarea-bordered w-full h-32 border border-mustard rounded-lg focus:outline-none"
                     required
                   ></textarea>
                 </div>
