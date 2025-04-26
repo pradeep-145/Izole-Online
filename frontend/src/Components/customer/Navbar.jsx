@@ -152,7 +152,7 @@ const Navbar = () => {
     <div className="flex flex-col space-y-2 max-w-md mx-auto">
       <Link
         to="/customer"
-        className="btn bg-green-600 hover:bg-green-700 text-white justify-start rounded-lg py-3 transition-all duration-200"
+        className="btn bg-wineRed hover:bg-green-700 text-white justify-start rounded-lg py-3 transition-all duration-200"
         onClick={() => setIsMobileMenuOpen(false)}
       >
         <Home className="h-5 w-5 mr-2" /> Home
@@ -192,14 +192,14 @@ const Navbar = () => {
 
       <Link
         to="/customer#about"
-        className="btn bg-yellow-400 hover:bg-yellow-500 text-green-800 justify-start rounded-lg py-3 transition-all duration-200"
+        className="btn bg-mustard hover:bg-mustard/90 text-green-800 justify-start rounded-lg py-3 transition-all duration-200"
         onClick={() => setIsMobileMenuOpen(false)}
       >
         <Info className="h-5 w-5 mr-2" /> About
       </Link>
       <Link
         to="/customer#contact"
-        className="btn bg-yellow-400 hover:bg-yellow-500 text-green-800 justify-start rounded-lg py-3 transition-all duration-200"
+        className="btn bg-mustard hover:bg-mustard/90 text-green-800 justify-start rounded-lg py-3 transition-all duration-200"
         onClick={() => setIsMobileMenuOpen(false)}
       >
         <Mail className="h-5 w-5 mr-2" /> Contact
@@ -247,7 +247,7 @@ const Navbar = () => {
           <div className="divider my-4 before:bg-green-200 after:bg-green-200"></div>
           <Link
             to="/customer/login"
-            className="btn bg-green-600 hover:bg-green-700 text-white btn-block mt-4 rounded-lg py-3 shadow-md hover:shadow-lg transition-all duration-200"
+            className="btn bg-wineRed hover:bg-green-700 text-white btn-block mt-4 rounded-lg py-3 shadow-md hover:shadow-lg transition-all duration-200"
             onClick={() => setIsMobileMenuOpen(false)}
           >
             <LogIn className="h-5 w-5 mr-2" /> Login / Sign Up

@@ -332,7 +332,7 @@ const ProductList = () => {
       </div>
 
       {/* Main Content */}
-      <div className="container mx-auto px-4 py-6 md:py-8">
+      <div className="container text-wineRed mx-auto px-4 py-6 md:py-8">
         {/* Mobile Filter Button */}
         <div className="md:hidden flex justify-between items-center mb-4">
           <button
@@ -386,7 +386,7 @@ const ProductList = () => {
               <div className="mt-6 grid grid-cols-2 gap-2">
                 <button
                   onClick={resetFilters}
-                  className="py-2 border border-gray-300 rounded text-center"
+                  className="py-2 border border-black rounded text-center"
                 >
                   Clear All
                 </button>
@@ -433,7 +433,7 @@ const ProductList = () => {
                 <select
                   value={sortOption}
                   onChange={(e) => setSortOption(e.target.value)}
-                  className="border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-wineRed"
+                  className="bg-wineRed border text-mustard border-black rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-wineRed "
                 >
                   <option value="featured">Featured</option>
                   <option value="price-low-high">Price: Low to High</option>
@@ -447,7 +447,7 @@ const ProductList = () => {
 
             {/* Active Filters Display */}
             {totalActiveFilters > 0 && (
-              <div className="flex flex-wrap gap-2 mb-4 pb-3 border-b border-gray-200">
+              <div className="flex flex-wrap gap-2 mb-4 pb-3 border-b border-wineRed">
                 {filters.categories.map((category) => (
                   <FilterTag
                     key={`cat-${category}`}
@@ -576,8 +576,9 @@ const FilterSidebar = ({
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <h3 className="text-lg font-bold">Filters</h3>
+      <div className="bg-mustard p-4 rounded-md ">
+      <div className="flex justify-between text-wineRed items-center">
+        <h3 className="text-lg font-bold ">Filters</h3>
         {totalActiveFilters > 0 && (
           <button
             onClick={resetFilters}
@@ -590,13 +591,13 @@ const FilterSidebar = ({
 
       {/* Categories Filter */}
       <FilterSection
-        title="Categories"
+        title="Categories" className="text-wineRed"
         isOpen={openSections.categories}
         toggleOpen={() => toggleSection("categories")}
       >
         <div className="space-y-2">
           {filterOptions.categories.map((category) => (
-            <FilterCheckbox
+            <FilterCheckbox className="text-wineRed"
               key={category}
               label={category}
               isChecked={filters.categories.includes(category)}
@@ -612,23 +613,23 @@ const FilterSidebar = ({
         isOpen={openSections.price}
         toggleOpen={() => toggleSection("price")}
       >
-        <div className="space-y-2">
+        <div className="space-y-2 text-wineRed">
           <div className="flex items-center gap-2">
             <input
               type="number"
               placeholder="Min"
-              className="w-full p-2 border border-gray-300 rounded"
+              className="w-full bg-white p-2 border text-wineRed border-black rounded"
               value={filters.price.min}
               onChange={(e) =>
                 handleFilterChange("price", { min: e.target.value })
               }
               min={0}
             />
-            <span>to</span>
+            <span className="text-wineRed">to</span>
             <input
               type="number"
               placeholder="Max"
-              className="w-full p-2 border border-gray-300 rounded"
+              className="w-full p-2 bg-white border border-black text-wineRed rounded"
               value={filters.price.max}
               onChange={(e) =>
                 handleFilterChange("price", { max: e.target.value })
@@ -666,6 +667,7 @@ const FilterSidebar = ({
           {filterOptions.colors.map((color) => (
             <FilterCheckbox
               key={color}
+              className="text-wineRed "
               label={color}
               isChecked={filters.colors.includes(color)}
               onChange={() => handleFilterChange("color", color)}
@@ -679,9 +681,10 @@ const FilterSidebar = ({
       <FilterSection
         title="Sizes"
         isOpen={openSections.sizes}
+        className="text-wineRed"
         toggleOpen={() => toggleSection("sizes")}
       >
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2 text-wineRed">
           {filterOptions.sizes.map((size) => (
             <SizeButton
               key={size}
@@ -712,6 +715,7 @@ const FilterSidebar = ({
           />
         </div>
       </FilterSection>
+    </div>
     </div>
   );
 };
@@ -745,12 +749,12 @@ const FilterCheckbox = ({ label, isChecked, onChange, colorSquare }) => {
         type="checkbox"
         checked={isChecked}
         onChange={onChange}
-        className="form-checkbox h-4 w-4 text-wineRed rounded focus:ring-wineRed border-gray-300"
+        className="form-checkbox h-4 w-4 text-wineRed rounded focus:ring-wineRed border-black"
       />
       <span className="ml-2 flex items-center">
         {colorSquare && (
           <span
-            className="inline-block w-3 h-3 mr-1 border border-gray-300 rounded-sm"
+            className="inline-block w-3 h-3 mr-1 border border-black rounded-sm"
             style={{ backgroundColor: colorSquare }}
           ></span>
         )}
@@ -769,7 +773,7 @@ const SizeButton = ({ size, isSelected, onClick }) => {
         ${
           isSelected
             ? "bg-wineRed text-white border-wineRed"
-            : "bg-white text-gray-700 border-gray-300 hover:border-gray-400"
+            : "bg-white text-gray-700 border-black hover:border-wineRed"
         }`}
     >
       {size}
@@ -782,7 +786,7 @@ const PriceRangeButton = ({ range, label, handleFilterChange }) => {
   return (
     <button
       onClick={() => handleFilterChange("price", range)}
-      className="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-100"
+      className="px-3 py-1 text-sm border border-black rounded-md hover:bg-gray-100"
     >
       {label || `₹${range.min} - ₹${range.max}`}
     </button>
@@ -805,7 +809,7 @@ const SortOptions = ({ sortOption, setSortOption, setIsOpen }) => {
       {options.map((option) => (
         <button
           key={option.value}
-          className={`block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 
+          className={`block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 text-wineRed
             ${sortOption === option.value ? "bg-gray-100 font-medium" : ""}`}
           onClick={() => {
             setSortOption(option.value);

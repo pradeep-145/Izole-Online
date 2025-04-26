@@ -340,7 +340,7 @@ const Product = () => {
   };
 
   return (
-    <div className="bg-[#F5F1E0] min-h-screen">
+    <div className="bg-yellow-50 min-h-screen">
       <Navbar />
 
       {/* Toast Notification for Cart */}
@@ -357,7 +357,7 @@ const Product = () => {
 
       <main className="max-w-6xl mx-auto pt-16 px-4 lg:px-0">
         {/* Product Overview Section */}
-        <div className="breadcrumbs text-wineRed mb-4">
+        {/* <div className="breadcrumbs text-wineRed mb-4">
           <ul>
             <li>
               <a href="/customer/home">Home</a>
@@ -369,9 +369,9 @@ const Product = () => {
             </li>
             <li>{product.name}</li>
           </ul>
-        </div>
+        </div> */}
 
-        <section className="card bg-white shadow-xl">
+        <section className="card bg-white shadow-xl mt-10">
           <div className="card-body p-6">
             <div className="flex flex-col lg:flex-row gap-8">
               {/* Image Gallery Section */}
@@ -391,25 +391,25 @@ const Product = () => {
                   <button
                     onClick={prevImage}
                     disabled={mainImageIndex === 0}
-                    className={`btn btn-circle btn-sm absolute left-2 top-1/2 transform -translate-y-1/2 bg-white ${
+                    className={`btn btn-circle btn-sm border border-wineRed absolute left-2 top-1/2 transform -translate-y-1/2 bg-white ${
                       mainImageIndex === 0
                         ? "btn-disabled"
                         : "hover:bg-gray-100"
                     }`}
                   >
-                    <ArrowLeft size={20} />
+                    <ArrowLeft size={20} className="text-wineRed "/>
                   </button>
 
                   <button
                     onClick={nextImage}
                     disabled={mainImageIndex === images.length - 1}
-                    className={`btn btn-circle btn-sm absolute right-2 top-1/2 transform -translate-y-1/2 bg-white ${
+                    className={`btn btn-circle btn-sm border border-wineRed absolute right-2 top-1/2 transform -translate-y-1/2 bg-white ${
                       mainImageIndex === images.length - 1
                         ? "btn-disabled"
                         : "hover:bg-gray-100"
                     }`}
                   >
-                    <ArrowRight size={20} />
+                    <ArrowRight size={20} className="text-wineRed"/>
                   </button>
 
                   {/* Add Wishlist Button in top-right corner */}
@@ -464,11 +464,11 @@ const Product = () => {
                 </h1>
 
                 {/* Ratings */}
-                <div className="flex items-center gap-2 mt-2">
+                <div className="flex items-center gap-2 mt-2 text-wineRed">
                   <div className="flex items-center">
                     {renderStars(calculateAverageRating(product.review))}
                   </div>
-                  <span className="badge badge-outline text-wineRed">
+                  <span className="text-wineRed font-semibold">
                     {calculateAverageRating(product.review)} (
                     {product.review.length} reviews)
                   </span>
@@ -597,7 +597,7 @@ const Product = () => {
                         className={`join-item btn ${
                           index === currentSizeIndex
                             ? "btn-primary text-mustard bg-wineRed"
-                            : "btn-outline text-wineRed"
+                            : "btn-outline text-wineRed hover:bg-mustard hover:text-wineRed"
                         } ${sizeOption.quantity === 0 ? "btn-disabled" : ""}`}
                         disabled={sizeOption.quantity === 0}
                       >
@@ -674,7 +674,7 @@ const Product = () => {
                   <button
                     onClick={handleWishlistToggle}
                     disabled={isWishlistLoading}
-                    className={`btn btn-sm btn-outline flex-1 ${
+                    className={`btn bg-yellow-100 flex-1 ${
                       inWishlist
                         ? "text-red-500 border-red-500"
                         : "text-wineRed"
@@ -689,7 +689,7 @@ const Product = () => {
                       ? "Remove from Wishlist"
                       : "Add to Wishlist"}
                   </button>
-                  <button className="btn btn-sm btn-outline text-wineRed flex-1">
+                  <button className="bg-yellow-100 btn text-wineRed flex-1">
                     <Share2 className="h-5 w-5" />
                     Share
                   </button>
@@ -705,7 +705,7 @@ const Product = () => {
             <h2 className="card-title text-2xl text-wineRed mb-4">
               Available Colors
             </h2>
-            <div className="flex gap-6 items-center overflow-x-auto pb-4">
+            <div className="flex gap-6 items-center overflow-x-auto p-4">
               {product.variants.map((variant, index) => (
                 <div
                   key={index}
