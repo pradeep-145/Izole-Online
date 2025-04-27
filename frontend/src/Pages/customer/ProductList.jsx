@@ -320,12 +320,12 @@ const ProductList = () => {
       <Navbar />
 
       {/* Hero Section */}
-      <div className="bg-wineRed text-white py-10 md:py-20 relative overflow-hidden">
+      <div className="bg-wineRed text-white md:mt-16 mt-16 md:pt-5 pt-3 relative overflow-hidden">
         <div className="container mx-auto px-4 text-mustard">
-          <h1 className="text-3xl md:text-4xl font-bold mb-2 md:mb-4 mt-4">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 sm:mb-3 md:mb-4 mt-4">
             IZOLE Collection
           </h1>
-          <p className="text-lg md:text-xl mb-2">
+          <p className="text-base sm:text-lg md:text-xl mb-4 sm:mb-5 md:mb-6">
             Discover the latest trends in fashion with our new arrivals
           </p>
         </div>
@@ -577,145 +577,145 @@ const FilterSidebar = ({
   return (
     <div className="space-y-4">
       <div className="bg-mustard p-4 rounded-md ">
-      <div className="flex justify-between text-wineRed items-center">
-        <h3 className="text-lg font-bold ">Filters</h3>
-        {totalActiveFilters > 0 && (
-          <button
-            onClick={resetFilters}
-            className="text-sm text-wineRed hover:underline"
-          >
-            Clear All
-          </button>
-        )}
-      </div>
-
-      {/* Categories Filter */}
-      <FilterSection
-        title="Categories" className="text-wineRed"
-        isOpen={openSections.categories}
-        toggleOpen={() => toggleSection("categories")}
-      >
-        <div className="space-y-2">
-          {filterOptions.categories.map((category) => (
-            <FilterCheckbox className="text-wineRed"
-              key={category}
-              label={category}
-              isChecked={filters.categories.includes(category)}
-              onChange={() => handleFilterChange("category", category)}
-            />
-          ))}
+        <div className="flex justify-between text-wineRed items-center">
+          <h3 className="text-lg font-bold ">Filters</h3>
+          {totalActiveFilters > 0 && (
+            <button
+              onClick={resetFilters}
+              className="text-sm text-wineRed hover:underline"
+            >
+              Clear All
+            </button>
+          )}
         </div>
-      </FilterSection>
 
-      {/* Price Range Filter */}
-      <FilterSection
-        title="Price Range"
-        isOpen={openSections.price}
-        toggleOpen={() => toggleSection("price")}
-      >
-        <div className="space-y-2 text-wineRed">
-          <div className="flex items-center gap-2">
-            <input
-              type="number"
-              placeholder="Min"
-              className="w-full bg-white p-2 border text-wineRed border-black rounded"
-              value={filters.price.min}
-              onChange={(e) =>
-                handleFilterChange("price", { min: e.target.value })
-              }
-              min={0}
-            />
-            <span className="text-wineRed">to</span>
-            <input
-              type="number"
-              placeholder="Max"
-              className="w-full p-2 bg-white border border-black text-wineRed rounded"
-              value={filters.price.max}
-              onChange={(e) =>
-                handleFilterChange("price", { max: e.target.value })
-              }
-              min={0}
-            />
+        {/* Categories Filter */}
+        <FilterSection
+          title="Categories" className="text-wineRed"
+          isOpen={openSections.categories}
+          toggleOpen={() => toggleSection("categories")}
+        >
+          <div className="space-y-2">
+            {filterOptions.categories.map((category) => (
+              <FilterCheckbox className="text-wineRed"
+                key={category}
+                label={category}
+                isChecked={filters.categories.includes(category)}
+                onChange={() => handleFilterChange("category", category)}
+              />
+            ))}
           </div>
+        </FilterSection>
 
-          {/* Price Range Buttons */}
-          <div className="flex flex-wrap gap-2 mt-2">
-            <PriceRangeButton
-              range={{ min: 0, max: 500 }}
-              handleFilterChange={handleFilterChange}
-            />
-            <PriceRangeButton
-              range={{ min: 500, max: 1000 }}
-              handleFilterChange={handleFilterChange}
-            />
-            <PriceRangeButton
-              range={{ min: 1000, max: "" }}
-              label="₹1000+"
-              handleFilterChange={handleFilterChange}
-            />
+        {/* Price Range Filter */}
+        <FilterSection
+          title="Price Range"
+          isOpen={openSections.price}
+          toggleOpen={() => toggleSection("price")}
+        >
+          <div className="space-y-2 text-wineRed">
+            <div className="flex items-center gap-2">
+              <input
+                type="number"
+                placeholder="Min"
+                className="w-full bg-white p-2 border text-wineRed border-black rounded"
+                value={filters.price.min}
+                onChange={(e) =>
+                  handleFilterChange("price", { min: e.target.value })
+                }
+                min={0}
+              />
+              <span className="text-wineRed">to</span>
+              <input
+                type="number"
+                placeholder="Max"
+                className="w-full p-2 bg-white border border-black text-wineRed rounded"
+                value={filters.price.max}
+                onChange={(e) =>
+                  handleFilterChange("price", { max: e.target.value })
+                }
+                min={0}
+              />
+            </div>
+
+            {/* Price Range Buttons */}
+            <div className="flex flex-wrap gap-2 mt-2">
+              <PriceRangeButton
+                range={{ min: 0, max: 500 }}
+                handleFilterChange={handleFilterChange}
+              />
+              <PriceRangeButton
+                range={{ min: 500, max: 1000 }}
+                handleFilterChange={handleFilterChange}
+              />
+              <PriceRangeButton
+                range={{ min: 1000, max: "" }}
+                label="₹1000+"
+                handleFilterChange={handleFilterChange}
+              />
+            </div>
           </div>
-        </div>
-      </FilterSection>
+        </FilterSection>
 
-      {/* Colors Filter */}
-      <FilterSection
-        title="Colors"
-        isOpen={openSections.colors}
-        toggleOpen={() => toggleSection("colors")}
-      >
-        <div className="grid grid-cols-2 gap-2">
-          {filterOptions.colors.map((color) => (
+        {/* Colors Filter */}
+        <FilterSection
+          title="Colors"
+          isOpen={openSections.colors}
+          toggleOpen={() => toggleSection("colors")}
+        >
+          <div className="grid grid-cols-2 gap-2">
+            {filterOptions.colors.map((color) => (
+              <FilterCheckbox
+                key={color}
+                className="text-wineRed "
+                label={color}
+                isChecked={filters.colors.includes(color)}
+                onChange={() => handleFilterChange("color", color)}
+                colorSquare={color.toLowerCase()}
+              />
+            ))}
+          </div>
+        </FilterSection>
+
+        {/* Sizes Filter */}
+        <FilterSection
+          title="Sizes"
+          isOpen={openSections.sizes}
+          className="text-wineRed"
+          toggleOpen={() => toggleSection("sizes")}
+        >
+          <div className="flex flex-wrap gap-2 text-wineRed">
+            {filterOptions.sizes.map((size) => (
+              <SizeButton
+                key={size}
+                size={size}
+                isSelected={filters.sizes.includes(size)}
+                onClick={() => handleFilterChange("size", size)}
+              />
+            ))}
+          </div>
+        </FilterSection>
+
+        {/* Other Filters */}
+        <FilterSection
+          title="Other Filters"
+          isOpen={openSections.other}
+          toggleOpen={() => toggleSection("other")}
+        >
+          <div className="space-y-2">
             <FilterCheckbox
-              key={color}
-              className="text-wineRed "
-              label={color}
-              isChecked={filters.colors.includes(color)}
-              onChange={() => handleFilterChange("color", color)}
-              colorSquare={color.toLowerCase()}
+              label="Discounted Items"
+              isChecked={filters.discount}
+              onChange={() => handleFilterChange("discount")}
             />
-          ))}
-        </div>
-      </FilterSection>
-
-      {/* Sizes Filter */}
-      <FilterSection
-        title="Sizes"
-        isOpen={openSections.sizes}
-        className="text-wineRed"
-        toggleOpen={() => toggleSection("sizes")}
-      >
-        <div className="flex flex-wrap gap-2 text-wineRed">
-          {filterOptions.sizes.map((size) => (
-            <SizeButton
-              key={size}
-              size={size}
-              isSelected={filters.sizes.includes(size)}
-              onClick={() => handleFilterChange("size", size)}
+            <FilterCheckbox
+              label="In Stock"
+              isChecked={filters.inStock}
+              onChange={() => handleFilterChange("inStock")}
             />
-          ))}
-        </div>
-      </FilterSection>
-
-      {/* Other Filters */}
-      <FilterSection
-        title="Other Filters"
-        isOpen={openSections.other}
-        toggleOpen={() => toggleSection("other")}
-      >
-        <div className="space-y-2">
-          <FilterCheckbox
-            label="Discounted Items"
-            isChecked={filters.discount}
-            onChange={() => handleFilterChange("discount")}
-          />
-          <FilterCheckbox
-            label="In Stock"
-            isChecked={filters.inStock}
-            onChange={() => handleFilterChange("inStock")}
-          />
-        </div>
-      </FilterSection>
-    </div>
+          </div>
+        </FilterSection>
+      </div>
     </div>
   );
 };
@@ -731,9 +731,8 @@ const FilterSection = ({ title, isOpen, toggleOpen, children }) => {
         {title}
         <ChevronDown
           size={18}
-          className={`transition-transform ${
-            isOpen ? "transform rotate-180" : ""
-          }`}
+          className={`transition-transform ${isOpen ? "transform rotate-180" : ""
+            }`}
         />
       </button>
       {isOpen && <div className="mt-2">{children}</div>}
@@ -770,10 +769,9 @@ const SizeButton = ({ size, isSelected, onClick }) => {
     <button
       onClick={onClick}
       className={`px-3 py-1 border rounded-md text-sm font-medium 
-        ${
-          isSelected
-            ? "bg-wineRed text-white border-wineRed"
-            : "bg-white text-gray-700 border-black hover:border-wineRed"
+        ${isSelected
+          ? "bg-wineRed text-white border-wineRed"
+          : "bg-white text-gray-700 border-black hover:border-wineRed"
         }`}
     >
       {size}

@@ -36,13 +36,13 @@ const Navbar = () => {
   );
   const [wishlistCount, setWishlistCount] = useState(wishlistItems.length);
   const [totalPrice, setTotalPrice] = useState(0);
-  const {authUser}= useAuth();
+  const { authUser } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [categoryDropdownOpen, setCategoryDropdownOpen] = useState(false);
-  const {wishListLogout}=useWishlist();
-  const {cartLogout}=useCart()
+  const { wishListLogout } = useWishlist();
+  const { cartLogout } = useCart()
   // Check if a navigation item is active
   const isActive = (path) => {
     return (
@@ -77,11 +77,10 @@ const Navbar = () => {
 
   return (
     <div
-      className={`navbar justify-between fixed top-0 w-full z-30 transition-all duration-300 ${
-        scrolled
+      className={`navbar justify-between fixed top-0 w-full z-30 transition-all duration-300 ${scrolled
           ? "py-2 shadow-md bg-mustard text-wineRed"
           : "py-4 bg-mustard backdrop-blur-sm text-wineRed"
-      }`}
+        }`}
     >
       <div className="container mx-auto px-4 flex justify-between items-center">
         {/* Mobile menu button */}
@@ -110,153 +109,149 @@ const Navbar = () => {
           <div className="hidden lg:flex items-center ml-12 space-x-10">
             <Link
               to="/"
-              className={`font-semibold ${
-                isActive("/customer") && !isActive("/customer/products")
+              className={`font-semibold ${isActive("/customer") && !isActive("/customer/products")
                   ? " font-bold"
                   : ""
-              }`}
+                }`}
             >
               Home
             </Link>
 
             <Link
               to="/customer/products"
-              className={`font-semibold ${
-                isActive("/customer/products") ? " font-bold" : ""
-              }`}
+              className={`font-semibold ${isActive("/customer/products") ? " font-bold" : ""
+                }`}
             >
               Products
             </Link>
 
             <Link
               to="/customer#about"
-              className={` font-semibold ${
-                isActive("/customer/about") ? " font-bold" : ""
-              }`}
+              className={` font-semibold ${isActive("/customer/about") ? " font-bold" : ""
+                }`}
             >
               About
             </Link>
             <Link
               to="/customer#contact"
-              className={`font-semibold ${
-                isActive("/customer/contact") ? " font-bold" : ""
-              }`}
+              className={`font-semibold ${isActive("/customer/contact") ? " font-bold" : ""
+                }`}
             >
               Contact
             </Link>
           </div>
         </div>
 
-       
-  <div className={`lg:hidden fixed inset-0 ${isMobileMenuOpen?'translate-y-[72px]':'-translate-y-[700px]'} z-50 bg-gradient-to-b from-green-50 to-yellow-50 h-96 p-4 overflow-y-auto transition-all duration-200 ease-in-out shadow-lg`}>
-    <div className="flex flex-col space-y-2 max-w-md mx-auto">
-      <Link
-        to="/customer"
-        className="btn bg-wineRed hover:bg-green-700 text-white justify-start rounded-lg py-3 transition-all duration-200"
-        onClick={() => setIsMobileMenuOpen(false)}
-      >
-        <Home className="h-5 w-5 mr-2" /> Home
-      </Link>
 
-      {/* Mobile categories dropdown */}
-      <div className="collapse z-50 collapse-arrow border-b border-yellow-200">
-        <input type="checkbox" />
-        <div className="collapse-title px-0 py-3 text-lg font-medium text-green-800 flex items-center">
-          <ShoppingBag className="h-5 w-5 mr-2" /> Products
-        </div>
-        <div className="collapse-content px-0">
-          <ul className="menu menu-sm pl-2 space-y-1">
-            {categories.map((category) => (
-              <li key={category.name}>
+        <div className={`lg:hidden fixed inset-0 ${isMobileMenuOpen ? 'translate-y-[72px]' : '-translate-y-[700px]'} z-50 bg-gradient-to-b from-green-50 to-yellow-50 h-96 p-4 overflow-y-auto transition-all duration-200 ease-in-out shadow-lg`}>
+          <div className="flex flex-col space-y-2 max-w-md mx-auto">
+            <Link
+              to="/customer"
+              className="btn bg-wineRed hover:bg-green-700 text-white justify-start rounded-lg py-3 transition-all duration-200"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              <Home className="h-5 w-5 mr-2" /> Home
+            </Link>
+
+            {/* Mobile categories dropdown */}
+            <div className="collapse z-50 collapse-arrow border-b border-yellow-200">
+              <input type="checkbox" />
+              <div className="collapse-title px-0 py-3 text-lg font-medium text-green-800 flex items-center">
+                <ShoppingBag className="h-5 w-5 mr-2" /> Products
+              </div>
+              <div className="collapse-content px-0">
+                <ul className="menu menu-sm pl-2 space-y-1">
+                  {categories.map((category) => (
+                    <li key={category.name}>
+                      <Link
+                        to={category.path}
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="hover:bg-yellow-200 hover:text-green-800 rounded-md py-2 pl-4 transition-colors duration-200"
+                      >
+                        {category.name}
+                      </Link>
+                    </li>
+                  ))}
+                  <li>
+                    <Link
+                      to="/customer/products"
+                      className="font-medium text-green-700 hover:bg-yellow-200 rounded-md py-2 pl-4 transition-colors duration-200"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      View All Products
+                    </Link>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <Link
+              to="/customer#about"
+              className="btn bg-mustard hover:bg-mustard/90 text-green-800 justify-start rounded-lg py-3 transition-all duration-200"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              <Info className="h-5 w-5 mr-2" /> About
+            </Link>
+            <Link
+              to="/customer#contact"
+              className="btn bg-mustard hover:bg-mustard/90 text-green-800 justify-start rounded-lg py-3 transition-all duration-200"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              <Mail className="h-5 w-5 mr-2" /> Contact
+            </Link>
+
+            {/* Mobile user actions */}
+            {login && (
+              <>
+                <div className="divider my-4 before:bg-green-200 after:bg-green-200"></div>
                 <Link
-                  to={category.path}
+                  to="/customer/profile"
+                  className="btn btn-outline border-green-600 text-green-700 hover:bg-green-100 justify-start rounded-lg py-3 transition-all duration-200"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="hover:bg-yellow-200 hover:text-green-800 rounded-md py-2 pl-4 transition-colors duration-200"
                 >
-                  {category.name}
+                  <User className="h-5 w-5 mr-2" /> My Profile
                 </Link>
-              </li>
-            ))}
-            <li>
-              <Link
-                to="/customer/products"
-                className="font-medium text-green-700 hover:bg-yellow-200 rounded-md py-2 pl-4 transition-colors duration-200"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                View All Products
-              </Link>
-            </li>
-          </ul>
+                <Link
+                  to="/customer/orders"
+                  className="btn btn-outline border-green-600 text-green-700 hover:bg-green-100 justify-start rounded-lg py-3 transition-all duration-200"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <Package className="h-5 w-5 mr-2" /> My Orders
+                </Link>
+                <Link
+                  to="/customer/wishlist"
+                  className="btn btn-outline border-green-600 text-green-700 hover:bg-green-100 justify-start rounded-lg py-3 transition-all duration-200"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <Heart className="h-5 w-5 mr-2" /> Wishlist
+                </Link>
+                <button
+                  onClick={() => {
+                    handleLogout();
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="btn btn-outline border-green-600 text-green-700 hover:bg-green-100 justify-start rounded-lg py-3 transition-all duration-200"
+                >
+                  <LogOut className="h-5 w-5 mr-2" /> Logout
+                </button>
+              </>
+            )}
+
+            {login === null && (
+              <>
+                <div className="divider my-4 before:bg-green-200 after:bg-green-200"></div>
+                <Link
+                  to="/customer/login"
+                  className="btn bg-wineRed hover:bg-green-700 text-white btn-block mt-4 rounded-lg py-3 shadow-md hover:shadow-lg transition-all duration-200"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <LogIn className="h-5 w-5 mr-2" /> Login / Sign Up
+                </Link>
+              </>
+            )}
+          </div>
+
         </div>
-      </div>
-
-      <Link
-        to="/customer#about"
-        className="btn bg-mustard hover:bg-mustard/90 text-green-800 justify-start rounded-lg py-3 transition-all duration-200"
-        onClick={() => setIsMobileMenuOpen(false)}
-      >
-        <Info className="h-5 w-5 mr-2" /> About
-      </Link>
-      <Link
-        to="/customer#contact"
-        className="btn bg-mustard hover:bg-mustard/90 text-green-800 justify-start rounded-lg py-3 transition-all duration-200"
-        onClick={() => setIsMobileMenuOpen(false)}
-      >
-        <Mail className="h-5 w-5 mr-2" /> Contact
-      </Link>
-
-      {/* Mobile user actions */}
-      {login && (
-        <>
-          <div className="divider my-4 before:bg-green-200 after:bg-green-200"></div>
-          <Link
-            to="/customer/profile"
-            className="btn btn-outline border-green-600 text-green-700 hover:bg-green-100 justify-start rounded-lg py-3 transition-all duration-200"
-            onClick={() => setIsMobileMenuOpen(false)}
-          >
-            <User className="h-5 w-5 mr-2" /> My Profile
-          </Link>
-          <Link
-            to="/customer/orders"
-            className="btn btn-outline border-green-600 text-green-700 hover:bg-green-100 justify-start rounded-lg py-3 transition-all duration-200"
-            onClick={() => setIsMobileMenuOpen(false)}
-          >
-            <Package className="h-5 w-5 mr-2" /> My Orders
-          </Link>
-          <Link
-            to="/customer/wishlist"
-            className="btn btn-outline border-green-600 text-green-700 hover:bg-green-100 justify-start rounded-lg py-3 transition-all duration-200"
-            onClick={() => setIsMobileMenuOpen(false)}
-          >
-            <Heart className="h-5 w-5 mr-2" /> Wishlist
-          </Link>
-          <button
-            onClick={() => {
-              handleLogout();
-              setIsMobileMenuOpen(false);
-            }}
-            className="btn btn-outline border-green-600 text-green-700 hover:bg-green-100 justify-start rounded-lg py-3 transition-all duration-200"
-          >
-            <LogOut className="h-5 w-5 mr-2" /> Logout
-          </button>
-        </>
-      )}
-
-      {login === null && (
-        <>
-          <div className="divider my-4 before:bg-green-200 after:bg-green-200"></div>
-          <Link
-            to="/customer/login"
-            className="btn bg-wineRed hover:bg-green-700 text-white btn-block mt-4 rounded-lg py-3 shadow-md hover:shadow-lg transition-all duration-200"
-            onClick={() => setIsMobileMenuOpen(false)}
-          >
-            <LogIn className="h-5 w-5 mr-2" /> Login / Sign Up
-          </Link>
-        </>
-      )}
-    </div>
-    
-  </div>
 
         {/* Search bar and user actions */}
         <div className="flex items-center gap-2">
@@ -287,95 +282,95 @@ const Navbar = () => {
 
           {/* User Account */}
           {login && (
-  <div className="dropdown dropdown-end">
-    <div
-      tabIndex={0}
-      role="button"
-      className="btn btn-ghost btn-circle avatar transition-all duration-200 hover:scale-105"
-    >
-      <div className="w-10 rounded-full ring ring-[#1A3B2A] ring-offset-base-100 ring-offset-2 hover:ring-[#D6AF36]">
-        <img
-          alt="User avatar"
-          src={authUser?.avatar}
-        />
-      </div>
-    </div>
-    <ul
-      tabIndex={0}
-      className="menu menu-sm dropdown-content bg-gradient-to-b from-[#1A3B2A] to-[#2a4d3a] text-[#D6AF36] rounded-xl z-30 mt-3 w-64 p-4 shadow-xl overflow-hidden"
-    >
-      <li className="mb-3">
-        <div className="flex flex-col hover:bg-transparent cursor-default px-2">
-          <span className="font-bold text-[#D6AF36] text-lg">{authUser.name}</span>
-          <span className="text-xs text-[#D6AF36]/80">
-            {authUser.email}
-          </span>
-        </div>
-      </li>
-      <div className="divider my-1 before:bg-[#D6AF36]/20 after:bg-[#D6AF36]/20"></div>
-      
-      <li>
-        <Link 
-          to="/customer/profile" 
-          className="flex gap-2 hover:bg-[#D6AF36]/10 rounded-lg transition-colors duration-200 mb-1"
-        >
-          <User className="h-4 w-4" />
-          Profile
-          <span className="badge bg-[#D6AF36] text-[#1A3B2A] border-none badge-sm ml-auto font-medium">
-            New
-          </span>
-        </Link>
-      </li>
-      <li>
-        <Link 
-          to="/customer/orders" 
-          className="flex gap-2 hover:bg-[#D6AF36]/10 rounded-lg transition-colors duration-200 mb-1"
-        >
-          <Package className="h-4 w-4" />
-          My Orders
-        </Link>
-      </li>
-      <li>
-        <Link 
-          to="/customer/wishlist" 
-          className="flex gap-2 hover:bg-[#D6AF36]/10 rounded-lg transition-colors duration-200 mb-1"
-        >
-          <Heart className="h-4 w-4" />
-          Wishlist
-        </Link>
-      </li>
-      <li>
-        <Link 
-          to="/customer/notifications" 
-          className="flex gap-2 hover:bg-[#D6AF36]/10 rounded-lg transition-colors duration-200 mb-1"
-        >
-          <Bell className="h-4 w-4" />
-          Notifications
-          <span className="badge bg-[#D6AF36] text-[#1A3B2A] border-none badge-sm ml-auto font-medium">5</span>
-        </Link>
-      </li>
-      
-      <div className="divider my-1 before:bg-[#D6AF36]/20 after:bg-[#D6AF36]/20"></div>
-      
-      <li>
-        <button
-          onClick={handleLogout}
-          className="flex gap-2 text-[#FF6B6B] hover:bg-[#FF6B6B]/10 rounded-lg transition-colors duration-200"
-        >
-          <LogOut className="h-4 w-4" />
-          Logout
-        </button>
-      </li>
-      
-      <div className="mt-3 pt-2 border-t border-[#D6AF36]/20">
-        <div className="flex justify-between items-center px-2">
-          <span className="text-xs text-[#D6AF36]/60">Last login: Today, 14:30</span>
-          <Link to="/customer/settings" className="text-xs text-[#D6AF36] hover:underline">Settings</Link>
-        </div>
-      </div>
-    </ul>
-  </div>
-)}
+            <div className="dropdown dropdown-end">
+              <div
+                tabIndex={0}
+                role="button"
+                className="btn btn-ghost btn-circle avatar transition-all duration-200 hover:scale-105"
+              >
+                <div className="w-10 rounded-full ring ring-[#1A3B2A] ring-offset-base-100 ring-offset-2 hover:ring-[#D6AF36]">
+                  <img
+                    alt="User avatar"
+                    src={authUser?.avatar}
+                  />
+                </div>
+              </div>
+              <ul
+                tabIndex={0}
+                className="menu menu-sm dropdown-content bg-gradient-to-b from-[#1A3B2A] to-[#2a4d3a] text-[#D6AF36] rounded-xl z-30 mt-3 w-64 p-4 shadow-xl overflow-hidden"
+              >
+                <li className="mb-3">
+                  <div className="flex flex-col hover:bg-transparent cursor-default px-2">
+                    <span className="font-bold text-[#D6AF36] text-lg">{authUser.name}</span>
+                    <span className="text-xs text-[#D6AF36]/80">
+                      {authUser.email}
+                    </span>
+                  </div>
+                </li>
+                <div className="divider my-1 before:bg-[#D6AF36]/20 after:bg-[#D6AF36]/20"></div>
+
+                <li>
+                  <Link
+                    to="/customer/profile"
+                    className="flex gap-2 hover:bg-[#D6AF36]/10 rounded-lg transition-colors duration-200 mb-1"
+                  >
+                    <User className="h-4 w-4" />
+                    Profile
+                    <span className="badge bg-[#D6AF36] text-[#1A3B2A] border-none badge-sm ml-auto font-medium">
+                      New
+                    </span>
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/customer/orders"
+                    className="flex gap-2 hover:bg-[#D6AF36]/10 rounded-lg transition-colors duration-200 mb-1"
+                  >
+                    <Package className="h-4 w-4" />
+                    My Orders
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/customer/wishlist"
+                    className="flex gap-2 hover:bg-[#D6AF36]/10 rounded-lg transition-colors duration-200 mb-1"
+                  >
+                    <Heart className="h-4 w-4" />
+                    Wishlist
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/customer/notifications"
+                    className="flex gap-2 hover:bg-[#D6AF36]/10 rounded-lg transition-colors duration-200 mb-1"
+                  >
+                    <Bell className="h-4 w-4" />
+                    Notifications
+                    <span className="badge bg-[#D6AF36] text-[#1A3B2A] border-none badge-sm ml-auto font-medium">5</span>
+                  </Link>
+                </li>
+
+                <div className="divider my-1 before:bg-[#D6AF36]/20 after:bg-[#D6AF36]/20"></div>
+
+                <li>
+                  <button
+                    onClick={handleLogout}
+                    className="flex gap-2 text-[#FF6B6B] hover:bg-[#FF6B6B]/10 rounded-lg transition-colors duration-200"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    Logout
+                  </button>
+                </li>
+
+                <div className="mt-3 pt-2 border-t border-[#D6AF36]/20">
+                  <div className="flex justify-between items-center px-2">
+                    <span className="text-xs text-[#D6AF36]/60">Last login: Today, 14:30</span>
+                    <Link to="/customer/settings" className="text-xs text-[#D6AF36] hover:underline">Settings</Link>
+                  </div>
+                </div>
+              </ul>
+            </div>
+          )}
 
           {/* Login Button */}
           {login === null && (
