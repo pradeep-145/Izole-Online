@@ -21,8 +21,24 @@ const Home = () => {
     arrows: true,
     pauseOnHover: false,
     fade: true,
+    responsive: [
+      {
+        breakpoint: 768, // For tablets
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1,
+        },
+      },
+      {
+        breakpoint: 480, // For mobile phones
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1,
+        },
+      },
+    ],
   };
-
+  
   return (
     <div className={styles.carouselContainer}>
       <Slider {...settings}>

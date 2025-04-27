@@ -37,7 +37,7 @@ const ProductPreview = () => {
     <div id="products" className="bg-yellow-50 text-wineRed py-24">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
-          <h2 className="text-5xl font-bold font-serif mb-4">Featured Products</h2>
+          <h2 className="sm:text-5xl font-bold font-serif sm:mb-4 text-2xl">Featured Products</h2>
         </div>
 
         {products.length > 0 ? (
@@ -108,14 +108,14 @@ const ProductPreview = () => {
             </div>
 
             {/* Info Section */}
-            <div className="w-full lg:w-1/2 space-y-6">
+            <div className="w-full lg:w-1/2 space-y-6 pl-14">
               <h3 className="text-3xl font-bold">Why Choose Us?</h3>
-              <ul className="space-y-4">
+              <ul className="space-y-4  ">
                 {[
-                  "Premium quality materials",
-                  "Designed for everyday wear",
-                  "Timeless styles",
-                  "Attention to detail",
+                  "✬ Premium quality materials",
+                  "✬ Designed for everyday wear",
+                  "✬ Timeless styles",
+                  "✬ Attention to detail",
                 ].map((point, index) => (
                   <li key={index} className="flex items-start gap-3">
                     <span className="text-lg">{point}</span>

@@ -34,9 +34,9 @@ const Contact = () => {
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-16">
-          <h2 className="text-5xl font-bold font-serif mb-4">Contact Us</h2>
+          <h2 className="sm:text-5xl text-2xl font-bold font-serif mb-4">Contact Us</h2>
           <div className="w-24 h-1 bg-mustard mx-auto mb-8"></div>
-          <p className="text-xl max-w-3xl mx-auto">
+          <p className="sm:text-xl text-lg max-w-3xl mx-auto">
             We'd love to hear from you. Reach out with any questions, feedback,
             or inquiries.
           </p>

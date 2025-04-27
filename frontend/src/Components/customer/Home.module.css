@@ -2,7 +2,7 @@
     width: 100%;
     max-width: 1600px;
     margin: 20px auto;
-    padding: 20 20px;
+    padding: 0px 20px;
     position: relative;
   }
   
@@ -100,5 +100,8 @@
   @media (max-width: 480px) {
     .carouselContainer :global(.slick-slide) {
       height: 200px;
+      padding: 0 10px;
+      margin-top: 40px;
+
     }
   }

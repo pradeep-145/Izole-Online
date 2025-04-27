@@ -7,31 +7,31 @@ const About = () => {
       <div className="container mx-auto px-4">
         {/* Header section */}
         <div className="text-center mb-16">
-          <h2 className="text-5xl font-bold font-serif mb-4">About Izole</h2>
+          <h2 className="sm:text-5xl font-bold font-serif mb-4 text-2xl">About Izole</h2>
           <div className="w-24 h-1 bg-mustard mx-auto mb-8"></div>
-          <p className="text-xl opacity-80 max-w-3xl mx-auto">
+          <p className="sm:text-xl opacity-80 max-w-3xl mx-auto text-lg">
             Redefining authentic clothing with passion and precision
           </p>
         </div>
 
         {/* Main content */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 mb-16 mx-10">
-          <div className="space-y-6">
-            <h3 className="text-3xl font-bold">Our Story</h3>
-            <p className="text-lg leading-relaxed">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 mb-16 sm:mx-10 mx-5">
+          <div className="sm:space-y-6">
+            <h3 className="sm:text-3xl font-bold text-xl">Our Story</h3>
+            <p className="text-lg leading-relaxed text-justify">
               Welcome to Izole – Authentic Clothing, your go-to destination for
               premium men's and boys' fashion. Based in Tirupur, the heart of
               India's textile industry, we take pride in delivering high-quality
               trousers, t-shirts, and leisurewear that blend style, comfort, and
               durability.
             </p>
-            <p className="text-lg leading-relaxed">
+            <p className="text-lg leading-relaxed text-justify">
               At Izole, we believe clothing is more than just fabric—it's a
               statement of individuality. Our collections cater to modern trends
               while ensuring a timeless appeal, making every outfit effortlessly
               stylish.
             </p>
-            <p className="text-lg leading-relaxed">
+            <p className="text-lg leading-relaxed text-justify">
               With a commitment to quality craftsmanship and authenticity, we
               source the finest fabrics and employ meticulous tailoring
               techniques to ensure every piece meets the highest standards.
@@ -76,7 +76,7 @@ const About = () => {
 
         {/* Why Choose Us section */}
         <div className="bg-mustard/10 rounded-xl p-8 lg:p-12 mb-16">
-          <h3 className="text-3xl font-bold text-center mb-12">
+          <h3 className="sm:text-3xl font-bold text-center mb-12 text-2xl ">
             Why Choose Izole?
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -134,7 +134,7 @@ const About = () => {
             </a>
             <a
               href="/customer#contact"
-              className="btn border border-mustard text-mustard"
+              className="btn border border-mustard text-black"
             >
               Contact Us
             </a>
