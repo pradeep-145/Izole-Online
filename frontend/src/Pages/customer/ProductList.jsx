@@ -429,11 +429,11 @@ const ProductList = () => {
 
               {/* Desktop Sort Options */}
               <div className="hidden md:flex items-center">
-                <span className="text-gray-700 mr-2">Sort By:</span>
+                <span className="text-gray-700 mr-2 font-semibold">Sort By:</span>
                 <select
                   value={sortOption}
                   onChange={(e) => setSortOption(e.target.value)}
-                  className="bg-wineRed border text-mustard border-black rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-wineRed "
+                  className="bg-[#ECE6D4] border text-black font-semibold border-black rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-wineRed "
                 >
                   <option value="featured">Featured</option>
                   <option value="price-low-high">Price: Low to High</option>
@@ -576,7 +576,7 @@ const FilterSidebar = ({
 
   return (
     <div className="space-y-4">
-      <div className="bg-mustard p-4 rounded-md ">
+      <div className="bg-[#ECE6D4] p-4 rounded-md ">
         <div className="flex justify-between text-wineRed items-center">
           <h3 className="text-lg font-bold ">Filters</h3>
           {totalActiveFilters > 0 && (

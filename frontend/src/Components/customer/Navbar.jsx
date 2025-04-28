@@ -77,7 +77,7 @@ const Navbar = () => {
 
   return (
     <div
-      className={`navbar justify-between fixed top-0 w-full z-30 transition-all duration-300 ${scrolled
+      className={`navbar justify-between fixed top-0 w-full z-30  transition-all duration-300 ${scrolled
           ? "py-2 shadow-md bg-mustard text-wineRed"
           : "py-4 bg-mustard backdrop-blur-sm text-wineRed"
         }`}

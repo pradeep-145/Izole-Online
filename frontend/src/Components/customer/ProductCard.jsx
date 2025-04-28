@@ -203,11 +203,6 @@ const ProductCard = ({ product }) => {
             <Shield className="h-3 w-3 mr-1" />
             <span>Secure</span>
           </div>
-          <span className="mx-1">•</span>
-          <div className="flex items-center mx-1">
-            <TruckIcon className="h-3 w-3 mr-1" />
-            <span>Free shipping</span>
-          </div>
         </div>
       </div>
     </div>

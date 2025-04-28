@@ -392,7 +392,7 @@ const CheckoutPage = () => {
                       </div>
 
                       {/* Estimated Delivery */}
-                      <div className="mt-6 bg-gray-50 p-4 rounded-md flex items-start">
+                      {/* <div className="mt-6 bg-gray-50 p-4 rounded-md flex items-start">
                         <Truck className="w-5 h-5 text-amber-500 mr-2 mt-1" />
                         <div>
                           <h4 className="font-medium text-gray-800">
@@ -408,7 +408,7 @@ const CheckoutPage = () => {
                             })}
                           </p>
                         </div>
-                      </div>
+                      </div> */}
                     </>
                   )}
                 </div>
@@ -418,7 +418,7 @@ const CheckoutPage = () => {
 
           {/* Additional information */}
           <div className="bg-white rounded-lg shadow-lg p-6">
-            <div className="flex items-center mb-4">
+            {/* <div className="flex items-center mb-4">
               <div className="h-8 w-8 rounded-full bg-amber-100 flex items-center justify-center mr-3">
                 <ShoppingCart className="h-4 w-4 text-amber-500" />
               </div>
@@ -430,7 +430,7 @@ const CheckoutPage = () => {
                   You've qualified for free shipping!
                 </p>
               </div>
-            </div>
+            </div> */}
 
             <div className="flex items-center">
               <div className="h-8 w-8 rounded-full bg-amber-100 flex items-center justify-center mr-3">

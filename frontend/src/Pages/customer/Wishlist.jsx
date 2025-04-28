@@ -270,7 +270,7 @@ const Wishlist = () => {
                   </div>
                 </div>
 
-                <div className="p-4 pt-0">
+                {/* <div className="p-4 pt-0">
                   <button
                     onClick={() => handleAddToCart(item)}
                     disabled={
@@ -294,7 +294,7 @@ const Wishlist = () => {
                     <ShoppingCart className="mr-2 h-4 w-4" />
                     Add to Cart
                   </button>
-                </div>
+                </div> */}
               </div>
             ))}
           </div>

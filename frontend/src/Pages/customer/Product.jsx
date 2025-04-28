@@ -345,7 +345,7 @@ const Product = () => {
 
       {/* Toast Notification for Cart */}
       <div id="cart-toast" className="toast toast-top toast-end hidden z-50">
-        <div className="alert alert-success">
+        <div className="alert alert-horizontal">
           <div>
             <span>
               Added {itemCount} {currentVariant.color} {currentSizeOption.size}{" "}
@@ -657,18 +657,6 @@ const Product = () => {
                   </button>
                 </div>
 
-                {/* Shipping Information */}
-                <div className="mt-6 alert bg-wineRed/20 text-wineRed">
-                  <Truck className="h-5 w-5" />
-                  <div>
-                    <h4 className="font-bold">Free Shipping & Returns</h4>
-                    <p className="text-xs">
-                      Free standard shipping on orders over $50. Estimated
-                      delivery: 3-5 business days.
-                    </p>
-                  </div>
-                </div>
-
                 {/* Wishlist & Share */}
                 <div className="mt-6 flex gap-4">
                   <button
@@ -890,7 +878,7 @@ const Product = () => {
                             d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"
                           />
                         </svg>
-                        Helpful
+                        Like
                       </button>
                       <button className="btn btn-xs btn-outline text-wineRed hover:bg-red-50 hover:text-red-500 transition-colors">
                         <svg
@@ -907,7 +895,7 @@ const Product = () => {
                             d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
                           />
                         </svg>
-                        Report
+                        Dislike
                       </button>
                     </div>
                   </div>

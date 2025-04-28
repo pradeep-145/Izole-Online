@@ -1,14 +1,14 @@
 .carouselContainer {
     width: 100%;
     max-width: 1600px;
-    margin: 20px auto;
-    padding: 0px 20px;
-    position: relative;
+    margin-top: 90px;
+    padding: 0px 14px;
+    position:relative;
   }
   
   .carouselContainer :global(.slick-slide) {
     position: relative;
-    height: 680px;
+    height: 600px;
   }
   
   .carouselContainer :global(.slick-slide img) {
