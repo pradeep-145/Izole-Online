@@ -1,29 +1,24 @@
-import React, { useState, useEffect } from "react";
 import {
-  ShoppingCart,
-  Heart,
-  User,
-  Search,
-  Menu,
-  X,
-  ChevronDown,
-  Home,
-  SearchIcon,
-  UserCircle,
-  ShoppingBag,
-  Info,
-  Mail,
   Bell,
-  Package,
-  LogOut,
+  Heart,
+  Home,
+  Info,
   LogIn,
+  LogOut,
+  Mail,
+  Menu,
+  Package,
+  ShoppingBag,
   ShoppingCartIcon,
+  User,
+  X,
 } from "lucide-react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import logo from "../../assets/logo.jpg";
+import { useAuth } from "../../context/AuthContext";
 import { useCart } from "../../zustand/useCart"; // Adjust the path according to your store location
 import { useWishlist } from "../../zustand/useWishlist";
-import { useAuth } from "../../context/AuthContext";
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -35,14 +30,11 @@ const Navbar = () => {
     cartItems.reduce((sum, item) => sum + item.quantity, 0)
   );
   const [wishlistCount, setWishlistCount] = useState(wishlistItems.length);
-  const [totalPrice, setTotalPrice] = useState(0);
   const { authUser } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [categoryDropdownOpen, setCategoryDropdownOpen] = useState(false);
-  const { wishListLogout } = useWishlist();
-  const { cartLogout } = useCart()
+  const { wishlistLogout } = useWishlist();
+  const { cartLogout } = useCart();
   // Check if a navigation item is active
   const isActive = (path) => {
     return (
@@ -63,7 +55,7 @@ const Navbar = () => {
     localStorage.removeItem("authUser");
     localStorage.removeItem("token");
     setLogin(null);
-    wishListLogout();
+    wishlistLogout();
     cartLogout();
 
     navigate("/customer/login");
@@ -77,10 +69,11 @@ const Navbar = () => {
 
   return (
     <div
-      className={`navbar justify-between fixed top-0 w-full z-30 transition-all duration-300 ${scrolled
+      className={`navbar justify-between fixed top-0 w-full z-30 transition-all duration-300 ${
+        scrolled
           ? "py-2 shadow-md bg-mustard text-wineRed"
           : "py-4 bg-mustard backdrop-blur-sm text-wineRed"
-        }`}
+      }`}
     >
       <div className="container mx-auto px-4 flex justify-between items-center">
         {/* Mobile menu button */}
@@ -109,41 +102,48 @@ const Navbar = () => {
           <div className="hidden lg:flex items-center ml-12 space-x-10">
             <Link
               to="/"
-              className={`font-semibold ${isActive("/customer") && !isActive("/customer/products")
+              className={`font-semibold ${
+                isActive("/customer") && !isActive("/customer/products")
                   ? " font-bold"
                   : ""
-                }`}
+              }`}
             >
               Home
             </Link>
 
             <Link
               to="/customer/products"
-              className={`font-semibold ${isActive("/customer/products") ? " font-bold" : ""
-                }`}
+              className={`font-semibold ${
+                isActive("/customer/products") ? " font-bold" : ""
+              }`}
             >
               Products
             </Link>
 
             <Link
               to="/customer#about"
-              className={` font-semibold ${isActive("/customer/about") ? " font-bold" : ""
-                }`}
+              className={` font-semibold ${
+                isActive("/customer/about") ? " font-bold" : ""
+              }`}
             >
               About
             </Link>
             <Link
               to="/customer#contact"
-              className={`font-semibold ${isActive("/customer/contact") ? " font-bold" : ""
-                }`}
+              className={`font-semibold ${
+                isActive("/customer/contact") ? " font-bold" : ""
+              }`}
             >
               Contact
             </Link>
           </div>
         </div>
 
-
-        <div className={`lg:hidden fixed inset-0 ${isMobileMenuOpen ? 'translate-y-[72px]' : '-translate-y-[700px]'} z-50 bg-gradient-to-b from-green-50 to-yellow-50 h-96 p-4 overflow-y-auto transition-all duration-200 ease-in-out shadow-lg`}>
+        <div
+          className={`lg:hidden fixed inset-0 ${
+            isMobileMenuOpen ? "translate-y-[72px]" : "-translate-y-[700px]"
+          } z-50 bg-gradient-to-b from-green-50 to-yellow-50 h-96 p-4 overflow-y-auto transition-all duration-200 ease-in-out shadow-lg`}
+        >
           <div className="flex flex-col space-y-2 max-w-md mx-auto">
             <Link
               to="/customer"
@@ -250,7 +250,6 @@ const Navbar = () => {
               </>
             )}
           </div>
-
         </div>
 
         {/* Search bar and user actions */}
@@ -282,26 +281,25 @@ const Navbar = () => {
 
           {/* User Account */}
           {login && (
-            <div className="dropdown dropdown-end">
+            <div className="dropdown dropdown-end" >
               <div
                 tabIndex={0}
                 role="button"
                 className="btn btn-ghost btn-circle avatar transition-all duration-200 hover:scale-105"
               >
                 <div className="w-10 rounded-full ring ring-[#1A3B2A] ring-offset-base-100 ring-offset-2 hover:ring-[#D6AF36]">
-                  <img
-                    alt="User avatar"
-                    src={authUser?.avatar}
-                  />
+                  <img alt="User avatar" src={authUser?.avatar} />
                 </div>
               </div>
               <ul
                 tabIndex={0}
-                className="menu menu-sm dropdown-content bg-gradient-to-b from-[#1A3B2A] to-[#2a4d3a] text-[#D6AF36] rounded-xl z-30 mt-3 w-64 p-4 shadow-xl overflow-hidden"
+                className="menu menu-sm dropdown-content bg-gradient-to-b from-[#1A3B2A] to-[#2a4d3a] text-[#D6AF36] rounded-xl z-30 mt-3 w-72 p-4 shadow-xl overflow-hidden"
               >
                 <li className="mb-3">
                   <div className="flex flex-col hover:bg-transparent cursor-default px-2">
-                    <span className="font-bold text-[#D6AF36] text-lg">{authUser.name}</span>
+                    <span className="font-bold text-[#D6AF36] text-lg">
+                      {authUser.name}
+                    </span>
                     <span className="text-xs text-[#D6AF36]/80">
                       {authUser.email}
                     </span>
@@ -346,7 +344,9 @@ const Navbar = () => {
                   >
                     <Bell className="h-4 w-4" />
                     Notifications
-                    <span className="badge bg-[#D6AF36] text-[#1A3B2A] border-none badge-sm ml-auto font-medium">5</span>
+                    <span className="badge bg-[#D6AF36] text-[#1A3B2A] border-none badge-sm ml-auto font-medium">
+                      5
+                    </span>
                   </Link>
                 </li>
 
@@ -364,8 +364,25 @@ const Navbar = () => {
 
                 <div className="mt-3 pt-2 border-t border-[#D6AF36]/20">
                   <div className="flex justify-between items-center px-2">
-                    <span className="text-xs text-[#D6AF36]/60">Last login: Today, 14:30</span>
-                    <Link to="/customer/settings" className="text-xs text-[#D6AF36] hover:underline">Settings</Link>
+                    <span className="text-xs text-[#D6AF36]/60">
+                      Last login:{" "}
+                      {authUser.lastLogin
+                        ? new Date(authUser.lastLogin).toLocaleString("en-US", {
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            hour12: true,
+                          })
+                        : "N/A"}
+                    </span>
+                    <Link
+                      to="/customer/settings"
+                      className="text-xs text-[#D6AF36] hover:underline"
+                    >
+                      Settings
+                    </Link>
                   </div>
                 </div>
               </ul>

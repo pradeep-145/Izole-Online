@@ -45,6 +45,10 @@ const customerSchema = mongoose.Schema(
       type:String,
       enum:["Male","Female","Other"]
     },
+    lastLogin:{
+      type:Date,
+      default:new Date( Date.now()),
+    },
     expiresAt: {
       type: Date,
       default:new Date( Date.now()),

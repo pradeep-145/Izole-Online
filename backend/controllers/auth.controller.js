@@ -45,11 +45,21 @@ const AuthController = {
             email: response.email,
           };
           const token = await JwtService.generateToken(payload);
-          const { password: _, ...userWithoutPassword } = response.toObject();
+          var { password: _, ...userWithoutPassword } = response.toObject();
 
           // Calculate 150 days in seconds: 150 days × 24 hours × 60 minutes × 60 seconds
           const maxAge = 150 * 24 * 60 * 60;
 
+          // Create current date in IST format
+          const currentDate = new Date();
+          
+          userWithoutPassword = {
+            ...userWithoutPassword,
+            lastLogin: currentDate,
+          };
+
+          console.log("User without password:", userWithoutPassword);
+          
           res.setHeader("Set-Cookie", [
             `jwt=${token}; HttpOnly; Path=/; SameSite=Lax; Max-Age=${maxAge};`,
           ]);
