@@ -39,6 +39,7 @@ function App() {
           <Route path="otp-verification" element={<OtpVerification />} />
           <Route path="products" element={<ProductList />} />
           <Route path="product/:id" element={<Product />} />
+          
           <Route path="cart" element={<Cart />} />
           <Route path="checkout" element={<Checkout />} />
           <Route path="wishlist" element={<Wishlist />} />

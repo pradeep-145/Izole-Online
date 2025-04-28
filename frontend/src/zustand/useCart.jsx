@@ -194,33 +194,36 @@ export const useCart = create(
 
         set({ isLoading: true, error: null });
 
-        fetchPromise = new Promise(async (resolve) => {
-          try {
-            console.log("Fetching cart from backend...");
-            const response = await axios.get("/api/cart/get", {
+        fetchPromise = new Promise((resolve) => {
+          axios
+            .get("/api/cart/get", {
               headers: {
                 Authorization: `Bearer ${localStorage.getItem("token")}`,
                 "Content-Type": "application/json",
               },
+            })
+            .then((response) => {
+              set({
+                cartItems: response.data.items || [],
+                isLoading: false,
+                cartFetched: true,
+                lastFetchTime: Date.now(),
+              });
+              resolve({ success: true, items: response.data.items });
+            })
+            .catch((error) => {
+              set({
+                error: error.response?.data?.message || "Failed to fetch cart",
+                isLoading: false,
+              });
+              resolve({
+                success: false,
+                error: error.response?.data?.message,
+              });
+            })
+            .finally(() => {
+              fetchPromise = null;
             });
-
-            set({
-              cartItems: response.data.items || [],
-              isLoading: false,
-              cartFetched: true,
-              lastFetchTime: Date.now(),
-            });
-
-            resolve({ success: true, items: response.data.items });
-          } catch (error) {
-            set({
-              error: error.response?.data?.message || "Failed to fetch cart",
-              isLoading: false,
-            });
-            resolve({ success: false, error: error.response?.data?.message });
-          } finally {
-            fetchPromise = null;
-          }
         });
 
         return fetchPromise;
@@ -284,6 +287,7 @@ export const useCart = create(
     }),
     {
       name: "cart-storage",
+      // partialize selects which parts of the state to persist in storage
       partialize: (state) => ({
         cartItems: state.cartItems,
         cartFetched: state.cartFetched,

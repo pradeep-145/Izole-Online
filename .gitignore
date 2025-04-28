@@ -16,7 +16,9 @@ dist-ssr
 backend.zip
 private.pem
 public.pem
-# Editor directories and files
+# Editor directories and files4
+package-lock.json
+package-lock.json.legacy
 .vscode/*
 !.vscode/extensions.json
 .idea

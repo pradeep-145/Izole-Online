@@ -39,34 +39,38 @@ export const useOrders = create(
 
         set({ isLoading: true, error: null });
 
-        fetchOrdersPromise = new Promise(async (resolve) => {
-          try {
-            const response = await axios.get("/api/orders", {
+        fetchOrdersPromise = new Promise((resolve) => {
+          axios
+            .get("/api/orders", {
               headers: {
                 Authorization: `Bearer ${localStorage.getItem("token")}`,
                 "Content-Type": "application/json",
               },
-            });
+            })
+            .then((response) => {
+              set({
+                orders: response.data.orders || [],
+                isLoading: false,
+                ordersLastFetched: Date.now(),
+              });
 
-            set({
-              orders: response.data.orders || [],
-              isLoading: false,
-              ordersLastFetched: Date.now(),
+              resolve({ success: true, orders: response.data.orders });
+            })
+            .catch((error) => {
+              set({
+                error:
+                  error.response?.data?.message || "Failed to fetch orders",
+                isLoading: false,
+              });
+              resolve({
+                success: false,
+                error:
+                  error.response?.data?.message || "Failed to fetch orders",
+              });
+            })
+            .finally(() => {
+              fetchOrdersPromise = null;
             });
-
-            resolve({ success: true, orders: response.data.orders });
-          } catch (error) {
-            set({
-              error: error.response?.data?.message || "Failed to fetch orders",
-              isLoading: false,
-            });
-            resolve({
-              success: false,
-              error: error.response?.data?.message || "Failed to fetch orders",
-            });
-          } finally {
-            fetchOrdersPromise = null;
-          }
         });
 
         return fetchOrdersPromise;
@@ -74,7 +78,7 @@ export const useOrders = create(
 
       // Fetch single order details with caching
       fetchOrderDetails: async (orderId, forceRefresh = false) => {
-        const { currentOrder, isLoading } = get();
+        const { currentOrder } = get(); // Removed unused isLoading variable
 
         // Use current order if it's the one we want
         if (!forceRefresh && currentOrder && currentOrder._id === orderId) {
@@ -88,37 +92,39 @@ export const useOrders = create(
 
         set({ isLoading: true, error: null });
 
-        fetchOrderDetailsPromise[orderId] = new Promise(async (resolve) => {
-          try {
-            const response = await axios.get(`/api/orders/${orderId}`, {
+        fetchOrderDetailsPromise[orderId] = new Promise((resolve) => {
+          axios
+            .get(`/api/orders/${orderId}`, {
               headers: {
                 Authorization: `Bearer ${localStorage.getItem("token")}`,
                 "Content-Type": "application/json",
               },
-            });
+            })
+            .then((response) => {
+              set({
+                currentOrder: response.data.order,
+                isLoading: false,
+              });
 
-            set({
-              currentOrder: response.data.order,
-              isLoading: false,
+              resolve({ success: true, order: response.data.order });
+            })
+            .catch((error) => {
+              set({
+                error:
+                  error.response?.data?.message ||
+                  "Failed to fetch order details",
+                isLoading: false,
+              });
+              resolve({
+                success: false,
+                error:
+                  error.response?.data?.message ||
+                  "Failed to fetch order details",
+              });
+            })
+            .finally(() => {
+              delete fetchOrderDetailsPromise[orderId];
             });
-
-            resolve({ success: true, order: response.data.order });
-          } catch (error) {
-            set({
-              error:
-                error.response?.data?.message ||
-                "Failed to fetch order details",
-              isLoading: false,
-            });
-            resolve({
-              success: false,
-              error:
-                error.response?.data?.message ||
-                "Failed to fetch order details",
-            });
-          } finally {
-            delete fetchOrderDetailsPromise[orderId];
-          }
         });
 
         return fetchOrderDetailsPromise[orderId];
@@ -159,7 +165,8 @@ export const useOrders = create(
       cancelOrder: async (orderId, reason) => {
         set({ isLoading: true, error: null });
         try {
-          const response = await axios.post(
+          await axios.post(
+            // Removed unused response variable
             `/api/orders/${orderId}/cancel`,
             { reason },
             {
@@ -219,6 +226,7 @@ export const useOrders = create(
     }),
     {
       name: "orders-storage",
+      // partialize selects which parts of the state to persist in storage
       partialize: (state) => ({
         orders: state.orders,
         ordersLastFetched: state.ordersLastFetched,

@@ -27,7 +27,7 @@ const ProductController = {
       res.status(500).json("Internal server Error");
     }
   },
-  getProduct: async (req, res) => {
+  getProductById: async (req, res) => {
     try {
       // Updated to find by product ID instead of image ID
       const response = await Product.findById(req.params.id).populate("review");
