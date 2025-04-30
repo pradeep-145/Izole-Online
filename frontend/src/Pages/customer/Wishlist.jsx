@@ -136,7 +136,7 @@ const Wishlist = () => {
             My Wishlist
           </h1>
           <div className="flex items-center">
-            <Heart style={{ color: COLORS.mustardGold }} className="mr-2" />
+            <Heart style={{ color: COLORS.mustardGold}} className="mr-2" />
             <span style={{ color: COLORS.darkGreen }} className="font-medium">
               {wishlistItems.length} items
             </span>

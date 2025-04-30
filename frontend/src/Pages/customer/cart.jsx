@@ -37,7 +37,7 @@ const Cart = () => {
   const subtotal = getCartTotal();
   const shipping = subtotal > 100 ? 0 : 9.99;
   const tax = subtotal * 0.08; // 8% tax rate
-  const total = subtotal + shipping + tax - discount;
+  const total = subtotal + shipping  - discount;
 
   // Handle quantity changes
   const handleUpdateQuantity = async (
@@ -441,15 +441,6 @@ const Cart = () => {
                     </span>
                   </div>
 
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Tax (8%)</span>
-                    <span
-                      style={{ color: COLORS.darkGreen }}
-                      className="font-medium"
-                    >
-                      ₹{tax.toFixed(2)}
-                    </span>
-                  </div>
 
                   {discount > 0 && (
                     <div className="flex justify-between text-green-600">
@@ -470,34 +461,7 @@ const Cart = () => {
                   </div>
                 </div>
 
-                {/* Shipping info */}
-                <div
-                  style={{ backgroundColor: COLORS.lightGold + "30" }}
-                  className="mt-4 p-4 rounded-lg flex items-start gap-3"
-                >
-                  <TruckIcon
-                    style={{ color: COLORS.mustardGold }}
-                    className="w-5 h-5 flex-shrink-0 mt-0.5"
-                  />
-                  <div className="text-sm">
-                    <p
-                      style={{ color: COLORS.darkGreen }}
-                      className="font-medium"
-                    >
-                      Free shipping on orders over ₹100
-                    </p>
-                    <p
-                      style={{ color: COLORS.darkGreen + "CC" }}
-                      className="mt-1"
-                    >
-                      {subtotal < 100
-                        ? `Add ₹${(100 - subtotal).toFixed(
-                            2
-                          )} more to qualify for free shipping.`
-                        : "You've qualified for free shipping!"}
-                    </p>
-                  </div>
-                </div>
+               
 
                 {/* Promo code section */}
                 <div className="mt-6">

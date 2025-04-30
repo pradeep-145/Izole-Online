@@ -177,7 +177,7 @@ const CheckoutPage = () => {
   const subtotal = orderTotal;
   const shipping = orderTotal > 500 ? 0 : 50;
   const tax = orderTotal * 0.18;
-  const total = subtotal + shipping + tax;
+  const total = subtotal + shipping ;
 
   return (
     <div className="mx-auto bg-gray-50 min-h-screen">
@@ -364,10 +364,7 @@ const CheckoutPage = () => {
                               : `₹${shipping.toFixed(2)}`}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-600">
-                          <span>Tax (18%)</span>
-                          <span>₹{tax.toFixed(2)}</span>
-                        </div>
+                        
                         <div className="flex text-black justify-between font-bold text-lg pt-2 border-t border-gray-200">
                           <span>Total</span>
                           <span>₹{total.toFixed(2)}</span>
