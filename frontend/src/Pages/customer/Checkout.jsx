@@ -1,13 +1,8 @@
-import {
-  ArrowLeft,
-  Lock,
-  MapPin,
-  Package,
-  ShoppingCart,
-  Truck,
-} from "lucide-react";
 import React, { useEffect, useState } from "react";
+import { load } from "@cashfreepayments/cashfree-js";
+import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
+import { ArrowLeft, MapPin, Package } from "lucide-react";
 import { useCart } from "../../zustand/useCart";
 
 const CheckoutPage = () => {
@@ -15,32 +10,57 @@ const CheckoutPage = () => {
   const navigate = useNavigate();
   const { cartItems, getCartTotal, clearCart } = useCart();
 
-  // Determine if we're coming from "Buy Now" or cart checkout
   const singleProduct = location.state?.product;
   const isBuyNow = !!singleProduct;
 
-  // Create a products array based on source
   const [products, setProducts] = useState([]);
   const [orderTotal, setOrderTotal] = useState(0);
 
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    address: "",
+    city: "",
+    zipCode: "",
+  });
+
+  const [paymentSessionId, setPaymentSessionId] = useState("");
+  const [orderId, setOrderId] = useState("");
+  const [paymentStatus, setPaymentStatus] = useState("pending");
+  const [paymentError, setPaymentError] = useState("");
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [cashfreeInstance, setCashfreeInstance] = useState(null);
+
+  // Calculate totals
+  const subtotal = orderTotal;
+  const shipping = orderTotal > 500 ? 0 : 50;
+  const tax = orderTotal * 0.18;
+  const total = subtotal + shipping + tax;
+
+  useEffect(() => {
+    // Load Cashfree SDK
+    load({ mode: "sandbox" }) // change to 'production' in prod
+      .then((cf) => setCashfreeInstance(cf))
+      .catch((err) => {
+        console.error("Cashfree SDK load error:", err);
+        setPaymentError("Failed to load payment SDK");
+      });
+  }, []);
+
   useEffect(() => {
     if (isBuyNow && singleProduct) {
-      console.log("product:", singleProduct);
       try {
-        // Check if variants array exists and has at least one item
         if (!singleProduct.variants || !singleProduct.variants.length) {
           throw new Error("Product has no variants");
         }
 
-        // Get selected variant or default to first variant
         const variantIndex = location.state?.variantIndex || 0;
         const variant = singleProduct.variants[variantIndex];
 
-        // Get selected size option or default to first size
         const sizeIndex = location.state?.sizeIndex || 0;
         const sizeOption = variant.sizeOptions[sizeIndex];
 
-        // Handle Buy Now flow with one product
         const buyNowItem = {
           id: singleProduct._id || Date.now(),
           name: singleProduct.name || "Unnamed Product",
@@ -61,11 +81,9 @@ const CheckoutPage = () => {
         navigate("/customer/cart", { replace: true });
       }
     } else {
-      // Handle cart checkout flow with multiple products
       if (cartItems && cartItems.length > 0) {
         try {
           const mappedCartItems = cartItems.map((item) => {
-            // Safely access cart item properties
             if (!item.product) {
               throw new Error("Invalid cart item");
             }
@@ -92,35 +110,21 @@ const CheckoutPage = () => {
 
           setProducts(mappedCartItems);
           setOrderTotal(
-            getCartTotal
-              ? getCartTotal()
-              : calculateTotalManually(mappedCartItems)
+            getCartTotal ? getCartTotal() : calculateTotalManually(mappedCartItems)
           );
         } catch (error) {
           console.error("Error processing cart items:", error);
-          // Handle gracefully with an empty cart
           setProducts([]);
           setOrderTotal(0);
         }
       } else {
-        // Redirect to cart if there are no items
         navigate("/customer/cart");
       }
     }
-  }, [location, cartItems, navigate]);
+  }, [location, cartItems, navigate, isBuyNow, singleProduct, getCartTotal]);
 
-  const calculateTotalManually = (items) => {
-    return items.reduce((total, item) => total + item.price * item.quantity, 0);
-  };
-
-  const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    address: "",
-    city: "",
-    zipCode: "",
-  });
+  const calculateTotalManually = (items) =>
+    items.reduce((total, item) => total + item.price * item.quantity, 0);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -129,59 +133,102 @@ const CheckoutPage = () => {
 
   const handleGoBack = () => {
     if (isBuyNow) {
-      // Go back to product page
       navigate(-1);
     } else {
-      // Go back to cart
       navigate("/customer/cart");
     }
   };
 
   const proceedToPayment = async (e) => {
     e.preventDefault();
+    setIsProcessing(true);
+    setPaymentError("");
+
+    if (
+      !formData.firstName ||
+      !formData.lastName ||
+      !formData.email ||
+      !formData.address ||
+      !formData.city ||
+      !formData.zipCode
+    ) {
+      setPaymentError("Please fill in all required fields");
+      setIsProcessing(false);
+      return;
+    }
+
+    const fullAddress = `${formData.address}, ${formData.city}, ${formData.zipCode}`;
 
     try {
-      // Here you would save shipping details and prepare for payment
-      console.log("Proceeding to payment gateway with shipping details:", {
-        items: products,
-        shippingDetails: formData,
+      // Create order on backend
+      const response = await axios.post("/api/orders/create-order", {
+        products,
         totalAmount: total,
-        isBuyNow: isBuyNow,
+        address: fullAddress,
       });
+      console.log(response);
 
-      // In a real implementation, you would likely:
-      // 1. Save the order with pending payment status
-      // 2. Generate a unique order ID
-      // 3. Redirect to the payment gateway with needed parameters
+      if (response.data.success) {
+        setOrderId(response.data.order._id);
+        setPaymentSessionId(response.data.paymentSessionId);
 
-      // For demo purposes, we're simulating this with an alert
-      alert("Redirecting to payment gateway...");
+        if (!cashfreeInstance) {
+          setPaymentError("Payment SDK not loaded. Please try again.");
+          setIsProcessing(false);
+          return;
+        }
 
-      // Redirect to external payment gateway (this would be your gateway URL)
-      // window.location.href = 'https://your-payment-gateway.com/pay?order=123';
+        const checkoutOptions = {
+          paymentSessionId: response.data.paymentSessionId,
+          redirectTarget: "_self",
+        };
 
-      // For demo purposes, let's navigate to a simulated payment page
-      navigate("/payment-gateway", {
-        state: {
-          orderNumber: `ORD-${Date.now()}`,
-          orderAmount: total,
-          customerName: `${formData.firstName} ${formData.lastName}`,
-        },
-      });
+        const result = await cashfreeInstance.checkout(checkoutOptions);
+
+        if (result.error) {
+          setPaymentError(result.error.message);
+        } else if (result.success) {
+          handlePaymentSuccess(result);
+        } else if (result.redirect) {
+          // You can handle redirect here if needed
+          console.log("Redirecting to payment gateway...");
+        }
+      } else {
+        setPaymentError(response.data.message || "Failed to create order");
+      }
     } catch (error) {
       console.error("Error proceeding to payment:", error);
-      alert("Failed to proceed to payment. Please try again.");
+      setPaymentError(
+        error.response?.data?.message ||
+          "Failed to proceed to payment. Please try again."
+      );
+    } finally {
+      setIsProcessing(false);
     }
   };
 
-  const subtotal = orderTotal;
-  const shipping = orderTotal > 500 ? 0 : 50;
-  const tax = orderTotal * 0.18;
-  const total = subtotal + shipping + tax;
+  const handlePaymentSuccess = async (paymentData) => {
+    setPaymentStatus("completed");
+    clearCart();
+
+    // Redirect to order confirmation page
+    setTimeout(() => {
+      navigate(`/customer/order-confirmation/${orderId}`, {
+        state: {
+          orderDetails: {
+            orderId,
+            amount: total,
+            products,
+            address: formData.address,
+          },
+        },
+      });
+    }, 1500);
+  };
 
   return (
     <div className="mx-auto bg-gray-50 min-h-screen">
-      {/* Header with logo and title */}
+      {/* Header */}
       <div className="bg-mustard py-4 sticky top-0 z-10 shadow-md">
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-center">
@@ -197,7 +244,7 @@ const CheckoutPage = () => {
               {isBuyNow ? "Buy Now" : "Checkout"}
             </h1>
 
-            <div className="w-8">{/* Spacer for alignment */}</div>
+            <div className="w-8" />
           </div>
         </div>
       </div>
@@ -210,18 +257,14 @@ const CheckoutPage = () => {
             </h2>
 
             <div className="grid md:grid-cols-3 gap-6">
-              {/* Column 1: Shipping Details */}
+              {/* Shipping Details */}
               <div className="md:col-span-2">
                 <div className="bg-white rounded-lg">
                   <h3 className="text-lg font-semibold mb-4 flex items-center text-gray-800">
                     <MapPin className="mr-2 text-amber-500" /> Shipping Details
                   </h3>
 
-                  <form
-                    id="shipping-form"
-                    onSubmit={proceedToPayment}
-                    className="space-y-4"
-                  >
+                  <form id="shipping-form" onSubmit={proceedToPayment} className="space-y-4">
                     <div className="grid md:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -307,11 +350,23 @@ const CheckoutPage = () => {
                         />
                       </div>
                     </div>
+
+                    {paymentError && (
+                      <p className="text-red-600 font-semibold">{paymentError}</p>
+                    )}
+
+                    <button
+                      type="submit"
+                      disabled={isProcessing}
+                      className="bg-wineRed text-white px-6 py-2 rounded-md font-semibold hover:bg-wineRed/90 transition-colors"
+                    >
+                      {isProcessing ? "Processing..." : `Pay ₹${total.toFixed(2)}`}
+                    </button>
                   </form>
                 </div>
               </div>
 
-              {/* Column 2: Order Summary */}
+              {/* Order Summary */}
               <div>
                 <div className="bg-white rounded-lg border border-gray-200 p-6">
                   <h3 className="text-lg font-semibold mb-4 flex items-center text-gray-800">
@@ -319,9 +374,9 @@ const CheckoutPage = () => {
                   </h3>
 
                   {products.length === 0 ? (
-                    <div className="text-center py-8">
-                      <p className="text-gray-500">No items in your order.</p>
-                    </div>
+                    <p className="text-gray-500 text-center py-8">
+                      No items in your order.
+                    </p>
                   ) : (
                     <>
                       <div className="max-h-64 overflow-y-auto mb-4">
@@ -337,110 +392,41 @@ const CheckoutPage = () => {
                             />
                             <div className="ml-4 flex-1">
                               <h4 className="font-medium text-wineRed">{item.name}</h4>
-                              <div className="flex justify-between items-center mt-1">
-                                <div className="text-sm text-gray-600">
-                                  <p>Qty: {item.quantity}</p>
-                                  <p>Size: {item.size}</p>
-                                </div>
-                                <p className="font-medium text-gray-600">
-                                  ₹{(item.price * item.quantity).toFixed(2)}
-                                </p>
-                              </div>
+                              <p className="text-sm text-gray-600">
+                                Color: {item.color}, Size: {item.size}
+                              </p>
+                              <p className="text-sm text-gray-600">
+                                Qty: {item.quantity}
+                              </p>
+                            </div>
+                            <div className="font-semibold text-gray-800">
+                              ₹{(item.price * item.quantity).toFixed(2)}
                             </div>
                           </div>
                         ))}
                       </div>
 
-                      <div className="border-t border-gray-200 pt-4 space-y-2">
-                        <div className="flex justify-between text-gray-600">
+                      <div className="border-t border-gray-200 pt-4 space-y-2 text-gray-700">
+                        <div className="flex justify-between">
                           <span>Subtotal</span>
                           <span>₹{subtotal.toFixed(2)}</span>
                         </div>
-                        <div className="flex justify-between text-gray-600">
+                        <div className="flex justify-between">
                           <span>Shipping</span>
-                          <span>
-                            {shipping === 0
-                              ? "Free"
-                              : `₹${shipping.toFixed(2)}`}
-                          </span>
+                          <span>{shipping === 0 ? "Free" : `₹${shipping.toFixed(2)}`}</span>
                         </div>
-                        <div className="flex justify-between text-gray-600">
+                        <div className="flex justify-between">
                           <span>Tax (18%)</span>
                           <span>₹{tax.toFixed(2)}</span>
                         </div>
-                        <div className="flex text-black justify-between font-bold text-lg pt-2 border-t border-gray-200">
+                        <div className="flex justify-between font-bold text-gray-900 text-lg">
                           <span>Total</span>
                           <span>₹{total.toFixed(2)}</span>
                         </div>
                       </div>
-
-                      <div className="mt-6">
-                        <button
-                          type="submit"
-                          form="shipping-form"
-                          className="w-full py-3 bg-mustard text-gray-800 font-bold rounded-md hover:bg-amber-500 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 shadow-md flex items-center justify-center"
-                        >
-                          <Lock className="mr-2 h-5 w-5" />
-                          Proceed to Payment
-                        </button>
-                      </div>
-
-                      <div className="mt-4 text-center">
-                        <p className="text-xs text-gray-500 flex items-center justify-center">
-                          <Lock className="w-3 h-3 mr-1" /> Secure Payment
-                        </p>
-                      </div>
-
-                      {/* Estimated Delivery */}
-                      {/* <div className="mt-6 bg-gray-50 p-4 rounded-md flex items-start">
-                        <Truck className="w-5 h-5 text-amber-500 mr-2 mt-1" />
-                        <div>
-                          <h4 className="font-medium text-gray-800">
-                            Estimated Delivery
-                          </h4>
-                          <p className="text-sm text-gray-600">
-                            {new Date(
-                              Date.now() + 5 * 24 * 60 * 60 * 1000
-                            ).toLocaleDateString("en-US", {
-                              weekday: "long",
-                              month: "long",
-                              day: "numeric",
-                            })}
-                          </p>
-                        </div>
-                      </div> */}
                     </>
                   )}
                 </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Additional information */}
-          <div className="bg-white rounded-lg shadow-lg p-6">
-            {/* <div className="flex items-center mb-4">
-              <div className="h-8 w-8 rounded-full bg-amber-100 flex items-center justify-center mr-3">
-                <ShoppingCart className="h-4 w-4 text-amber-500" />
-              </div>
-              <div>
-                <h3 className="font-medium text-wineRed">
-                  Free shipping on orders over ₹500
-                </h3>
-                <p className="text-sm text-gray-600">
-                  You've qualified for free shipping!
-                </p>
-              </div>
-            </div> */}
-
-            <div className="flex items-center">
-              <div className="h-8 w-8 rounded-full bg-amber-100 flex items-center justify-center mr-3">
-                <Lock className="h-4 w-4 text-amber-500" />
-              </div>
-              <div>
-                <h3 className="font-medium text-wineRed">Secure checkout</h3>
-                <p className="text-sm text-gray-600">
-                  Your payment information is protected
-                </p>
               </div>
             </div>
           </div>

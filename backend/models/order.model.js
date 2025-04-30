@@ -2,23 +2,54 @@ const mongoose = require("mongoose");
 
 const Order = new mongoose.Schema(
   {
-    productId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Product",
-      required: true,
+    products: [
+      {
+        id: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Product",
+          required: true,
+        },
+        name: {
+          type: String,
+          required: true,
+        },
+        price: {
+          type: Number,
+          required: true,
+        },
+        quantity: {
+          type: Number,
+          required: true,
+        },
+        image: {
+          type: String,
+          required: true,
+        },
+        color: {
+          type: String,
+          required: true,
+        },
+        size: {
+          type: String,
+          required: true,
+        },
+      },
+    ],
+    // Add Cashfree specific fields
+    cashfreeOrderId: {
+      type: String,
     },
-    // color: {
-    //   type: String,
-    //   required: true,
-    // },
+    paymentSessionId: {
+      type: String,
+    },
+    paymentId: {
+      type: String,
+    },
+   
     customerId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Customer",
       required: true,
-    },
-    quantity: { 
-      type: Number, 
-      required: true 
     },
     status: {
       type: String,
@@ -32,7 +63,7 @@ const Order = new mongoose.Schema(
     },
     delivery: {
       type: String,
-      enum: ["PENDING", "COMPLETED", "CANCELLED"],
+      enum: ["PENDING", "SHIPPED", "DELIVERED", "CANCELLED"],
       default: "PENDING",
       index: true,
     },
@@ -47,15 +78,21 @@ const Order = new mongoose.Schema(
     },
     expiresAt: {
       type: Date,
-      default: function() {
+      default: function () {
         return new Date(Date.now() + 10 * 60 * 1000); // 10 minutes from now
       },
       expires: 10 * 60, // TTL index in seconds
     },
     totalAmount: {
       type: Number,
-      default: 0
-    }
+      default: 0,
+    },
+    cancelReason: {
+      type: String,
+    },
+    estimatedDeliveryDate: {
+      type: Date,
+    },
   },
   {
     timestamps: {
@@ -75,10 +112,10 @@ Order.statics.storeOrder = async function (params) {
 };
 
 // Method to calculate order total based on product price and quantity
-Order.methods.calculateTotal = async function() {
-  const Product = mongoose.model('Product');
+Order.methods.calculateTotal = async function () {
+  const Product = mongoose.model("Product");
   const product = await Product.findById(this.productId);
-  
+
   if (product) {
     this.totalAmount = product.price * this.quantity;
     return this.totalAmount;
@@ -87,7 +124,7 @@ Order.methods.calculateTotal = async function() {
 };
 
 // Pre-save middleware to calculate total if not set
-Order.pre('save', async function(next) {
+Order.pre("save", async function (next) {
   if (this.totalAmount === 0) {
     try {
       await this.calculateTotal();

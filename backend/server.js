@@ -1,5 +1,4 @@
 const express = require("express");
-const cookieParser = require("cookie-parser");
 const connectToDB = require("./db/db.js");
 const cors = require("cors");
 const authRoute = require("./routes/auth.route.js");
@@ -26,7 +25,6 @@ require("dotenv").config();
 connectToDB().catch(err => console.error("Failed to connect to DB:", err));
 
 app.use(cors());
-app.use(cookieParser());
 app.use(express.json());
 
 // Routes

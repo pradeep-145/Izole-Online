@@ -2,8 +2,8 @@ const mongoose = require("mongoose");
 
 const customerSchema = mongoose.Schema(
   {
-    avatar:{
-      type:String,
+    avatar: {
+      type: String,
     },
     username: {
       type: String,
@@ -33,51 +33,54 @@ const customerSchema = mongoose.Schema(
       default: false,
       required: true,
     },
-    address:[{
-      type:String,
-
-    }],
-    orders:[{
-      type:mongoose.Schema.Types.ObjectId,
-      ref:"Order"
-    }],
-    gender:{
-      type:String,
-      enum:["Male","Female","Other"]
+    address: [
+      {
+        type: String,
+      },
+    ],
+    orders: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Order",
+      },
+    ],
+    gender: {
+      type: String,
+      enum: ["Male", "Female", "Other"],
     },
-    lastLogin:{
-      type:Date,
-      default:new Date( Date.now()),
+    lastLogin: {
+      type: Date,
+      default: new Date(Date.now()),
     },
     expiresAt: {
       type: Date,
-      default:new Date( Date.now()),
-      expires:10*24*60*60,
+      default: new Date(Date.now()),
+      expires: 10 * 24 * 60 * 60,
     },
   },
-  {timestamps: {
-    currentTime: () => new Date().toLocaleString('en-US', {
-      timeZone: 'Asia/Kolkata'
-    })}}
+  {
+    timestamps: {
+      currentTime: () =>
+        new Date().toLocaleString("en-US", {
+          timeZone: "Asia/Kolkata",
+        }),
+    },
+  }
 );
 
-
-
 customerSchema.statics.updateVerify = async function (customerId) {
-  const user = await this.findOne({_id:customerId });
+  const user = await this.findOne({ _id: customerId });
   if (!user) return false;
 
   await this.findByIdAndUpdate(
-    { _id:customerId },
+    { _id: customerId },
     {
       isVerified: true,
-      '$unset':{expiresAt:""}
+      $unset: { expiresAt: "" },
     }
   );
 
   return true;
 };
 
-module.exports=mongoose.model("Customer",customerSchema);
-
-
+module.exports = mongoose.model("Customer", customerSchema);

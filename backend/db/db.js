@@ -13,10 +13,10 @@ const connectToDB = async () => {
   try {
     // Set serverSelectionTimeoutMS to a lower value for faster Lambda cold starts
     const connection = await mongoose.connect(process.env.MONGO_URI, {
-      serverSelectionTimeoutMS: 5000,
-      socketTimeoutMS: 45000
+      serverSelectionTimeoutMS: 50000,
+      socketTimeoutMS: 45000,
     });
-    
+
     console.log("New DB connection established");
     cachedDb = connection;
     return connection;

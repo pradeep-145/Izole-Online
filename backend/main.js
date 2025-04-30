@@ -21,26 +21,44 @@ const eventBridgeHandler = async (event) => {
         };
       }
 
-      // Find the product and update the quantity in the correct variant and size
-      await productModel.updateOne(
-        {
-          _id: order.productId,
-          "variants.color": order.color,
-          "variants.sizeOptions.size": order.size,
-        },
-        {
-          $inc: {
-            "variants.$[variant].sizeOptions.$[sizeOption].quantity":
-              order.quantity,
-          },
-        },
-        {
-          arrayFilters: [
-            { "variant.color": order.color },
-            { "sizeOption.size": order.size },
-          ],
-        }
-      );
+      try {
+        const productArray = Array.isArray(order.products)
+          ? order.products
+          : [order.products];
+
+        await Promise.all(
+          productArray.map(async (product) => {
+            return productModel.updateOne(
+              {
+                _id: product.id,
+                "variants.color": product.color,
+                "variants.sizeOptions.size": product.size,
+              },
+              {
+                $inc: {
+                  "variants.$[variant].sizeOptions.$[sizeOption].quantity":
+                    product.quantity,
+                },
+              },
+              {
+                arrayFilters: [
+                  { "variant.color": product.color },
+                  { "sizeOption.size": product.size },
+                ],
+              }
+            );
+          })
+        );
+
+        console.log(
+          `Successfully restored inventory for all products in order: ${orderId}`
+        );
+      } catch (inventoryError) {
+        console.error(
+          `Error restoring product quantities: ${inventoryError.message}`
+        );
+        // Continue with order deletion even if inventory update fails
+      }
 
       // Delete the order after updating the inventory
       await orderModel.findByIdAndDelete(orderId);

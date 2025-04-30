@@ -5,7 +5,7 @@ const mongoose = require("mongoose");
 // Get user's wishlist
 exports.getWishlist = async (req, res) => {
   try {
-    const userId = req.user.userId;
+    const userId = req.user._id;
 
     // Find user's wishlist
     let wishlist = await Wishlist.findOne({ user: userId }).populate({
@@ -35,7 +35,7 @@ exports.getWishlist = async (req, res) => {
 exports.addToWishlist = async (req, res) => {
   try {
     const { productId } = req.body;
-    const userId = req.user.userId;
+    const userId = req.user._id;
 
     if (!productId) {
       return res.status(400).json({ message: "Product ID is required" });
@@ -101,7 +101,7 @@ exports.addToWishlist = async (req, res) => {
 exports.removeFromWishlist = async (req, res) => {
   try {
     const { productId } = req.body;
-    const userId = req.user.userId;
+    const userId = req.user._id;
 
     if (!productId) {
       return res.status(400).json({ message: "Product ID is required" });
@@ -141,7 +141,7 @@ exports.removeFromWishlist = async (req, res) => {
 // Clear wishlist
 exports.clearWishlist = async (req, res) => {
   try {
-    const userId = req.user.userId;
+    const userId = req.user._id;
 
     // Find and clear wishlist
     const wishlist = await Wishlist.findOne({ user: userId });
@@ -167,7 +167,7 @@ exports.clearWishlist = async (req, res) => {
 exports.checkWishlistItem = async (req, res) => {
   try {
     const { productId } = req.params;
-    const userId = req.user.userId;
+    const userId = req.user._id;
 
     if (!productId) {
       return res.status(400).json({ message: "Product ID is required" });

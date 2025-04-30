@@ -9,7 +9,6 @@ import AdminDashboard from "./Pages/Admin/AdminDashboard";
 import AdminLayout from "./Pages/Admin/AdminLayout";
 import AdminLogin from "./Pages/Admin/AdminLogin";
 import ProductEdit from "./Pages/Admin/ProductEdit";
-import AdminProductForm from "./Pages/Admin/ProductForm";
 import ProductView from "./Pages/Admin/ProductView";
 import Cart from "./Pages/customer/cart";
 import Checkout from "./Pages/customer/Checkout";
@@ -17,6 +16,7 @@ import CustomerLayout from "./Pages/customer/CustomerLayout";
 import CustomerLogin from "./Pages/customer/CustomerLogin";
 import CustomerSignUp from "./Pages/customer/CustomerSignUp";
 import LandingPage from "./Pages/customer/LandingPage";
+import OrderConfirmation from "./Pages/customer/OrderConfirmation";
 import OrderHistoryPage from "./Pages/customer/OrderHistoryPage";
 import OtpVerification from "./Pages/customer/otpVerification";
 import Product from "./Pages/customer/Product";
@@ -39,12 +39,16 @@ function App() {
           <Route path="otp-verification" element={<OtpVerification />} />
           <Route path="products" element={<ProductList />} />
           <Route path="product/:id" element={<Product />} />
-          
+
           <Route path="cart" element={<Cart />} />
           <Route path="checkout" element={<Checkout />} />
           <Route path="wishlist" element={<Wishlist />} />
           <Route path="shipping-status" element={<ShippingStatus />} />
           <Route path="orders" element={<OrderHistoryPage />} />
+          <Route
+            path="order-confirmation/:orderId"
+            element={<OrderConfirmation />}
+          />
         </Route>
 
         {/* Admin Routes */}

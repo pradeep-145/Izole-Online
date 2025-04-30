@@ -22,7 +22,7 @@ const CartController = {
   addToCart: async (req, res) => {
     try {
       const { product, quantity, color, size, price, image } = req.body;
-      const customerId = req.user.userId;
+      const customerId = req.user._id;
 
       // Validate product exists with new structure
       const productExists = await Product.findById(product._id);
@@ -108,7 +108,7 @@ const CartController = {
   },
   getCart: async (req, res) => {
     try {
-      const customerId = req.user.userId; // Assuming user is authenticated
+      const customerId = req.user._id; // Assuming user is authenticated
       const cart = await getOrCreateCart(customerId);
 
       // Format cart items to match frontend expectations
@@ -136,7 +136,7 @@ const CartController = {
   updateCart: async (req, res) => {
     try {
       const { productId, color, size, quantity } = req.body;
-      const customerId = req.user.userId; // Assuming user is authenticated
+      const customerId = req.user._id; // Assuming user is authenticated
 
       const cart = await Cart.findOne({ customerId });
       if (!cart) {
@@ -180,7 +180,7 @@ const CartController = {
   removeCart: async (req, res) => {
     try {
       const { productId, color, size } = req.body;
-      const customerId = req.user.userId; // Assuming user is authenticated
+      const customerId = req.user._id; // Assuming user is authenticated
 
       const cart = await Cart.findOne({ customerId });
       if (!cart) {
@@ -216,7 +216,7 @@ const CartController = {
   },
   cleanCart: async (req, res) => {
     try {
-      const customerId = req.user.userId; // Assuming user is authenticated
+      const customerId = req.user._id; // Assuming user is authenticated
 
       const cart = await Cart.findOne({ customerId });
       if (cart) {

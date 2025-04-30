@@ -52,14 +52,14 @@ const AuthController = {
 
           // Create current date in IST format
           const currentDate = new Date();
-          
+
           userWithoutPassword = {
             ...userWithoutPassword,
             lastLogin: currentDate,
           };
 
           console.log("User without password:", userWithoutPassword);
-          
+
           res.setHeader("Set-Cookie", [
             `jwt=${token}; HttpOnly; Path=/; SameSite=Lax; Max-Age=${maxAge};`,
           ]);
