@@ -5,8 +5,9 @@ import {
   Package,
   ShoppingCart,
   Truck,
+  Clock,
 } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useCart } from "../../zustand/useCart";
 
@@ -19,9 +20,62 @@ const CheckoutPage = () => {
   const singleProduct = location.state?.product;
   const isBuyNow = !!singleProduct;
 
+  // Timer state
+  const [timeLeft, setTimeLeft] = useState(10 * 60); // 10 minutes in seconds
+  const [timerActive, setTimerActive] = useState(false);
+
   // Create a products array based on source
   const [products, setProducts] = useState([]);
   const [orderTotal, setOrderTotal] = useState(0);
+
+  // Format time function
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+  };
+
+  // Handle timer expiration
+  const handleTimerExpired = useCallback(() => {
+    if (isBuyNow && singleProduct) {
+      // Get the product ID to navigate back to
+      const productId = singleProduct._id || singleProduct.id;
+
+      // Show alert
+      alert("Your checkout session has expired. Returning to product page.");
+
+      // Navigate back to product page
+      navigate(`/customer/product/${productId}`, { replace: true });
+    } else {
+      // For cart checkout, just go back to cart
+      navigate("/customer/cart", { replace: true });
+    }
+  }, [isBuyNow, singleProduct, navigate]);
+
+  // Timer effect
+  useEffect(() => {
+    if (isBuyNow) {
+      // Start timer when page loads for Buy Now checkout
+      setTimerActive(true);
+    }
+
+    // Timer countdown logic
+    let interval;
+    if (timerActive && timeLeft > 0) {
+      interval = setInterval(() => {
+        setTimeLeft((prevTime) => prevTime - 1);
+      }, 1000);
+    } else if (timerActive && timeLeft === 0) {
+      // Timer expired
+      clearInterval(interval);
+      handleTimerExpired();
+    }
+
+    // Cleanup
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [timerActive, timeLeft, isBuyNow, handleTimerExpired]);
 
   useEffect(() => {
     if (isBuyNow && singleProduct) {
@@ -129,8 +183,9 @@ const CheckoutPage = () => {
 
   const handleGoBack = () => {
     if (isBuyNow) {
-      // Go back to product page
-      navigate(-1);
+      // Go back to product page - get ID from singleProduct
+      const productId = singleProduct._id || singleProduct.id;
+      navigate(`/customer/product/${productId}`);
     } else {
       // Go back to cart
       navigate("/customer/cart");
@@ -148,6 +203,9 @@ const CheckoutPage = () => {
         totalAmount: total,
         isBuyNow: isBuyNow,
       });
+
+      // Stop the timer when proceeding to payment
+      setTimerActive(false);
 
       // In a real implementation, you would likely:
       // 1. Save the order with pending payment status
@@ -177,7 +235,7 @@ const CheckoutPage = () => {
   const subtotal = orderTotal;
   const shipping = orderTotal > 500 ? 0 : 50;
   const tax = orderTotal * 0.18;
-  const total = subtotal + shipping ;
+  const total = subtotal + shipping;
 
   return (
     <div className="mx-auto bg-gray-50 min-h-screen">
@@ -190,19 +248,35 @@ const CheckoutPage = () => {
               className="flex items-center border-2 border-wineRed font-semibold p-1 rounded-lg text-wineRed hover:text-gray-600 transition-colors"
             >
               <ArrowLeft size={20} className="mr-1" />
-              <span>Back to Cart</span>
+              <span>Back</span>
             </button>
 
             <h1 className="text-2xl font-bold text-gray-800">
               {isBuyNow ? "Buy Now" : "Checkout"}
             </h1>
 
-            <div className="w-8">{/* Spacer for alignment */}</div>
+            {/* Timer display - only show for Buy Now */}
+            {isBuyNow && (
+              <div className="flex items-center bg-wineRed text-white px-3 py-1 rounded-lg">
+                <Clock size={16} className="mr-1" />
+                <span className="font-mono">{formatTime(timeLeft)}</span>
+              </div>
+            )}
           </div>
         </div>
       </div>
 
       <div className="container mx-auto p-4 md:p-6">
+        {/* Timer warning - only show for Buy Now when less than 2 minutes remaining */}
+        {isBuyNow && timeLeft < 120 && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6 flex items-center justify-center">
+            <Clock className="mr-2 text-red-500" />
+            <p>
+              <span className="font-bold">Hurry!</span> Your checkout session will expire in {formatTime(timeLeft)}. Complete your purchase now.
+            </p>
+          </div>
+        )}
+
         <div className="max-w-6xl mx-auto">
           <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
             <h2 className="text-xl font-bold mb-4 text-gray-800 border-b pb-2">
@@ -364,7 +438,7 @@ const CheckoutPage = () => {
                               : `₹${shipping.toFixed(2)}`}
                           </span>
                         </div>
-                        
+
                         <div className="flex text-black justify-between font-bold text-lg pt-2 border-t border-gray-200">
                           <span>Total</span>
                           <span>₹{total.toFixed(2)}</span>
@@ -387,25 +461,6 @@ const CheckoutPage = () => {
                           <Lock className="w-3 h-3 mr-1" /> Secure Payment
                         </p>
                       </div>
-
-                      {/* Estimated Delivery */}
-                      {/* <div className="mt-6 bg-gray-50 p-4 rounded-md flex items-start">
-                        <Truck className="w-5 h-5 text-amber-500 mr-2 mt-1" />
-                        <div>
-                          <h4 className="font-medium text-gray-800">
-                            Estimated Delivery
-                          </h4>
-                          <p className="text-sm text-gray-600">
-                            {new Date(
-                              Date.now() + 5 * 24 * 60 * 60 * 1000
-                            ).toLocaleDateString("en-US", {
-                              weekday: "long",
-                              month: "long",
-                              day: "numeric",
-                            })}
-                          </p>
-                        </div>
-                      </div> */}
                     </>
                   )}
                 </div>
@@ -415,19 +470,21 @@ const CheckoutPage = () => {
 
           {/* Additional information */}
           <div className="bg-white rounded-lg shadow-lg p-6">
-            {/* <div className="flex items-center mb-4">
-              <div className="h-8 w-8 rounded-full bg-amber-100 flex items-center justify-center mr-3">
-                <ShoppingCart className="h-4 w-4 text-amber-500" />
+            {isBuyNow && (
+              <div className="flex items-center mb-4">
+                <div className="h-8 w-8 rounded-full bg-amber-100 flex items-center justify-center mr-3">
+                  <Clock className="h-4 w-4 text-amber-500" />
+                </div>
+                <div>
+                  <h3 className="font-medium text-wineRed">
+                    Limited Time Checkout
+                  </h3>
+                  <p className="text-sm text-gray-600">
+                    You have {formatTime(timeLeft)} to complete your purchase
+                  </p>
+                </div>
               </div>
-              <div>
-                <h3 className="font-medium text-wineRed">
-                  Free shipping on orders over ₹500
-                </h3>
-                <p className="text-sm text-gray-600">
-                  You've qualified for free shipping!
-                </p>
-              </div>
-            </div> */}
+            )}
 
             <div className="flex items-center">
               <div className="h-8 w-8 rounded-full bg-amber-100 flex items-center justify-center mr-3">
