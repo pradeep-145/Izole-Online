@@ -754,7 +754,7 @@ const Product = () => {
                   <div className="join mt-2">
                     <button
                       type="button"
-                      className="join-item btn btn-outline"
+                      className="join-item btn btn-outline hover:bg-wineRed hover:text-mustard"
                       onClick={decrementCount}
                       disabled={itemCount <= 1}
                     >
@@ -765,7 +765,7 @@ const Product = () => {
                     </div>
                     <button
                       type="button"
-                      className="join-item btn btn-outline"
+                      className="join-item btn btn-outline hover:bg-wineRed hover:text-mustard"
                       onClick={incrementCount}
                       disabled={itemCount >= (currentSizeOption?.quantity || 0)}
                     >
@@ -792,17 +792,6 @@ const Product = () => {
                   >
                     Buy Now
                   </button>
-                </div>
-
-                <div className="mt-6 alert bg-wineRed/20 text-wineRed">
-                  <Truck className="h-5 w-5" />
-                  <div>
-                    <h4 className="font-bold">Free Shipping & Returns</h4>
-                    <p className="text-xs">
-                      Free standard shipping on orders over $50. Estimated
-                      delivery: 3-5 business days.
-                    </p>
-                  </div>
                 </div>
 
                 <div className="mt-6 flex gap-4">

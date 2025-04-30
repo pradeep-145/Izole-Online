@@ -1,3 +1,13 @@
+import {
+  ArrowLeft,
+  Lock,
+  MapPin,
+  Package,
+  ShoppingCart,
+  Truck,
+  Clock,
+} from "lucide-react";
+import React, { useEffect, useState, useCallback } from "react";
 import React, { useEffect, useState } from "react";
 import { load } from "@cashfreepayments/cashfree-js";
 import axios from "axios";
@@ -13,8 +23,61 @@ const CheckoutPage = () => {
   const singleProduct = location.state?.product;
   const isBuyNow = !!singleProduct;
 
+  // Timer state
+  const [timeLeft, setTimeLeft] = useState(1 * 60); // 10 minutes in seconds
+  const [timerActive, setTimerActive] = useState(false);
+
   const [products, setProducts] = useState([]);
   const [orderTotal, setOrderTotal] = useState(0);
+
+  // Format time function
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+  };
+
+  // Handle timer expiration
+  const handleTimerExpired = useCallback(() => {
+    if (isBuyNow && singleProduct) {
+      // Get the product ID to navigate back to
+      const productId = singleProduct._id || singleProduct.id;
+
+      // Show alert
+      alert("Your checkout session has expired. Returning to product page.");
+
+      // Navigate back to product page
+      navigate(`/customer/product/${productId}`, { replace: true });
+    } else {
+      // For cart checkout, just go back to cart
+      navigate("/customer/cart", { replace: true });
+    }
+  }, [isBuyNow, singleProduct, navigate]);
+
+  // Timer effect
+  useEffect(() => {
+    if (isBuyNow) {
+      // Start timer when page loads for Buy Now checkout
+      setTimerActive(true);
+    }
+
+    // Timer countdown logic
+    let interval;
+    if (timerActive && timeLeft > 0) {
+      interval = setInterval(() => {
+        setTimeLeft((prevTime) => prevTime - 1);
+      }, 1000);
+    } else if (timerActive && timeLeft === 0) {
+      // Timer expired
+      clearInterval(interval);
+      handleTimerExpired();
+    }
+
+    // Cleanup
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [timerActive, timeLeft, isBuyNow, handleTimerExpired]);
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -133,6 +196,9 @@ const CheckoutPage = () => {
 
   const handleGoBack = () => {
     if (isBuyNow) {
+      // Go back to product page - get ID from singleProduct
+      const productId = singleProduct._id || singleProduct.id;
+      navigate(`/customer/product/${productId}`);
       navigate(-1);
     } else {
       navigate("/customer/cart");
@@ -165,6 +231,29 @@ const CheckoutPage = () => {
         products,
         totalAmount: total,
         address: fullAddress,
+      });
+
+      // Stop the timer when proceeding to payment
+      setTimerActive(false);
+
+      // In a real implementation, you would likely:
+      // 1. Save the order with pending payment status
+      // 2. Generate a unique order ID
+      // 3. Redirect to the payment gateway with needed parameters
+
+      // For demo purposes, we're simulating this with an alert
+      alert("Redirecting to payment gateway...");
+
+      // Redirect to external payment gateway (this would be your gateway URL)
+      // window.location.href = 'https://your-payment-gateway.com/pay?order=123';
+
+      // For demo purposes, let's navigate to a simulated payment page
+      navigate("/payment-gateway", {
+        state: {
+          orderNumber: `ORD-${Date.now()}`,
+          orderAmount: total,
+          customerName: `${formData.firstName} ${formData.lastName}`,
+        },
       });
       console.log(response);
 
@@ -207,6 +296,10 @@ const CheckoutPage = () => {
     }
   };
 
+  const subtotal = orderTotal;
+  const shipping = orderTotal > 500 ? 0 : 50;
+  const tax = orderTotal * 0.18;
+  const total = subtotal + shipping;
   const handlePaymentSuccess = async (paymentData) => {
     setPaymentStatus("completed");
     clearCart();
@@ -237,19 +330,36 @@ const CheckoutPage = () => {
               className="flex items-center border-2 border-wineRed font-semibold p-1 rounded-lg text-wineRed hover:text-gray-600 transition-colors"
             >
               <ArrowLeft size={20} className="mr-1" />
-              <span>Back to Cart</span>
+              <span>Back</span>
             </button>
 
             <h1 className="text-2xl font-bold text-gray-800">
               {isBuyNow ? "Buy Now" : "Checkout"}
             </h1>
 
+            {/* Timer display - only show for Buy Now */}
+            {isBuyNow && (
+              <div className="flex items-center bg-wineRed text-white px-3 py-1 rounded-lg">
+                <Clock size={16} className="mr-1" />
+                <span className="font-mono">{formatTime(timeLeft)}</span>
+              </div>
+            )}
             <div className="w-8" />
           </div>
         </div>
       </div>
 
       <div className="container mx-auto p-4 md:p-6">
+        {/* Timer warning - only show for Buy Now when less than 2 minutes remaining */}
+        {isBuyNow && timeLeft < 120 && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6 flex items-center justify-center">
+            <Clock className="mr-2 text-red-500" />
+            <p>
+              <span className="font-bold">Hurry!</span> Your checkout session will expire in {formatTime(timeLeft)}. Complete your purchase now.
+            </p>  
+          </div>
+        )}
+
         <div className="max-w-6xl mx-auto">
           <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
             <h2 className="text-xl font-bold mb-4 text-gray-800 border-b pb-2">
@@ -415,6 +525,8 @@ const CheckoutPage = () => {
                           <span>Shipping</span>
                           <span>{shipping === 0 ? "Free" : `₹${shipping.toFixed(2)}`}</span>
                         </div>
+
+                        <div className="flex text-black justify-between font-bold text-lg pt-2 border-t border-gray-200">
                         <div className="flex justify-between">
                           <span>Tax (18%)</span>
                           <span>₹{tax.toFixed(2)}</span>
@@ -424,9 +536,57 @@ const CheckoutPage = () => {
                           <span>₹{total.toFixed(2)}</span>
                         </div>
                       </div>
+
+                      <div className="mt-6">
+                        <button
+                          type="submit"
+                          form="shipping-form"
+                          className="w-full py-3 bg-mustard text-gray-800 font-bold rounded-md hover:bg-amber-500 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 shadow-md flex items-center justify-center"
+                        >
+                          <Lock className="mr-2 h-5 w-5" />
+                          Proceed to Payment
+                        </button>
+                      </div>
+
+                      <div className="mt-4 text-center">
+                        <p className="text-xs text-gray-500 flex items-center justify-center">
+                          <Lock className="w-3 h-3 mr-1" /> Secure Payment
+                        </p>
+                      </div>
                     </>
                   )}
                 </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Additional information */}
+          <div className="bg-white rounded-lg shadow-lg p-6">
+            {isBuyNow && (
+              <div className="flex items-center mb-4">
+                <div className="h-8 w-8 rounded-full bg-amber-100 flex items-center justify-center mr-3">
+                  <Clock className="h-4 w-4 text-amber-500" />
+                </div>
+                <div>
+                  <h3 className="font-medium text-wineRed">
+                    Limited Time Checkout
+                  </h3>
+                  <p className="text-sm text-gray-600">
+                    You have {formatTime(timeLeft)} to complete your purchase
+                  </p>
+                </div>
+              </div>
+            )}
+
+            <div className="flex items-center">
+              <div className="h-8 w-8 rounded-full bg-amber-100 flex items-center justify-center mr-3">
+                <Lock className="h-4 w-4 text-amber-500" />
+              </div>
+              <div>
+                <h3 className="font-medium text-wineRed">Secure checkout</h3>
+                <p className="text-sm text-gray-600">
+                  Your payment information is protected
+                </p>
               </div>
             </div>
           </div>
