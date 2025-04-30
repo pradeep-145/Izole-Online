@@ -98,7 +98,7 @@ const ProductCarousel = () => {
   };
 
   const handleProductClick = (productId) => {
-    navigate(`/customer/products/${productId}`);
+    navigate(`/customer/product/${productId}`);
   };
 
   return (

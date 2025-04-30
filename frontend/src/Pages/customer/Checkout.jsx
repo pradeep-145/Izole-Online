@@ -21,7 +21,7 @@ const CheckoutPage = () => {
   const isBuyNow = !!singleProduct;
 
   // Timer state
-  const [timeLeft, setTimeLeft] = useState(10 * 60); // 10 minutes in seconds
+  const [timeLeft, setTimeLeft] = useState(1 * 60); // 10 minutes in seconds
   const [timerActive, setTimerActive] = useState(false);
 
   // Create a products array based on source
@@ -273,7 +273,7 @@ const CheckoutPage = () => {
             <Clock className="mr-2 text-red-500" />
             <p>
               <span className="font-bold">Hurry!</span> Your checkout session will expire in {formatTime(timeLeft)}. Complete your purchase now.
-            </p>
+            </p>  
           </div>
         )}
 
