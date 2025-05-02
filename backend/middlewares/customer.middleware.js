@@ -4,7 +4,6 @@ const customerModel = require("../models/customer.model.js");
 const authenticateJWT = async (req, res, next) => {
   try {
 
-    // Parse the cookie header
     const cookies = req.headers["cookie"];
     if (!cookies) {
       throw new Error("Cookie header is missing");
@@ -14,10 +13,11 @@ const authenticateJWT = async (req, res, next) => {
     const jwtCookie = cookies
       .split("; ")
       .find((cookie) => cookie.startsWith("jwt="));
+
     if (!jwtCookie) {
       throw new Error("JWT token not found in cookies");
     }
-
+  
     const token = jwtCookie.split("=")[1];
     console.log(token);
     if (!token) {

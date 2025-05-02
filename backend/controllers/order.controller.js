@@ -202,7 +202,7 @@ exports.OrderController = {
       // Update the order status
 
       order.paymentStatus = "COMPLETED";
-      order.expiresAt = undefined; // Remove expiration
+      order.expiresAt = undefined;
       await order.save();
 
       res.status(200).json({
@@ -223,7 +223,7 @@ exports.OrderController = {
     const user = req.user;
     try {
       const response = await orderModel.find({ customerId: user._id });
-
+      console.log(response )
       res.status(200).json({
         success: true,
         order:response,

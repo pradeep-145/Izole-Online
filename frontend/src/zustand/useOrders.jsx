@@ -39,22 +39,21 @@ export const useOrders = create(
 
         set({ isLoading: true, error: null });
 
-        fetchOrdersPromise = new Promise((resolve) => {
-          axios
-            .get("/api/orders", {
+        fetchOrdersPromise = await axios
+            .get("/api/orders/get-orders", {
               headers: {
                 Authorization: `Bearer ${localStorage.getItem("token")}`,
                 "Content-Type": "application/json",
               },
+              withCredentials: true,
             })
             .then((response) => {
               set({
-                orders: response.data.orders || [],
+                orders: response.data.order || [],
                 isLoading: false,
                 ordersLastFetched: Date.now(),
               });
 
-              resolve({ success: true, orders: response.data.orders });
             })
             .catch((error) => {
               set({
@@ -62,16 +61,12 @@ export const useOrders = create(
                   error.response?.data?.message || "Failed to fetch orders",
                 isLoading: false,
               });
-              resolve({
-                success: false,
-                error:
-                  error.response?.data?.message || "Failed to fetch orders",
-              });
+             
             })
             .finally(() => {
               fetchOrdersPromise = null;
             });
-        });
+        console.log("Fetching orders from API..."+fetchOrdersPromise);
 
         return fetchOrdersPromise;
       },

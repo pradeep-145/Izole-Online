@@ -60,7 +60,11 @@ const orderSchema = new mongoose.Schema(
     paymentSessionId: String,
     paymentLink: String,
     schedulerName: String,
-    expiresAt: Date,
+    expiresAt: {
+      type: Date,
+      default: new Date(Date.now()),
+      expires: 10 * 60,
+    },
     cancelReason: String,
     cancelledAt: Date,
   },

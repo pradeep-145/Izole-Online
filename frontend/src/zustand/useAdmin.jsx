@@ -3,17 +3,17 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 // Configuration values
-const DASHBOARD_DATA_TTL = 5 * 60 * 1000; // Dashboard data fresh for 5 minutes
+const DASHBOARD_DATA_TTL = 5 * 60 * 1000;
 const PRODUCT_DATA_TTL = 10 * 60 * 1000; // Product data fresh for 10 minutes
 const ORDER_DATA_TTL = 5 * 60 * 1000; // Order data fresh for 5 minutes
 const USER_DATA_TTL = 30 * 60 * 1000; // User data fresh for 30 minutes
 
 // Request debouncing
 const pendingRequests = {
-  products: null,
-  orders: null,
-  users: null,
-  analytics: null,
+  products: [],
+  orders: [],
+  users:[],
+  analytics: [],
 };
 
 export const useAdmin = create(
