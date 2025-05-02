@@ -339,7 +339,7 @@ const OrderConfirmation = () => {
             </button>
 
             <button
-              onClick={() => navigate("/customer")}
+              onClick={() => navigate("/customer/products")}
               className="px-4 py-2 bg-wineRed text-white rounded-md hover:bg-wineRed/90 transition-colors flex items-center justify-center"
             >
               Continue Shopping <ChevronRight size={16} className="ml-1" />

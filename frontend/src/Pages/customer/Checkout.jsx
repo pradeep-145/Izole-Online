@@ -14,7 +14,7 @@ const CheckoutPage = () => {
   const isBuyNow = !!singleProduct;
 
   // Timer state
-  const [timeLeft, setTimeLeft] = useState(1 * 60); // 10 minutes in seconds
+  const [timeLeft, setTimeLeft] = useState(10 * 60); // 10 minutes in seconds
   const [timerActive, setTimerActive] = useState(false);
 
   const [products, setProducts] = useState([]);
