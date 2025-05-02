@@ -94,13 +94,14 @@ export const useOrders = create(
 
         fetchOrderDetailsPromise[orderId] = new Promise((resolve) => {
           axios
-            .get(`/api/orders/${orderId}`, {
+            .get(`/api/orders/get/${orderId}`, {
               headers: {
                 Authorization: `Bearer ${localStorage.getItem("token")}`,
                 "Content-Type": "application/json",
               },
             })
             .then((response) => {
+              console.log(response.data);
               set({
                 currentOrder: response.data.order,
                 isLoading: false,
@@ -165,9 +166,8 @@ export const useOrders = create(
       cancelOrder: async (orderId, reason) => {
         set({ isLoading: true, error: null });
         try {
-          await axios.post(
-            // Removed unused response variable
-            `/api/orders/${orderId}/cancel`,
+          const response = await axios.post(
+            `/api/orders/cancel-order/${orderId}`,
             { reason },
             {
               headers: {
@@ -181,21 +181,27 @@ export const useOrders = create(
           set((state) => ({
             orders: state.orders.map((order) =>
               order._id === orderId
-                ? { ...order, status: "Cancelled", cancelReason: reason }
+                ? {
+                    ...order,
+                    status: "CANCELLED",
+                    cancelReason: reason,
+                    cancelledAt: new Date(),
+                  }
                 : order
             ),
             currentOrder:
               state.currentOrder && state.currentOrder._id === orderId
                 ? {
                     ...state.currentOrder,
-                    status: "Cancelled",
+                    status: "CANCELLED",
                     cancelReason: reason,
+                    cancelledAt: new Date(),
                   }
                 : state.currentOrder,
             isLoading: false,
           }));
 
-          return { success: true };
+          return { success: true, order: response.data.order };
         } catch (error) {
           set({
             error: error.response?.data?.message || "Failed to cancel order",

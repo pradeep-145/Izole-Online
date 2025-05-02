@@ -11,6 +11,7 @@ import AdminLogin from "./Pages/Admin/AdminLogin";
 import ProductEdit from "./Pages/Admin/ProductEdit";
 import ProductView from "./Pages/Admin/ProductView";
 import Cart from "./Pages/customer/cart";
+import CashfreeRedirect from "./Pages/customer/CashfreeRedirect";
 import Checkout from "./Pages/customer/Checkout";
 import CustomerLayout from "./Pages/customer/CustomerLayout";
 import CustomerLogin from "./Pages/customer/CustomerLogin";
@@ -19,6 +20,7 @@ import LandingPage from "./Pages/customer/LandingPage";
 import OrderConfirmation from "./Pages/customer/OrderConfirmation";
 import OrderHistoryPage from "./Pages/customer/OrderHistoryPage";
 import OtpVerification from "./Pages/customer/otpVerification";
+import PaymentFailed from "./Pages/customer/PaymentFailed";
 import Product from "./Pages/customer/Product";
 import ProductList from "./Pages/customer/ProductList";
 import ShippingStatus from "./Pages/customer/ShippingStatus";
@@ -45,10 +47,10 @@ function App() {
           <Route path="wishlist" element={<Wishlist />} />
           <Route path="shipping-status" element={<ShippingStatus />} />
           <Route path="orders" element={<OrderHistoryPage />} />
-          <Route
-            path="order-confirmation/:orderId"
-            element={<OrderConfirmation />}
-          />
+          <Route path="order-confirmation" element={<OrderConfirmation />} />
+          {/* New routes for payment handling */}
+          <Route path="payment/redirect" element={<CashfreeRedirect />} />
+          <Route path="payment-failed" element={<PaymentFailed />} />
         </Route>
 
         {/* Admin Routes */}

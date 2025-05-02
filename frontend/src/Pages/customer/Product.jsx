@@ -236,7 +236,7 @@ const Product = () => {
       navigate("/customer/login");
       return;
     }
-
+    console.log(currentVariant)
     navigate("/customer/checkout", {
       state: {
         product: product,
@@ -786,8 +786,11 @@ const Product = () => {
                   </button>
                   <button
                     type="button"
-                    onClick={handleBuyNow}
-                    disabled={currentSizeOption.quantity === 0}
+
+                    onClick={()=>{
+                      handleBuyNow()
+                    }}
+                    disabled={currentSizeOption.quantity== 0}
                     className="btn btn-primary flex-1 bg-mustard text-wineRed border-mustard hover:bg-mustard/80"
                   >
                     Buy Now

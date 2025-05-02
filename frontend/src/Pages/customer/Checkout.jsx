@@ -1,18 +1,8 @@
-import {
-  ArrowLeft,
-  Lock,
-  MapPin,
-  Package,
-  ShoppingCart,
-  Truck,
-  Clock,
-} from "lucide-react";
-import React, { useEffect, useState, useCallback } from "react";
-import React, { useEffect, useState } from "react";
 import { load } from "@cashfreepayments/cashfree-js";
 import axios from "axios";
+import { ArrowLeft, Clock, Lock, MapPin, Package } from "lucide-react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { ArrowLeft, MapPin, Package } from "lucide-react";
 import { useCart } from "../../zustand/useCart";
 
 const CheckoutPage = () => {
@@ -34,7 +24,7 @@ const CheckoutPage = () => {
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
-    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+    return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
   };
 
   // Handle timer expiration
@@ -130,9 +120,7 @@ const CheckoutPage = () => {
           price: sizeOption?.price || variant.sizeOptions[0]?.price || 0,
           quantity: location.state?.quantity || 1,
           image:
-            location.state?.image ||
-            variant.images?.[0] ||
-            "https://placeholder.com/400",
+            location.state?.images[0],
           color: location.state?.color || variant.color || "N/A",
           size: location.state?.size || sizeOption?.size || "N/A",
         };
@@ -173,7 +161,9 @@ const CheckoutPage = () => {
 
           setProducts(mappedCartItems);
           setOrderTotal(
-            getCartTotal ? getCartTotal() : calculateTotalManually(mappedCartItems)
+            getCartTotal
+              ? getCartTotal()
+              : calculateTotalManually(mappedCartItems)
           );
         } catch (error) {
           console.error("Error processing cart items:", error);
@@ -198,7 +188,6 @@ const CheckoutPage = () => {
     if (isBuyNow) {
       // Go back to product page - get ID from singleProduct
       const productId = singleProduct._id || singleProduct.id;
-      navigate(`/customer/product/${productId}`);
       navigate(-1);
     } else {
       navigate("/customer/cart");
@@ -236,25 +225,6 @@ const CheckoutPage = () => {
       // Stop the timer when proceeding to payment
       setTimerActive(false);
 
-      // In a real implementation, you would likely:
-      // 1. Save the order with pending payment status
-      // 2. Generate a unique order ID
-      // 3. Redirect to the payment gateway with needed parameters
-
-      // For demo purposes, we're simulating this with an alert
-      alert("Redirecting to payment gateway...");
-
-      // Redirect to external payment gateway (this would be your gateway URL)
-      // window.location.href = 'https://your-payment-gateway.com/pay?order=123';
-
-      // For demo purposes, let's navigate to a simulated payment page
-      navigate("/payment-gateway", {
-        state: {
-          orderNumber: `ORD-${Date.now()}`,
-          orderAmount: total,
-          customerName: `${formData.firstName} ${formData.lastName}`,
-        },
-      });
       console.log(response);
 
       if (response.data.success) {
@@ -269,17 +239,44 @@ const CheckoutPage = () => {
 
         const checkoutOptions = {
           paymentSessionId: response.data.paymentSessionId,
-          redirectTarget: "_self",
         };
 
         const result = await cashfreeInstance.checkout(checkoutOptions);
+        console.log(result);
 
         if (result.error) {
           setPaymentError(result.error.message);
         } else if (result.success) {
-          handlePaymentSuccess(result);
+          const payment = await axios.post("/api/orders/confirm-order", {
+            orderId: response.data.order._id,
+          });
+          console.log(payment.data);
+
+  
+          setPaymentStatus("completed");
+
+          // Clear cart if it's not a Buy Now purchase
+          if (!isBuyNow) {
+            clearCart();
+          }
+
+          // Redirect to order confirmation page with all necessary details
+          navigate(`/customer/order-confirmation/${orderId}`, {
+            state: {
+              orderDetails: {
+                orderId,
+                amount: total,
+                products,
+                address: `${formData.address}, ${formData.city}, ${formData.zipCode}`,
+                customerName: `${formData.firstName} ${formData.lastName}`,
+                email: formData.email,
+              },
+            },
+            replace: true,
+          });
         } else if (result.redirect) {
           // You can handle redirect here if needed
+
           console.log("Redirecting to payment gateway...");
         }
       } else {
@@ -296,10 +293,6 @@ const CheckoutPage = () => {
     }
   };
 
-  const subtotal = orderTotal;
-  const shipping = orderTotal > 500 ? 0 : 50;
-  const tax = orderTotal * 0.18;
-  const total = subtotal + shipping;
   const handlePaymentSuccess = async (paymentData) => {
     setPaymentStatus("completed");
     clearCart();
@@ -355,8 +348,9 @@ const CheckoutPage = () => {
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6 flex items-center justify-center">
             <Clock className="mr-2 text-red-500" />
             <p>
-              <span className="font-bold">Hurry!</span> Your checkout session will expire in {formatTime(timeLeft)}. Complete your purchase now.
-            </p>  
+              <span className="font-bold">Hurry!</span> Your checkout session
+              will expire in {formatTime(timeLeft)}. Complete your purchase now.
+            </p>
           </div>
         )}
 
@@ -374,7 +368,11 @@ const CheckoutPage = () => {
                     <MapPin className="mr-2 text-amber-500" /> Shipping Details
                   </h3>
 
-                  <form id="shipping-form" onSubmit={proceedToPayment} className="space-y-4">
+                  <form
+                    id="shipping-form"
+                    onSubmit={proceedToPayment}
+                    className="space-y-4"
+                  >
                     <div className="grid md:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -462,7 +460,9 @@ const CheckoutPage = () => {
                     </div>
 
                     {paymentError && (
-                      <p className="text-red-600 font-semibold">{paymentError}</p>
+                      <p className="text-red-600 font-semibold">
+                        {paymentError}
+                      </p>
                     )}
 
                     <button
@@ -470,7 +470,9 @@ const CheckoutPage = () => {
                       disabled={isProcessing}
                       className="bg-wineRed text-white px-6 py-2 rounded-md font-semibold hover:bg-wineRed/90 transition-colors"
                     >
-                      {isProcessing ? "Processing..." : `Pay ₹${total.toFixed(2)}`}
+                      {isProcessing
+                        ? "Processing..."
+                        : `Pay ₹${total.toFixed(2)}`}
                     </button>
                   </form>
                 </div>
@@ -501,7 +503,9 @@ const CheckoutPage = () => {
                               className="w-16 h-16 object-cover rounded-md"
                             />
                             <div className="ml-4 flex-1">
-                              <h4 className="font-medium text-wineRed">{item.name}</h4>
+                              <h4 className="font-medium text-wineRed">
+                                {item.name}
+                              </h4>
                               <p className="text-sm text-gray-600">
                                 Color: {item.color}, Size: {item.size}
                               </p>
@@ -523,15 +527,18 @@ const CheckoutPage = () => {
                         </div>
                         <div className="flex justify-between">
                           <span>Shipping</span>
-                          <span>{shipping === 0 ? "Free" : `₹${shipping.toFixed(2)}`}</span>
+                          <span>
+                            {shipping === 0
+                              ? "Free"
+                              : `₹${shipping.toFixed(2)}`}
+                          </span>
                         </div>
 
-                        <div className="flex text-black justify-between font-bold text-lg pt-2 border-t border-gray-200">
                         <div className="flex justify-between">
                           <span>Tax (18%)</span>
                           <span>₹{tax.toFixed(2)}</span>
                         </div>
-                        <div className="flex justify-between font-bold text-gray-900 text-lg">
+                        <div className="flex justify-between font-bold text-gray-900 text-lg pt-2 border-t border-gray-200">
                           <span>Total</span>
                           <span>₹{total.toFixed(2)}</span>
                         </div>

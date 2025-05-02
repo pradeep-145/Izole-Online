@@ -49,7 +49,7 @@ const ProductView = () => {
       <div className="mb-6 flex items-center justify-between">
         <div className="flex items-center">
           <button
-            onClick={() => navigate("/admin/dashboard")}
+            onClick={() => navigate("/admin ")}
             className="mr-4 p-1 rounded-full hover:bg-gray-100"
           >
             <ChevronLeft className="w-5 h-5" />

@@ -9,130 +9,183 @@ const axios = require("axios");
 exports.OrderController = {
   createOrder: async (req, res) => {
     const { totalAmount, products, address } = req.body;
-    if (!process.env.CASHFREE_CLIENT_ID || !process.env.CASHFREE_CLIENT_SECRET) {
+    if (
+      !process.env.CASHFREE_CLIENT_ID ||
+      !process.env.CASHFREE_CLIENT_SECRET
+    ) {
       throw new Error("Cashfree credentials not configured");
     }
+
     try {
-      // 1. Create order in your database
+      // Validate that products is an array
+      if (!Array.isArray(products) || products.length === 0) {
+        return res.status(400).json({
+          success: false,
+          message: "Products should be provided as a non-empty array",
+        });
+      }
+
+      // Validate and sanitize product data before creating order
+      const validatedProducts = products.map((product) => ({
+        id: product.id || "default_id",
+        name: product.name || "Unknown Product",
+        price: parseFloat(product.price || 0),
+        quantity: parseInt(product.quantity || 1, 10),
+        image: product.image || "https://via.placeholder.com/150",
+        color: product.color || "Default",
+        size: product.size || "Default",
+      }));
+
+      // 1. Create order in your database with validated products
       const order = await orderModel.create({
         customerId: req.user._id,
-        products,
+        products: validatedProducts,
         totalAmount,
         address,
       });
 
-      // 2. Update product quantities
-      if (
-        products &&
-        products.id &&
-        products.color &&
-        products.size &&
-        products.quantity
-      ) {
-        const quantityToDeduct = parseInt(products.quantity, 10);
-        if (!isNaN(quantityToDeduct)) {
-          await productModel.updateOne(
-            {
-              _id: products.id,
-              "variants.color": products.color,
-              "variants.sizeOptions.size": products.size,
-            },
-            {
-              $inc: {
-                "variants.$[variant].sizeOptions.$[sizeOption].quantity":
-                  -quantityToDeduct,
-              },
-            },
-            {
-              arrayFilters: [
-                { "variant.color": products.color },
-                { "sizeOption.size": products.size },
-              ],
+      // 2. Update product quantities for each product that has a valid ID
+      for (const product of validatedProducts) {
+        if (
+          product.id &&
+          product.id !== "default_id" &&
+          product.color &&
+          product.size &&
+          product.quantity
+        ) {
+          const quantityToDeduct = parseInt(product.quantity, 10);
+          if (!isNaN(quantityToDeduct)) {
+            try {
+              await productModel.updateOne(
+                {
+                  _id: product.id,
+                  "variants.color": product.color,
+                  "variants.sizeOptions.size": product.size,
+                },
+                {
+                  $inc: {
+                    "variants.$[variant].sizeOptions.$[sizeOption].quantity":
+                      -quantityToDeduct,
+                  },
+                },
+                {
+                  arrayFilters: [
+                    { "variant.color": product.color },
+                    { "sizeOption.size": product.size },
+                  ],
+                }
+              );
+            } catch (updateError) {
+              console.error("Error updating product quantity:", updateError);
+              // Continue with order creation even if quantity update fails
             }
-          );
+          }
         }
       }
 
       const orderId = `order_${order._id}`;
-      const cashfree = await axios.post(
-        "https://sandbox.cashfree.com/pg/orders",
-        {
-          // This is the request BODY 
-          order_amount: parseFloat(totalAmount).toFixed(2),
-          order_currency: "INR",
-          order_id: orderId,
-          customer_details: {
-            customer_id: req.user._id,
-            customer_phone: req.user.phoneNumber.toString(),
-            customer_email: req.user.email,
-            customer_name: req.user.name,
+      createScheduler(order._id);
+      try {
+        const cashfree = await axios.post(
+          "https://sandbox.cashfree.com/pg/orders",
+          {
+            order_amount: parseFloat(totalAmount).toFixed(2),
+            order_currency: "INR",
+            order_id: orderId,
+            customer_details: {
+              customer_id: req.user._id.toString(),
+              customer_phone: req.user.phoneNumber
+                ? req.user.phoneNumber.toString()
+                : "9999999999",
+              customer_email: req.user.email || "customer@example.com",
+              customer_name: req.user.name || "Customer",
+            },
+            order_meta: {
+              payment_methods: "cc,dc,upi",
+              return_url: `http://localhost:5173/customer/payment/redirect?order_id=${orderId}&status=success`,
+            },
+            order_expiry_time: new Date(
+              Date.now() + 30 * 60 * 1000
+            ).toISOString(),
           },
-          order_meta: {
-            return_url: `https://www.cashfree.com/devstudio/preview/pg/web/card?order_id=${orderId}`,
-            payment_methods: "cc,dc,upi",
-          },
-          order_expiry_time: new Date(
-            Date.now() + 30 * 60 * 1000
-          ).toISOString(),
-        },
-        {
-          // This is the Axios config object where headers should be
-          headers: {
-            "x-client-id": process.env.CASHFREE_CLIENT_ID,
-            "x-client-secret": process.env.CASHFREE_CLIENT_SECRET,
-            "x-api-version": "2025-01-01",
-            "Content-Type": "application/json",
-          },
-        }
-      );
+          {
+            headers: {
+              "x-client-id": process.env.CASHFREE_CLIENT_ID,
+              "x-client-secret": process.env.CASHFREE_CLIENT_SECRET,
+              "x-api-version": "2025-01-01",
+              "Content-Type": "application/json",
+            },
+          }
+        );
 
-  
-      order.paymentSessionId = cashfree.paymentSessionId;
-      // order.schedulerName = await createScheduler(order._id); // Assuming createScheduler is defined elsewhere
-      await order.save();
-      console.log(cashfree.data);
-      // 6. Return response
-      res.status(201).json({
-        success: true,
-        order: order,
-        paymentSessionId: cashfree.data.payment_session_id,
-        message: "Order created successfully",
-      });
+        // Save payment information
+        order.paymentSessionId = cashfree.data.payment_session_id;
+        // Create a direct payment link for the order
+        order.paymentLink = `https://sandbox.cashfree.com/pg/view/order/${orderId}/${cashfree.data.payment_session_id}`;
+        await order.save();
+
+        // Return response
+        res.status(201).json({
+          success: true,
+          order: {
+            _id: order._id,
+            totalAmount: order.totalAmount,
+            address: order.address,
+            products: order.products,
+            paymentLink: order.paymentLink,
+          },
+          paymentSessionId: cashfree.data.payment_session_id,
+          message: "Order created successfully",
+        });
+      } catch (paymentError) {
+        console.error("Payment gateway error:", paymentError);
+
+        // Return order even if payment gateway fails
+        res.status(201).json({
+          success: true,
+          order: {
+            _id: order._id,
+            totalAmount: order.totalAmount,
+            address: order.address,
+            products: order.products,
+            paymentLink: null,
+          },
+          message: "Order created successfully but payment setup failed",
+        });
+      }
     } catch (error) {
       console.error("Error in creating order:", error);
       res.status(500).json({
         success: false,
         message: error.message || "Error in creating order",
-        error: error,
+        error: error.toString(),
       });
     }
   },
 
   confirmPayment: async (req, res) => {
-    const { paymentIntentId, orderId } = req.body;
+    const { orderId } = req.body;
 
     try {
-      // Verify the payment intent with Stripe
-      const paymentIntent = await stripe.paymentIntents.retrieve(
-        paymentIntentId
+      // Verify the payment intent with Strip
+      const response = await axios.get(
+        `https://sandbox.cashfree.com/pg/orders/order_${orderId}/payments`,
+        {
+          headers: {
+            "x-client-id": process.env.CASHFREE_CLIENT_ID,
+            "x-client-secret": process.env.CASHFREE_CLIENT_SECRET,
+            "x-api-version": "2025-01-01",
+          },
+        }
       );
 
-      if (!paymentIntent) {
+      console.log("Payment response:", response.data);
+      if (response.data[0].payment_status !== "SUCCESS") {
         return res.status(400).json({
           success: false,
-          message: "Payment not found",
+          message: "Payment not verified",
         });
       }
-
-      // Check payment status
-      if (paymentIntent.status !== "succeeded") {
-        return res.status(400).json({
-          success: false,
-          message: `Payment not successful. Status: ${paymentIntent.status}`,
-        });
-      }
-
-      // Get the order
       const order = await orderModel.findById(orderId);
       if (!order) {
         return res.status(404).json({
@@ -147,7 +200,7 @@ exports.OrderController = {
       }
 
       // Update the order status
-      order.status = "COMPLETED";
+
       order.paymentStatus = "COMPLETED";
       order.expiresAt = undefined; // Remove expiration
       await order.save();
@@ -169,11 +222,11 @@ exports.OrderController = {
   getOrders: async (req, res) => {
     const user = req.user;
     try {
-      const response = await orderModel.find({ customerId: user.userId });
+      const response = await orderModel.find({ customerId: user._id });
 
       res.status(200).json({
         success: true,
-        response,
+        order:response,
         message: "Orders fetched successfully",
       });
     } catch (error) {
@@ -185,8 +238,9 @@ exports.OrderController = {
     }
   },
 
-  confirmOrder: async (req, res) => {
-    const { orderId } = req.body;
+  cancelOrder: async (req, res) => {
+    const { orderId } = req.params;
+    const { reason } = req.body;
 
     try {
       const order = await orderModel.findById(orderId);
@@ -198,57 +252,62 @@ exports.OrderController = {
         });
       }
 
-      // Delete the scheduler
+      // Check if user is authorized to cancel this order
+      if (order.customerId.toString() !== req.user._id.toString()) {
+        return res.status(403).json({
+          success: false,
+          message: "Not authorized to cancel this order",
+        });
+      }
+
+      // Only allow cancellation for orders that are not already delivered or cancelled
+      if (order.status === "DELIVERED" || order.status === "CANCELLED") {
+        return res.status(400).json({
+          success: false,
+          message: `Cannot cancel order that is already ${order.status.toLowerCase()}`,
+        });
+      }
+
+      // Process refund if payment was completed
+      if (order.paymentStatus === "COMPLETED") {
+        try {
+          await axios.post(
+            `https://sandbox.cashfree.com/pg/orders/order_${orderId}/refunds`,
+            {
+              refund_amount: order.totalAmount,
+              refund_id: `refund_${orderId}`,
+              refund_note: reason || "Customer cancelled order",
+            },
+            {
+              headers: {
+                "x-client-id": process.env.CASHFREE_CLIENT_ID,
+                "x-client-secret": process.env.CASHFREE_CLIENT_SECRET,
+                "x-api-version": "2025-01-01",
+                "Content-Type": "application/json",
+              },
+            }
+          );
+        } catch (refundError) {
+          console.error("Refund processing error:", refundError);
+          // Continue with cancellation even if refund has issues
+        }
+      }
+
+      // Delete the scheduler if exists
       if (order.schedulerName) {
         await deleteOrderScheduler(order.schedulerName);
       }
 
       // Update order status
-      order.status = "COMPLETED";
-      order.expiresAt = undefined; // Remove expiration
-      await order.save();
-
-      res.status(200).json({
-        success: true,
-        response: order,
-        message: "Order confirmed successfully",
-      });
-    } catch (error) {
-      console.log("Error in confirming order", error);
-      res.status(500).json({
-        success: false,
-        message: "Error in confirming order",
-      });
-    }
-  },
-
-  cancelOrder: async (req, res) => {
-    const { orderId, schedulerName } = req.body;
-
-    try {
-      // Find the order
-      const order = await orderModel.findById(orderId);
-
-      if (!order) {
-        return res.status(404).json({
-          success: false,
-          message: "Order not found",
-        });
-      }
-
-      // Delete the scheduler
-      if (schedulerName || order.schedulerName) {
-        await deleteOrderScheduler(schedulerName || order.schedulerName);
-      }
-
-      // Update order status
       order.status = "CANCELLED";
+      order.cancelReason = reason || "Customer cancelled order";
+      order.cancelledAt = new Date();
       order.expiresAt = undefined; // Remove expiration
       await order.save();
 
       res.status(200).json({
         success: true,
-        response: order,
+        order: order,
         message: "Order cancelled successfully",
       });
     } catch (error) {
@@ -357,10 +416,7 @@ exports.OrderController = {
     const { orderId } = req.params;
 
     try {
-      const order = await orderModel
-        .findById(orderId)
-        .populate("productId", "name price description image")
-        .populate("customerId", "name email phone");
+      const order = await orderModel.findById(orderId);
 
       if (!order) {
         return res.status(404).json({
@@ -371,7 +427,7 @@ exports.OrderController = {
 
       res.status(200).json({
         success: true,
-        response: order,
+        order,
         message: "Order fetched successfully",
       });
     } catch (error) {

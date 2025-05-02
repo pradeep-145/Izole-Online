@@ -12,7 +12,7 @@ const AdminLogin = () => {
   // Redirect if already logged in
   useEffect(() => {
     if (isAuthenticated) {
-      navigate("/admin/dashboard");
+      navigate("/admin ");
     }
   }, [isAuthenticated, navigate]);
 
@@ -31,7 +31,7 @@ const AdminLogin = () => {
 
     if (result.success) {
       toast.success("Login successful");
-      navigate("/admin/dashboard");
+      navigate("/admin ");
     }
   };
 

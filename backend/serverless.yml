@@ -10,6 +10,7 @@ provider:
   environment:
     MONGO_URI: ${env:MONGO_URI}
     SECRET_KEY: ${env:SECRET_KEY}
+    CASHFREE
    
     SCHEDULER_ROLE_ARN: ${env:SCHEDULER_ROLE_ARN}
     LAMBDA_ARN: ${env:LAMBDA_ARN}
