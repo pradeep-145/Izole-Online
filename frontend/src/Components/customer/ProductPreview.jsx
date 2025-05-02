@@ -168,10 +168,10 @@ const ProductCarousel = () => {
                         <p className="text-sm text-gray-600 mb-2 line-clamp-2">
                           {product.description || "No description available"}
                         </p>
-                        <div className="flex justify-between items-center mt-3">
-                          <span className="font-bold text-xl">
+                        <div className="flex justify-end items-center mt-3">
+                          {/* <span className="font-bold text-xl">
                             ${formattedPrice}
-                          </span>
+                          </span> */}
                           <button
                             onClick={() => handleProductClick(productId)}
                             className="text-sm text-wineRed hover:text-mustard flex items-center gap-1"
@@ -196,7 +196,7 @@ const ProductCarousel = () => {
         <div className="text-center mt-8">
           <button
             onClick={() => navigate("/customer/products")}
-            className="btn inline-block bg-wineRed text-white px-8 py-3 rounded-lg hover:bg-opacity-90 transition font-medium"
+            className="btn bg-wineRed text-white px-8 py-3 rounded-lg hover:bg-opacity-90 transition font-medium"
           >
             Browse All Products
           </button>

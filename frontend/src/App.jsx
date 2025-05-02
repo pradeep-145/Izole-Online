@@ -25,6 +25,8 @@ import Product from "./Pages/customer/Product";
 import ProductList from "./Pages/customer/ProductList";
 import ShippingStatus from "./Pages/customer/ShippingStatus";
 import Wishlist from "./Pages/customer/Wishlist";
+import Notifications from "./Pages/customer/Notifications";
+import Profile from "./Pages/customer/Profile";
 
 function App() {
   return (
@@ -48,9 +50,11 @@ function App() {
           <Route path="shipping-status" element={<ShippingStatus />} />
           <Route path="orders" element={<OrderHistoryPage />} />
           <Route path="order-confirmation" element={<OrderConfirmation />} />
-          {/* New routes for payment handling */}
+      
           <Route path="payment/redirect" element={<CashfreeRedirect />} />
           <Route path="payment-failed" element={<PaymentFailed />} />
+          <Route path="notifications" element={<Notifications />} />
+          <Route path="profile" element={<Profile />} />
         </Route>
 
         {/* Admin Routes */}

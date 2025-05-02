@@ -18,6 +18,7 @@ import {
   Users,
 } from "lucide-react";
 import React, { useEffect, useState } from "react";
+import axios from "axios";
 import OrderManagement from "../../Components/admin/Ordermanagement";
 import ProductTable from "../../Components/admin/ProductTable";
 import { useProduct } from "../../zustand/useProducts.jsx";
@@ -29,6 +30,8 @@ const AdminDashboard = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [notificationOpen, setNotificationOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [inventory, setInventory] = useState([]);
+  const [orders, setOrders] = useState([]);
   // Sample data
   const { products } = useProduct();
   const recentOrders = [
@@ -85,6 +88,45 @@ const AdminDashboard = () => {
         return "bg-gray-100 text-gray-800";
     }
   };
+
+  // Fetch inventory
+  const fetchInventory = async () => {
+    try {
+      const response = await axios.get("/api/admin/inventory", {
+        headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` },
+      });
+      setInventory(response.data.inventory);
+    } catch (error) {
+      console.error("Error fetching inventory:", error);
+    }
+  };
+
+  // Fetch orders
+  const fetchOrders = async () => {
+    try {
+      const response = await axios.get("/api/admin/orders", {
+        headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` },
+      });
+      setOrders(response.data.orders);
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+    }
+  };
+
+  // Update order status
+  const updateOrderStatus = async (orderId, status) => {
+    try {
+      await axios.put(
+        "/api/admin/orders/update",
+        { orderId, status },
+        { headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` } }
+      );
+      fetchOrders(); // Refresh orders after update
+    } catch (error) {
+      console.error("Error updating order status:", error);
+    }
+  };
+
   // Add this useEffect to handle closing dropdowns when clicking outside
   useEffect(() => {
     function handleClickOutside(event) {
@@ -103,6 +145,12 @@ const AdminDashboard = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [notificationOpen, profileOpen]);
+
+  useEffect(() => {
+    if (activeTab === "inventory") fetchInventory();
+    if (activeTab === "orders") fetchOrders();
+  }, [activeTab]);
+
   // Sample analytics data
   const salesData = {
     today: "₹3,245",
@@ -207,7 +255,7 @@ const AdminDashboard = () => {
               <Layers className="w-5 h-5 mr-3" />
               Inventory
             </button>
-            <button
+            {/* <button
               onClick={() => setActiveTab("categories")}
               className={`flex items-center w-full px-4 py-2 text-sm rounded-lg ${activeTab === "categories"
                   ? "bg-blue-100 text-blue-700"
@@ -216,7 +264,7 @@ const AdminDashboard = () => {
             >
               <Tag className="w-5 h-5 mr-3" />
               Categories
-            </button>
+            </button> */}
             <button
               onClick={() => setActiveTab("shipping")}
               className={`flex items-center w-full px-4 py-2 text-sm rounded-lg ${activeTab === "shipping"
@@ -232,7 +280,7 @@ const AdminDashboard = () => {
                 </span>
               )}
             </button>
-            <button
+            {/* <button
               onClick={() => setActiveTab("settings")}
               className={`flex items-center w-full px-4 py-2 text-sm rounded-lg ${activeTab === "settings"
                   ? "bg-blue-100 text-blue-700"
@@ -241,7 +289,7 @@ const AdminDashboard = () => {
             >
               <Settings className="w-5 h-5 mr-3" />
               Settings
-            </button>
+            </button> */}
           </nav>
           <div className="px-4 py-2 mt-auto border-t border-gray-200">
             <button className="flex items-center w-full px-4 py-2 text-sm rounded-lg text-red-600 hover:bg-red-50">
@@ -446,10 +494,10 @@ const AdminDashboard = () => {
                       <Users className="w-4 h-4 mr-3 text-gray-500" />
                       My Profile
                     </button>
-                    <button className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
+                    {/* <button className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
                       <Settings className="w-4 h-4 mr-3 text-gray-500" />
                       Account Settings
-                    </button>
+                    </button> */}
                     <button className="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 w-full text-left">
                       <LogOut className="w-4 h-4 mr-3 text-red-500" />
                       Logout
@@ -749,7 +797,42 @@ const AdminDashboard = () => {
             </div>
           )}
           {/* Other tabs content would go here */}
-          {activeTab === "orders" && <OrderManagement />}
+          {activeTab === "orders" && (
+            <div>
+              <h1>Order Management</h1>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Order ID</th>
+                    <th>Customer</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {orders.map((order) => (
+                    <tr key={order._id}>
+                      <td>{order._id}</td>
+                      <td>{order.customerId?.name || "Unknown"}</td>
+                      <td>{order.status}</td>
+                      <td>
+                        <select
+                          value={order.status}
+                          onChange={(e) => updateOrderStatus(order._id, e.target.value)}
+                        >
+                          <option value="Pending">Pending</option>
+                          <option value="Processing">Processing</option>
+                          <option value="Shipped">Shipped</option>
+                          <option value="Delivered">Delivered</option>
+                          <option value="CANCELLED">Cancelled</option>
+                        </select>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
 
           {activeTab === "products" && (
             <div>
@@ -805,33 +888,27 @@ const AdminDashboard = () => {
 
           {activeTab === "inventory" && (
             <div>
-              <h1 className="text-2xl font-bold text-gray-900 mb-6">
-                Inventory Management
-              </h1>
-              {/* Inventory tab content */}
-              <div className="bg-white rounded-lg shadow">
-                {/* Inventory content would go here */}
-                <div className="p-10 text-center text-gray-500">
-                  Inventory content would be displayed here
-                </div>
-              </div>
+              <h1>Inventory Management</h1>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Product</th>
+                    <th>Category</th>
+                    <th>Stock</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {inventory.map((product) => (
+                    <tr key={product._id}>
+                      <td>{product.name}</td>
+                      <td>{product.category}</td>
+                      <td>{product.variants.reduce((sum, v) => sum + v.quantity, 0)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           )}
-
-          {/* {activeTab === "categories" && (
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900 mb-6">
-                Categories Management
-              </h1>
-              
-              <div className="bg-white rounded-lg shadow">
-             
-                <div className="p-10 text-center text-gray-500">
-                  Categories content would be displayed here
-                </div>
-              </div>
-            </div>
-          )} */}
 
           {activeTab === "shipping" && (
             <div>
@@ -847,22 +924,6 @@ const AdminDashboard = () => {
               </div>
             </div>
           )}
-
-          {/* {activeTab === "settings" && (
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900 mb-6">
-                Account Settings
-              </h1>
-             
-              <div className="bg-white rounded-lg shadow">
-               
-                <div className="p-10 text-center text-gray-500">
-                  Settings content would be displayed here
-                </div>
-              </div>
-            </div>
-          )} */}
-          
         </main>
       </div>
     </div>

@@ -69,11 +69,10 @@ const Navbar = () => {
 
   return (
     <div
-      className={`navbar justify-between fixed top-0 w-full z-30 transition-all duration-300 ${
-        scrolled
-          ? "py-2 shadow-md bg-mustard text-wineRed"
-          : "py-4 bg-mustard backdrop-blur-sm text-wineRed"
-      }`}
+      className={`navbar justify-between fixed top-0 w-full z-30 transition-all duration-300 ${scrolled
+        ? "py-2 shadow-md bg-mustard text-wineRed"
+        : "py-4 bg-mustard backdrop-blur-sm text-wineRed"
+        }`}
     >
       <div className="container mx-auto px-4 flex justify-between items-center">
         {/* Mobile menu button */}
@@ -102,37 +101,33 @@ const Navbar = () => {
           <div className="hidden lg:flex items-center ml-12 space-x-10">
             <Link
               to="/"
-              className={`font-semibold ${
-                isActive("/customer") && !isActive("/customer/products")
-                  ? " font-bold"
-                  : ""
-              }`}
+              className={`font-semibold ${isActive("/customer") && !isActive("/customer/products")
+                ? " font-bold"
+                : ""
+                }`}
             >
               Home
             </Link>
 
             <Link
               to="/customer/products"
-              className={`font-semibold ${
-                isActive("/customer/products") ? " font-bold" : ""
-              }`}
+              className={`font-semibold ${isActive("/customer/products") ? " font-bold" : ""
+                }`}
             >
               Products
             </Link>
 
             <Link
               to="/customer#about"
-              className={` font-semibold ${
-                isActive("/customer/about") ? " font-bold" : ""
-              }`}
+              className={` font-semibold ${isActive("/customer/about") ? " font-bold" : ""
+                }`}
             >
               About
             </Link>
             <Link
               to="/customer#contact"
-              className={`font-semibold ${
-                isActive("/customer/contact") ? " font-bold" : ""
-              }`}
+              className={`font-semibold ${isActive("/customer/contact") ? " font-bold" : ""
+                }`}
             >
               Contact
             </Link>
@@ -140,9 +135,8 @@ const Navbar = () => {
         </div>
 
         <div
-          className={`lg:hidden fixed inset-0 ${
-            isMobileMenuOpen ? "translate-y-[72px]" : "-translate-y-[700px]"
-          } z-50 bg-gradient-to-b from-green-50 to-yellow-50 h-96 p-4 overflow-y-auto transition-all duration-200 ease-in-out shadow-lg`}
+          className={`lg:hidden fixed inset-0 ${isMobileMenuOpen ? "translate-y-[72px]" : "-translate-y-[700px]"
+            } z-50 bg-gradient-to-b from-green-50 to-yellow-50 h-96 p-4 overflow-y-auto transition-all duration-200 ease-in-out shadow-lg`}
         >
           <div className="flex flex-col space-y-2 max-w-md mx-auto">
             <Link
@@ -368,13 +362,13 @@ const Navbar = () => {
                       Last login:{" "}
                       {authUser.lastLogin
                         ? new Date(authUser.lastLogin).toLocaleString("en-US", {
-                            year: "numeric",
-                            month: "short",
-                            day: "numeric",
-                            hour: "2-digit",
-                            minute: "2-digit",
-                            hour12: true,
-                          })
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                          hour12: true,
+                        })
                         : "N/A"}
                     </span>
                     <Link
