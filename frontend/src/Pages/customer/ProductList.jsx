@@ -671,7 +671,7 @@ const FilterSidebar = ({
                 label={color}
                 isChecked={filters.colors.includes(color)}
                 onChange={() => handleFilterChange("color", color)}
-                colorSquare={color.toLowerCase()}
+                
               />
             ))}
           </div>

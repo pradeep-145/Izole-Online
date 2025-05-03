@@ -5,7 +5,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 const OtpVerification = () => {
   const [step, setStep] = useState(1);
   const [email, setEmail] = useState('');
-  const [otp, setOtp] = useState(['', '', '', '']);
+  const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -15,33 +15,27 @@ const OtpVerification = () => {
   const [canResend, setCanResend] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const inputRefs = [useRef(), useRef(), useRef(), useRef()];
+  const inputRefs = [useRef(), useRef(), useRef(), useRef(), useRef(), useRef()];
   const timerRef = useRef(null);
-
 
   const isFromLogin = location.state?.source === 'login';
 
   useEffect(() => {
-    
     if (isFromLogin) {
       setStep(2);
-      // Load email from state if available
       if (location.state?.email) {
         setEmail(location.state.email);
       }
       startResendTimer();
     }
-    // Otherwise start at email entry (step 1 - forgot password flow)
   }, [isFromLogin, location.state]);
 
-  // Focus on first input when component mounts or when step changes to OTP verification
   useEffect(() => {
     if (step === 2) {
       inputRefs[0].current?.focus();
     }
   }, [step]);
 
-  // Timer for resend OTP functionality
   const startResendTimer = () => {
     setCanResend(false);
     setTimer(60);
@@ -62,7 +56,6 @@ const OtpVerification = () => {
     }, 1000);
   };
 
-  // Clean up timer on unmount
   useEffect(() => {
     return () => {
       if (timerRef.current) {
@@ -72,20 +65,17 @@ const OtpVerification = () => {
   }, []);
 
   const handleChange = (index, value) => {
-    // Only allow numbers
     if (value && !/^\d*$/.test(value)) return;
 
     const newOtp = [...otp];
     newOtp[index] = value;
     setOtp(newOtp);
 
-    // Auto-focus next input if current one is filled
-    if (value && index < 3) {
+    if (value && index < 5) {
       inputRefs[index + 1].current?.focus();
     }
     
-    // If last digit is entered, auto-submit after a small delay
-    if (index === 3 && value) {
+    if (index === 5 && value) {
       const allFilled = newOtp.every(digit => digit !== '');
       if (allFilled) {
         setTimeout(() => {
@@ -96,7 +86,6 @@ const OtpVerification = () => {
   };
 
   const handleKeyDown = (index, e) => {
-    // Move to previous input on backspace if current input is empty
     if (e.key === 'Backspace' && !otp[index] && index > 0) {
       inputRefs[index - 1].current?.focus();
     }
@@ -114,10 +103,8 @@ const OtpVerification = () => {
     }
 
     try {
-      // Request password reset and send OTP
-      // await axios.post("/api/auth/forgot-password", { email });
       setSuccess(`OTP has been sent to ${email}`);
-      setStep(2); // Move to OTP verification
+      setStep(2);
       startResendTimer();
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to send OTP. Please try again.');
@@ -132,28 +119,26 @@ const OtpVerification = () => {
     setError('');
     
     const otpValue = otp.join('');
-    if (otpValue.length !== 4) {
-      setError('Please enter a valid 4-digit OTP');
+    if (otpValue.length !== 6) {
+      setError('Please enter a valid 6-digit OTP');
       setIsLoading(false);
       return;
     }
 
     try {
       if (isFromLogin) {
-        // For login flow - verify OTP and redirect to customer page
         const res = await axios.post("/api/auth/confirm", {
-          customerId: JSON.parse(localStorage.getItem("authUser")),
+          customerId: location.state.customerId,
           code: otpValue
         });
         navigate('/customer');
       } else {
-        // For forgot password flow - verify OTP and move to password reset
         await axios.post("/api/auth/verify-otp", {
           email,
           code: otpValue
         });
         setSuccess('OTP verified successfully!');
-        setStep(3); // Move to password reset
+        setStep(3);
       }
     } catch (err) {
       setError('Invalid OTP. Please try again.');
@@ -181,7 +166,6 @@ const OtpVerification = () => {
     }
 
     try {
-      // Reset password
       await axios.post("/api/auth/reset-password", {
         email,
         code: otp.join(''),
@@ -197,7 +181,7 @@ const OtpVerification = () => {
   };
 
   const resetOTP = () => {
-    setOtp(['', '', '', '']);
+    setOtp(['', '', '', '', '', '']);
     inputRefs[0].current?.focus();
   };
 
@@ -278,14 +262,14 @@ const OtpVerification = () => {
         {isFromLogin ? 'Verify Your Account' : 'Enter Verification Code'}
       </h1>
       <p className="text-center text-gray-600 mb-2">
-        Enter the 4-digit code sent to {email || 'your device'}
+        Enter the 6-digit code sent to {email || 'your device'}
       </p>
       <p className="text-center text-sm text-gray-500 mb-6">
         The code will expire in 10 minutes
       </p>
       
       <form onSubmit={handleOtpSubmit} className="space-y-6">
-        <div className="flex justify-center space-x-4 mb-2">
+        <div className="flex justify-center space-x-2 mb-2">
           {otp.map((digit, index) => (
             <input
               key={index}
@@ -295,7 +279,7 @@ const OtpVerification = () => {
               value={digit}
               onChange={(e) => handleChange(index, e.target.value)}
               onKeyDown={(e) => handleKeyDown(index, e)}
-              className="w-16 h-16 text-center text-2xl font-bold rounded-lg border-2 border-yellow-300 focus:border-yellow-500 focus:ring focus:ring-yellow-200 focus:outline-none bg-white"
+              className="w-12 h-12 text-center text-xl font-bold rounded-lg border-2 border-yellow-300 focus:border-yellow-500 focus:ring focus:ring-yellow-200 focus:outline-none bg-white"
             />
           ))}
         </div>

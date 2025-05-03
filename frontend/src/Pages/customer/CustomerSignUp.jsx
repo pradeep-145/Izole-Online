@@ -45,10 +45,13 @@ const CustomerSignUp = () => {
         phoneNumber: formData.phone,
         password: formData.password,
       })
-      .then((res) => {
+      .then(async(res) => {
         console.log(res);
-        
-        navigate("/otpVerification");
+        await axios.post("/api/auth/send-otp", {
+          customerId:res.data._id,
+          email: formData.email,
+        });
+        navigate("/customer/otp-verification",{ state:{source:'login',customerId:res.data._id}});
       })
       .catch((err) => {
         console.log(err);

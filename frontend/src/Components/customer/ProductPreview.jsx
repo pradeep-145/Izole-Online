@@ -22,14 +22,13 @@ const ProductCarousel = () => {
   useEffect(() => {
     fetchProductsIfEmpty(); // fetch data on mount
   }, [fetchProductsIfEmpty]);
-
-  // Custom arrow components
+  
   const NextArrow = (props) => {
     const { onClick } = props;
     return (
       <button
         onClick={onClick}
-        className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-wineRed p-2 rounded-full text-mustard hover:bg-opacity-80 transition"
+        className={`absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-wineRed p-2 rounded-full text-mustard hover:bg-opacity-80 transition translate-x-16`}
         aria-label="Next"
       >
         <ArrowRight className="h-5 w-5" />
@@ -42,13 +41,14 @@ const ProductCarousel = () => {
     return (
       <button
         onClick={onClick}
-        className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-wineRed p-2 rounded-full text-mustard hover:bg-opacity-80 transition"
+        className={`absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-wineRed p-2 rounded-full text-mustard hover:bg-opacity-80 transition -translate-x-12`}
         aria-label="Previous"
       >
         <ArrowLeft className="h-5 w-5" />
       </button>
     );
   };
+
 
   // Slick settings
   const settings = {

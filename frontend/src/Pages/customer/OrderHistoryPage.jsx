@@ -150,7 +150,7 @@ const OrderHistoryPage = () => {
                       </div>
                       <div className="flex flex-col items-end">
                         <p className="font-semibold text-wineRed">
-                          ${order.totalAmount?.toFixed(2) || "0.00"}
+                        ₹{order.totalAmount?.toFixed(2) || "0.00"}
                         </p>
                         <div className="mt-2">
                           <ChevronRight
@@ -263,7 +263,7 @@ const OrderHistoryPage = () => {
                             </div>
                           </div>
                           <div className="font-semibold text-wineRed">
-                            ${(item.price || 0).toFixed(2)}
+                          ₹{(item.price || 0).toFixed(2)}
                           </div>
                         </div>
                       ))}
@@ -276,7 +276,7 @@ const OrderHistoryPage = () => {
                     )}
                   </div>
                   <div className="text-right mt-4 font-bold text-lg text-wineRed">
-                    Total: ${selectedOrder.totalAmount?.toFixed(2) || "0.00"}
+                    Total: ₹{selectedOrder.totalAmount?.toFixed(2) || "0.00"}
                   </div>
                 </div>
 
