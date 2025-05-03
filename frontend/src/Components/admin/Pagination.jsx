@@ -18,10 +18,8 @@ const Pagination = ({
         pages.push(i);
       }
     } else {
-      // Always include first page
       pages.push(1);
 
-      // Calculate start and end of page range around current page
       let start = Math.max(2, currentPage - 1);
       let end = Math.min(totalPages - 1, currentPage + 1);
 
