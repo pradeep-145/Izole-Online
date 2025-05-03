@@ -1,3 +1,4 @@
+import axios from "axios";
 import {
   AlertCircle,
   BarChart3,
@@ -10,16 +11,15 @@ import {
   Package,
   Plus,
   Search,
-  Settings,
   ShoppingBag,
-  Tag,
   TrendingUp,
   Truck,
   Users,
 } from "lucide-react";
 import React, { useEffect, useState } from "react";
-import axios from "axios";
-import OrderManagement from "../../Components/admin/Ordermanagement";
+import CustomerManagement from "../../Components/admin/CustomerManagement";
+import InventoryManagement from "../../Components/admin/InventoryManagement";
+import OrderManagement from "../../Components/admin/OrderManagement";
 import ProductTable from "../../Components/admin/ProductTable";
 import { useProduct } from "../../zustand/useProducts.jsx";
 import AdminProductForm from "./ProductForm";
@@ -93,7 +93,9 @@ const AdminDashboard = () => {
   const fetchInventory = async () => {
     try {
       const response = await axios.get("/api/admin/inventory", {
-        headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` },
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
+        },
       });
       setInventory(response.data.inventory);
     } catch (error) {
@@ -105,7 +107,9 @@ const AdminDashboard = () => {
   const fetchOrders = async () => {
     try {
       const response = await axios.get("/api/admin/orders", {
-        headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` },
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
+        },
       });
       setOrders(response.data.orders);
     } catch (error) {
@@ -119,7 +123,11 @@ const AdminDashboard = () => {
       await axios.put(
         "/api/admin/orders/update",
         { orderId, status },
-        { headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` } }
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
+          },
+        }
       );
       fetchOrders(); // Refresh orders after update
     } catch (error) {
@@ -172,15 +180,15 @@ const AdminDashboard = () => {
 
   const lowStockItems = Array.isArray(products)
     ? products.reduce((count, product) => {
-      // Check if product.images exists and is an array
-      if (product && product.images && Array.isArray(product.images)) {
-        const lowStockImages = product.images.filter(
-          (img) => img && img.quantity !== undefined && img.quantity <= 10
-        );
-        return count + lowStockImages.length;
-      }
-      return count;
-    }, 0)
+        // Check if product.images exists and is an array
+        if (product && product.images && Array.isArray(product.images)) {
+          const lowStockImages = product.images.filter(
+            (img) => img && img.quantity !== undefined && img.quantity <= 10
+          );
+          return count + lowStockImages.length;
+        }
+        return count;
+      }, 0)
     : 0;
 
   const pendingReturns = 5;
@@ -197,20 +205,22 @@ const AdminDashboard = () => {
           <nav className="flex-1 px-2 py-4 space-y-1">
             <button
               onClick={() => setActiveTab("dashboard")}
-              className={`flex items-center w-full px-4 py-2 text-sm rounded-lg ${activeTab === "dashboard"
+              className={`flex items-center w-full px-4 py-2 text-sm rounded-lg ${
+                activeTab === "dashboard"
                   ? "bg-blue-100 text-blue-700"
                   : "text-gray-700 hover:bg-gray-100"
-                }`}
+              }`}
             >
               <BarChart3 className="w-5 h-5 mr-3" />
               Dashboard
             </button>
             <button
               onClick={() => setActiveTab("orders")}
-              className={`flex items-center w-full px-4 py-2 text-sm rounded-lg ${activeTab === "orders"
+              className={`flex items-center w-full px-4 py-2 text-sm rounded-lg ${
+                activeTab === "orders"
                   ? "bg-blue-100 text-blue-700"
                   : "text-gray-700 hover:bg-gray-100"
-                }`}
+              }`}
             >
               <ShoppingBag className="w-5 h-5 mr-3" />
               Orders
@@ -222,10 +232,11 @@ const AdminDashboard = () => {
             </button>
             <button
               onClick={() => setActiveTab("products")}
-              className={`flex items-center w-full px-4 py-2 text-sm rounded-lg ${activeTab === "products"
+              className={`flex items-center w-full px-4 py-2 text-sm rounded-lg ${
+                activeTab === "products"
                   ? "bg-blue-100 text-blue-700"
                   : "text-gray-700 hover:bg-gray-100"
-                }`}
+              }`}
             >
               <Package className="w-5 h-5 mr-3" />
               Products
@@ -237,20 +248,22 @@ const AdminDashboard = () => {
             </button>
             <button
               onClick={() => setActiveTab("customers")}
-              className={`flex items-center w-full px-4 py-2 text-sm rounded-lg ${activeTab === "customers"
+              className={`flex items-center w-full px-4 py-2 text-sm rounded-lg ${
+                activeTab === "customers"
                   ? "bg-blue-100 text-blue-700"
                   : "text-gray-700 hover:bg-gray-100"
-                }`}
+              }`}
             >
               <Users className="w-5 h-5 mr-3" />
               Customers
             </button>
             <button
               onClick={() => setActiveTab("inventory")}
-              className={`flex items-center w-full px-4 py-2 text-sm rounded-lg ${activeTab === "inventory"
+              className={`flex items-center w-full px-4 py-2 text-sm rounded-lg ${
+                activeTab === "inventory"
                   ? "bg-blue-100 text-blue-700"
                   : "text-gray-700 hover:bg-gray-100"
-                }`}
+              }`}
             >
               <Layers className="w-5 h-5 mr-3" />
               Inventory
@@ -267,10 +280,11 @@ const AdminDashboard = () => {
             </button> */}
             <button
               onClick={() => setActiveTab("shipping")}
-              className={`flex items-center w-full px-4 py-2 text-sm rounded-lg ${activeTab === "shipping"
+              className={`flex items-center w-full px-4 py-2 text-sm rounded-lg ${
+                activeTab === "shipping"
                   ? "bg-blue-100 text-blue-700"
                   : "text-gray-700 hover:bg-gray-100"
-                }`}
+              }`}
             >
               <Truck className="w-5 h-5 mr-3" />
               Shipping
@@ -799,38 +813,7 @@ const AdminDashboard = () => {
           {/* Other tabs content would go here */}
           {activeTab === "orders" && (
             <div>
-              <h1>Order Management</h1>
-              <table>
-                <thead>
-                  <tr>
-                    <th>Order ID</th>
-                    <th>Customer</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {orders.map((order) => (
-                    <tr key={order._id}>
-                      <td>{order._id}</td>
-                      <td>{order.customerId?.name || "Unknown"}</td>
-                      <td>{order.status}</td>
-                      <td>
-                        <select
-                          value={order.status}
-                          onChange={(e) => updateOrderStatus(order._id, e.target.value)}
-                        >
-                          <option value="Pending">Pending</option>
-                          <option value="Processing">Processing</option>
-                          <option value="Shipped">Shipped</option>
-                          <option value="Delivered">Delivered</option>
-                          <option value="CANCELLED">Cancelled</option>
-                        </select>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              <OrderManagement />
             </div>
           )}
 
@@ -873,40 +856,13 @@ const AdminDashboard = () => {
 
           {activeTab === "customers" && (
             <div>
-              <h1 className="text-2xl font-bold text-gray-900 mb-6">
-                Customer Management
-              </h1>
-              {/* Customers tab content */}
-              <div className="bg-white rounded-lg shadow">
-                {/* Customers content would go here */}
-                <div className="p-10 text-center text-gray-500">
-                  Customers content would be displayed here
-                </div>
-              </div>
+              <CustomerManagement />
             </div>
           )}
 
           {activeTab === "inventory" && (
             <div>
-              <h1>Inventory Management</h1>
-              <table>
-                <thead>
-                  <tr>
-                    <th>Product</th>
-                    <th>Category</th>
-                    <th>Stock</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {inventory.map((product) => (
-                    <tr key={product._id}>
-                      <td>{product.name}</td>
-                      <td>{product.category}</td>
-                      <td>{product.variants.reduce((sum, v) => sum + v.quantity, 0)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              <InventoryManagement />
             </div>
           )}
 

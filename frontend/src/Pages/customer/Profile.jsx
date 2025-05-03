@@ -1,28 +1,12 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { User } from "lucide-react";
+import { useAuth } from "../../context/AuthContext";
 
 const Profile = () => {
-  const [profile, setProfile] = useState(null);
+  const {authUser}=useAuth();
+  const [profile, setProfile] = useState(authUser);
   const [loading, setLoading] = useState(true);
-
-  // Fetch profile data from the backend
-  const fetchProfile = async () => {
-    try {
-      const response = await axios.get("/api/customer/profile", {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-      });
-      setProfile(response.data.profile);
-    } catch (error) {
-      console.error("Error fetching profile:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchProfile();
-  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50 py-10">

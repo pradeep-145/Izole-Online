@@ -223,10 +223,10 @@ exports.OrderController = {
     const user = req.user;
     try {
       const response = await orderModel.find({ customerId: user._id });
-      console.log(response )
+      console.log(response);
       res.status(200).json({
         success: true,
-        order:response,
+        order: response,
         message: "Orders fetched successfully",
       });
     } catch (error) {

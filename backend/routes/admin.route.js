@@ -1,16 +1,28 @@
-const router = require('express').Router();
-const adminController = require('../controllers/admin.controller.js');
+const router = require("express").Router();
+const adminController = require("../controllers/admin.controller.js");
 
-// Existing routes
-router.get('/get', adminController.get);
-router.post('/create-product', adminController.saveProduct);
-router.put('/update-product', adminController.updateProduct);
-router.delete('/remove-product', adminController.removeProduct);
+// Dashboard and general routes
+router.get("/get", adminController.get);
+router.get("/dashboard-analytics", adminController.getDashboardAnalytics);
 
-// New routes for inventory and order management
-router.get('/inventory', adminController.getInventory); // Fetch inventory
-router.put('/inventory/update', adminController.updateInventory); // Update inventory
-router.get('/orders', adminController.getOrders); // Fetch orders
-router.put('/orders/update', adminController.updateOrders); // Update order status
+// Product management routes
+router.post("/create-product", adminController.saveProduct);
+router.put("/update-product", adminController.updateProduct);
+router.delete("/remove-product", adminController.removeProduct);
+
+// Inventory management routes
+router.get("/inventory", adminController.getInventory);
+router.put("/inventory/update", adminController.updateInventory);
+
+// Order management routes
+router.get("/orders", adminController.getOrders);
+router.put("/orders/update", adminController.updateOrders);
+
+// Customer management routes
+router.get("/customers", adminController.getCustomers);
+router.get("/customers/:customerId", adminController.getCustomerDetails);
+
+// Notification routes
+router.post("/notifications/send", adminController.sendNotification);
 
 module.exports = router;
