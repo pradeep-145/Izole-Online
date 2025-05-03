@@ -12,7 +12,67 @@ const customerController = {
       res.status(200).json({ success: true, notifications });
     } catch (error) {
       console.error("Error fetching notifications:", error);
-      res.status(500).json({ success: false, message: "Failed to fetch notifications" });
+      res
+        .status(500)
+        .json({ success: false, message: "Failed to fetch notifications" });
+    }
+  },
+
+  // Mark notification as read
+  markNotificationRead: async (req, res) => {
+    try {
+      const { notificationId } = req.params;
+      const customerId = req.customer.id;
+
+      const notification = await Notification.findOneAndUpdate(
+        { _id: notificationId, customerId },
+        { read: true },
+        { new: true }
+      );
+
+      if (!notification) {
+        return res
+          .status(404)
+          .json({ success: false, message: "Notification not found" });
+      }
+
+      res.status(200).json({ success: true, notification });
+    } catch (error) {
+      console.error("Error marking notification as read:", error);
+      res
+        .status(500)
+        .json({
+          success: false,
+          message: "Failed to mark notification as read",
+        });
+    }
+  },
+
+  // Delete notification
+  deleteNotification: async (req, res) => {
+    try {
+      const { notificationId } = req.params;
+      const customerId = req.customer.id;
+
+      const notification = await Notification.findOneAndDelete({
+        _id: notificationId,
+        customerId,
+      });
+
+      if (!notification) {
+        return res
+          .status(404)
+          .json({ success: false, message: "Notification not found" });
+      }
+
+      res
+        .status(200)
+        .json({ success: true, message: "Notification deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting notification:", error);
+      res
+        .status(500)
+        .json({ success: false, message: "Failed to delete notification" });
     }
   },
 
@@ -26,7 +86,9 @@ const customerController = {
       res.status(200).json({ success: true, profile });
     } catch (error) {
       console.error("Error fetching profile:", error);
-      res.status(500).json({ success: false, message: "Failed to fetch profile" });
+      res
+        .status(500)
+        .json({ success: false, message: "Failed to fetch profile" });
     }
   },
 };

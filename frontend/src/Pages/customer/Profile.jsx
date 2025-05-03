@@ -3,6 +3,7 @@ import { User, Edit2, Mail, Phone, MapPin, Upload, ShoppingBag, Heart, Shield, C
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext"; // Assuming AuthContext is in this path
 import axios from "axios";
+<<<<<<< HEAD
 import { toast } from "react-toastify";
 import { useOrders } from "../../zustand/useOrders"; // Assuming useOrders is in this path
 import Navbar from "../../Components/customer/Navbar"; // Import the Navbar component
@@ -11,6 +12,14 @@ export default function CustomerProfile() {
   const { authUser } = useAuth();
   const currentUser = authUser || null;
   const [profile, setProfile] = useState(null);
+=======
+import { User } from "lucide-react";
+import { useAuth } from "../../context/AuthContext";
+
+const Profile = () => {
+  const {authUser}=useAuth();
+  const [profile, setProfile] = useState(authUser);
+>>>>>>> ab410befcb9450ebcad1ce5b93b517c5a1051194
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const { orders } = useOrders();
@@ -95,6 +104,13 @@ export default function CustomerProfile() {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
+  return (
+    <div className="min-h-screen bg-gray-50 py-10">
+      <div className="max-w-3xl mx-auto px-4">
+        <h1 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+          <User className="text-wineRed" size={24} />
+          My Profile
+        </h1>
 
   const handlePasswordInputChange = (e) => {
     const { name, value } = e.target;

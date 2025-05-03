@@ -33,6 +33,8 @@ app.use("/api/products", productRoute);
 app.use('/api/cart', cartRoute);
 app.use('/api/orders', OrderRoute);
 app.use('/api/wishlist', wishlistRoutes);
+app.use('/api/admin', require('./routes/admin.route.js'));
+app.use('/api/customer', require('./routes/customer.route.js'));
 
 // Health check endpoint for AWS
 app.get('/health', (req, res) => {
