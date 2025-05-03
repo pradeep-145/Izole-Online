@@ -1,25 +1,16 @@
 import React, { useState, useEffect, useContext } from "react";
 import { User, Edit2, Mail, Phone, MapPin, Upload, ShoppingBag, Heart, Shield, Clock, LogOut } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext"; // Assuming AuthContext is in this path
+import { useAuth } from "../../context/AuthContext"; 
 import axios from "axios";
-<<<<<<< HEAD
 import { toast } from "react-toastify";
-import { useOrders } from "../../zustand/useOrders"; // Assuming useOrders is in this path
-import Navbar from "../../Components/customer/Navbar"; // Import the Navbar component
+import { useOrders } from "../../zustand/useOrders"; 
+import Navbar from "../../Components/customer/Navbar"; 
 
 export default function CustomerProfile() {
-  const { authUser } = useAuth();
+  const { authUser, logout } = useAuth(); 
   const currentUser = authUser || null;
   const [profile, setProfile] = useState(null);
-=======
-import { User } from "lucide-react";
-import { useAuth } from "../../context/AuthContext";
-
-const Profile = () => {
-  const {authUser}=useAuth();
-  const [profile, setProfile] = useState(authUser);
->>>>>>> ab410befcb9450ebcad1ce5b93b517c5a1051194
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const { orders } = useOrders();
@@ -53,7 +44,6 @@ const Profile = () => {
     try {
       console.log(currentUser.phoneNumber);
       setLoading(true);
-      // Use currentUser data from AuthContext if available
       if (currentUser) {
         setProfile(currentUser);
         setFormData({
@@ -69,10 +59,7 @@ const Profile = () => {
         setLoading(false);
         return;
       }
-
-      // Fallback to API call if needed
-      const token = localStorage.getItem("token");
-       } catch (error) {
+    } catch (error) {
       console.error("Error:", error);
       toast.error("Failed to load profile data");
     } finally {
@@ -84,7 +71,6 @@ const Profile = () => {
     try {
       setOrdersLoading(true);
       const token = localStorage.getItem("token");
-    
       setOrderHistory(response.data.orders || []);
     } catch (error) {
       console.error("Error fetching orders:", error);
@@ -104,13 +90,6 @@ const Profile = () => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
-  return (
-    <div className="min-h-screen bg-gray-50 py-10">
-      <div className="max-w-3xl mx-auto px-4">
-        <h1 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
-          <User className="text-wineRed" size={24} />
-          My Profile
-        </h1>
 
   const handlePasswordInputChange = (e) => {
     const { name, value } = e.target;
@@ -197,9 +176,12 @@ const Profile = () => {
   };
 
   const handleLogout = () => {
-    logout();
-    toast.info("Logged out successfully");
-    // Redirect to home or login page handled by AuthContext
+    if (logout) {
+      logout();
+      toast.info("Logged out successfully");
+    } else {
+      toast.error("Logout function not available");
+    }
   };
 
   if (loading) {
@@ -545,7 +527,7 @@ const Profile = () => {
 
   return (
     <>
-      <Navbar /> {/* Add the Navbar component at the top */}
+      <Navbar /> 
       <div className="bg-gray-50 min-h-screen py-8 mt-16">
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
@@ -556,7 +538,6 @@ const Profile = () => {
 
               <div className="p-6">
                 <div className="flex flex-col md:flex-row gap-8">
-                  {/* Sidebar */}
                   <div className="md:w-1/4">
                     <div className="flex flex-col items-center mb-6">
                       <div className="avatar">
@@ -666,7 +647,6 @@ const Profile = () => {
                     </div>
                   </div>
 
-                  {/* Main Content */}
                   <div className="md:w-3/4">
                     <div className="card bg-base-100 shadow-sm border border-gray-100">
                       <div className="card-body">
