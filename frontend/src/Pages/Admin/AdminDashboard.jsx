@@ -16,7 +16,7 @@ import {
   Truck,
   Users,
 } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import CustomerManagement from "../../Components/admin/CustomerManagement";
 import InventoryManagement from "../../Components/admin/InventoryManagement";
 import OrderManagement from "../../Components/admin/OrderManagement";
@@ -32,45 +32,21 @@ const AdminDashboard = () => {
   const [profileOpen, setProfileOpen] = useState(false);
   const [inventory, setInventory] = useState([]);
   const [orders, setOrders] = useState([]);
-  // Sample data
+  const [analyticsData, setAnalyticsData] = useState({
+    sales: { today: "₹0", yesterday: "₹0", growth: "0%" },
+    orders: { today: 0, yesterday: 0, growth: "0%" },
+    customers: { today: 0, yesterday: 0, growth: "0%" },
+    lowStockCount: 0,
+    pendingReturns: 0,
+    notifications: 0,
+  });
+  const [recentOrders, setRecentOrders] = useState([]);
+  const [topProducts, setTopProducts] = useState([]);
+  const [isLoadingAnalytics, setIsLoadingAnalytics] = useState(false);
+  const [refreshInterval, setRefreshInterval] = useState(null);
+  const [autoRefresh, setAutoRefresh] = useState(true);
+  const [refreshRate, setRefreshRate] = useState(60000); // 60 seconds by default
   const { products } = useProduct();
-  const recentOrders = [
-    {
-      id: "#ORD-7462",
-      customer: "Emma Wilson",
-      date: "15 Mar 2025",
-      status: "Delivered",
-      total: "₹129.99",
-    },
-    {
-      id: "#ORD-7461",
-      customer: "Jason Brown",
-      date: "14 Mar 2025",
-      status: "Processing",
-      total: "₹85.50",
-    },
-    {
-      id: "#ORD-7460",
-      customer: "Sarah Thomas",
-      date: "14 Mar 2025",
-      status: "Shipped",
-      total: "₹214.30",
-    },
-    {
-      id: "#ORD-7459",
-      customer: "Michael Davis",
-      date: "13 Mar 2025",
-      status: "Pending",
-      total: "₹59.99",
-    },
-  ];
-
-  const topProducts = [
-    { name: "Classic White T-Shirt", sold: 324, stock: 156, price: "₹24.99" },
-    { name: "Slim Fit Jeans", sold: 276, stock: 82, price: "₹59.99" },
-    { name: "Summer Floral Dress", sold: 198, stock: 43, price: "₹45.50" },
-    { name: "Casual Linen Blazer", sold: 182, stock: 27, price: "₹89.99" },
-  ];
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -130,9 +106,183 @@ const AdminDashboard = () => {
         }
       );
       fetchOrders(); // Refresh orders after update
+      if (activeTab === "dashboard") {
+        fetchAnalyticsData(); // Also refresh dashboard data when order status changes
+      }
     } catch (error) {
       console.error("Error updating order status:", error);
     }
+  };
+
+  // Fetch dashboard analytics data - memoized with useCallback
+  const fetchAnalyticsData = useCallback(async () => {
+    try {
+      setIsLoadingAnalytics(true);
+      const token = localStorage.getItem("adminToken");
+
+      const response = await axios.get("/api/admin/analytics", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        params: {
+          timestamp: new Date().getTime(), // Add cache-busting parameter
+        },
+      });
+
+      const data = response.data;
+
+      setAnalyticsData({
+        sales: {
+          today: `₹${data.sales.today.toFixed(2)}`,
+          yesterday: `₹${data.sales.yesterday.toFixed(2)}`,
+          growth: `${data.sales.growth > 0 ? "+" : ""}${data.sales.growth.toFixed(
+            1
+          )}%`,
+        },
+        orders: {
+          today: data.orders.today,
+          yesterday: data.orders.yesterday,
+          growth: `${data.orders.growth > 0 ? "+" : ""}${data.orders.growth.toFixed(
+            1
+          )}%`,
+        },
+        customers: {
+          today: data.customers.today,
+          yesterday: data.customers.yesterday,
+          growth: `${data.customers.growth > 0 ? "+" : ""}${data.customers.growth.toFixed(
+            1
+          )}%`,
+        },
+        lowStockCount: data.lowStockCount || 0,
+        pendingReturns: data.pendingReturns || 0,
+        notifications: data.notifications || 0,
+        rawData: data, // Store raw data for reporting
+      });
+
+      setRecentOrders(
+        data.recentOrders.map((order) => ({
+          id: `#${order.orderNumber || order._id.substring(0, 8)}`,
+          customer: `${order.customer?.name || "Guest User"}`,
+          date: new Date(order.createdAt).toLocaleDateString(),
+          status: order.status.charAt(0).toUpperCase() + order.status.slice(1),
+          total: `₹${order.totalAmount.toFixed(2)}`,
+        }))
+      );
+
+      setTopProducts(
+        data.topProducts.map((product) => ({
+          name: product.name,
+          sold: product.totalSold || 0,
+          stock: product.stock || 0,
+          price: `₹${product.price.toFixed(2)}`,
+        }))
+      );
+    } catch (error) {
+      console.error("Error fetching analytics data:", error);
+      // Use fallback data if API fails
+      setAnalyticsData({
+        sales: { today: "₹0", yesterday: "₹0", growth: "0%" },
+        orders: { today: 0, yesterday: 0, growth: "0%" },
+        customers: { today: 0, yesterday: 0, growth: "0%" },
+        lowStockCount: 0,
+        pendingReturns: 0,
+        notifications: 0,
+      });
+    } finally {
+      setIsLoadingAnalytics(false);
+    }
+  }, []);
+
+  // Download report as CSV
+  const generateReport = async () => {
+    try {
+      setIsLoadingAnalytics(true);
+      const token = localStorage.getItem("adminToken");
+
+      // Request report data from backend with additional details
+      const response = await axios.get("/api/admin/reports/generate", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        params: {
+          format: "csv", // or "pdf" depending on what your backend supports
+          type: "sales",
+          startDate: new Date(new Date().setDate(new Date().getDate() - 30)).toISOString(), // Last 30 days
+          endDate: new Date().toISOString(),
+        },
+        responseType: "blob", // Important for handling file downloads
+      });
+
+      // Create a download link for the file
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+
+      // Get current date for filename
+      const date = new Date().toISOString().split("T")[0];
+      link.setAttribute("download", `izole-sales-report-${date}.csv`);
+
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+
+      // Clean up the URL
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Error generating report:", error);
+      // Create a basic CSV if API fails
+      generateFallbackReport();
+    } finally {
+      setIsLoadingAnalytics(false);
+    }
+  };
+
+  // Fallback report generation (client-side) if API fails
+  const generateFallbackReport = () => {
+    // Create basic CSV with current data
+    const { rawData } = analyticsData;
+
+    if (!rawData) {
+      alert("No data available to generate report");
+      return;
+    }
+
+    let csvContent = "data:text/csv;charset=utf-8,";
+
+    // Add headers
+    csvContent += "Report Date,Generated On," + new Date().toLocaleString() + "\r\n\r\n";
+    csvContent += "SALES SUMMARY\r\n";
+    csvContent += "Today,Yesterday,Growth\r\n";
+    csvContent += `${analyticsData.sales.today.replace("₹", "")},${analyticsData.sales.yesterday.replace("₹", "")},${analyticsData.sales.growth}\r\n\r\n`;
+
+    // Add orders data
+    csvContent += "ORDERS SUMMARY\r\n";
+    csvContent += "Today,Yesterday,Growth\r\n";
+    csvContent += `${analyticsData.orders.today},${analyticsData.orders.yesterday},${analyticsData.orders.growth}\r\n\r\n`;
+
+    // Add top products if available
+    if (topProducts.length > 0) {
+      csvContent += "TOP PRODUCTS\r\n";
+      csvContent += "Product Name,Units Sold,In Stock,Price\r\n";
+
+      topProducts.forEach((product) => {
+        csvContent += `${product.name},${product.sold},${product.stock},${product.price.replace("₹", "")}\r\n`;
+      });
+    }
+
+    // Create download link
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `izole-sales-report-${new Date().toISOString().split("T")[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+  };
+
+  // Toggle auto-refresh
+  const toggleAutoRefresh = () => {
+    setAutoRefresh(!autoRefresh);
   };
 
   // Add this useEffect to handle closing dropdowns when clicking outside
@@ -154,45 +304,50 @@ const AdminDashboard = () => {
     };
   }, [notificationOpen, profileOpen]);
 
+  // Setup real-time data refresh
+  useEffect(() => {
+    // Clear existing interval when component unmounts or autoRefresh changes
+    if (refreshInterval) {
+      clearInterval(refreshInterval);
+    }
+
+    // Set up new interval if autoRefresh is enabled
+    if (autoRefresh && activeTab === "dashboard") {
+      const interval = setInterval(() => {
+        if (document.visibilityState === "visible") {
+          fetchAnalyticsData();
+        }
+      }, refreshRate);
+      setRefreshInterval(interval);
+    }
+
+    return () => {
+      if (refreshInterval) {
+        clearInterval(refreshInterval);
+      }
+    };
+  }, [autoRefresh, activeTab, refreshRate, fetchAnalyticsData]);
+
+  // Listen for visibility changes to pause refresh when tab is not visible
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible" && autoRefresh && activeTab === "dashboard") {
+        fetchAnalyticsData(); // Refresh immediately when tab becomes visible
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [autoRefresh, activeTab, fetchAnalyticsData]);
+
   useEffect(() => {
     if (activeTab === "inventory") fetchInventory();
     if (activeTab === "orders") fetchOrders();
-  }, [activeTab]);
-
-  // Sample analytics data
-  const salesData = {
-    today: "₹3,245",
-    yesterday: "₹2,890",
-    growth: "+12.3%",
-  };
-
-  const ordersData = {
-    today: 47,
-    yesterday: 42,
-    growth: "+11.9%",
-  };
-
-  const customersData = {
-    today: 18,
-    yesterday: 12,
-    growth: "+50.0%",
-  };
-
-  const lowStockItems = Array.isArray(products)
-    ? products.reduce((count, product) => {
-        // Check if product.images exists and is an array
-        if (product && product.images && Array.isArray(product.images)) {
-          const lowStockImages = product.images.filter(
-            (img) => img && img.quantity !== undefined && img.quantity <= 10
-          );
-          return count + lowStockImages.length;
-        }
-        return count;
-      }, 0)
-    : 0;
-
-  const pendingReturns = 5;
-  const notifications = 3;
+    if (activeTab === "dashboard") fetchAnalyticsData();
+  }, [activeTab, fetchAnalyticsData]);
 
   return (
     <div className="flex h-screen bg-gray-50">
@@ -224,9 +379,9 @@ const AdminDashboard = () => {
             >
               <ShoppingBag className="w-5 h-5 mr-3" />
               Orders
-              {notifications > 0 && (
+              {analyticsData.notifications > 0 && (
                 <span className="ml-auto bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
-                  {notifications}
+                  {analyticsData.notifications}
                 </span>
               )}
             </button>
@@ -240,9 +395,9 @@ const AdminDashboard = () => {
             >
               <Package className="w-5 h-5 mr-3" />
               Products
-              {lowStockItems > 0 && (
+              {analyticsData.lowStockCount > 0 && (
                 <span className="ml-auto bg-yellow-500 text-white text-xs font-bold px-2 py-1 rounded-full">
-                  {lowStockItems}
+                  {analyticsData.lowStockCount}
                 </span>
               )}
             </button>
@@ -268,16 +423,6 @@ const AdminDashboard = () => {
               <Layers className="w-5 h-5 mr-3" />
               Inventory
             </button>
-            {/* <button
-              onClick={() => setActiveTab("categories")}
-              className={`flex items-center w-full px-4 py-2 text-sm rounded-lg ${activeTab === "categories"
-                  ? "bg-blue-100 text-blue-700"
-                  : "text-gray-700 hover:bg-gray-100"
-                }`}
-            >
-              <Tag className="w-5 h-5 mr-3" />
-              Categories
-            </button> */}
             <button
               onClick={() => setActiveTab("shipping")}
               className={`flex items-center w-full px-4 py-2 text-sm rounded-lg ${
@@ -288,22 +433,12 @@ const AdminDashboard = () => {
             >
               <Truck className="w-5 h-5 mr-3" />
               Shipping
-              {pendingReturns > 0 && (
+              {analyticsData.pendingReturns > 0 && (
                 <span className="ml-auto bg-purple-500 text-white text-xs font-bold px-2 py-1 rounded-full">
-                  {pendingReturns}
+                  {analyticsData.pendingReturns}
                 </span>
               )}
             </button>
-            {/* <button
-              onClick={() => setActiveTab("settings")}
-              className={`flex items-center w-full px-4 py-2 text-sm rounded-lg ${activeTab === "settings"
-                  ? "bg-blue-100 text-blue-700"
-                  : "text-gray-700 hover:bg-gray-100"
-                }`}
-            >
-              <Settings className="w-5 h-5 mr-3" />
-              Settings
-            </button> */}
           </nav>
           <div className="px-4 py-2 mt-auto border-t border-gray-200">
             <button className="flex items-center w-full px-4 py-2 text-sm rounded-lg text-red-600 hover:bg-red-50">
@@ -398,9 +533,9 @@ const AdminDashboard = () => {
                 className="p-1 text-gray-400 hover:text-gray-500 relative"
               >
                 <Bell className="w-6 h-6" />
-                {notifications > 0 && (
+                {analyticsData.notifications > 0 && (
                   <span className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full">
-                    {notifications}
+                    {analyticsData.notifications}
                   </span>
                 )}
               </button>
@@ -508,10 +643,6 @@ const AdminDashboard = () => {
                       <Users className="w-4 h-4 mr-3 text-gray-500" />
                       My Profile
                     </button>
-                    {/* <button className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
-                      <Settings className="w-4 h-4 mr-3 text-gray-500" />
-                      Account Settings
-                    </button> */}
                     <button className="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 w-full text-left">
                       <LogOut className="w-4 h-4 mr-3 text-red-500" />
                       Logout
@@ -532,13 +663,77 @@ const AdminDashboard = () => {
                   Dashboard Overview
                 </h1>
                 <div className="flex space-x-2">
-                  <button className="px-4 py-2 bg-white border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
-                    Export
-                  </button>
-                  <button className="px-4 py-2 bg-blue-600 rounded-md text-sm font-medium text-white hover:bg-blue-700">
-                    Generate Report
+                  <div className="flex items-center mr-4">
+                    <input
+                      id="autoRefresh"
+                      type="checkbox"
+                      checked={autoRefresh}
+                      onChange={toggleAutoRefresh}
+                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    />
+                    <label
+                      htmlFor="autoRefresh"
+                      className="ml-2 text-sm text-gray-700"
+                    >
+                      Auto-refresh {autoRefresh ? "(on)" : "(off)"}
+                    </label>
+                  </div>
+
+                  <button
+                    onClick={generateReport}
+                    className="px-4 py-2 bg-blue-600 rounded-md text-sm font-medium text-white hover:bg-blue-700 flex items-center"
+                    disabled={isLoadingAnalytics}
+                  >
+                    {isLoadingAnalytics ? (
+                      <>
+                        <svg
+                          className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                          ></circle>
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                          ></path>
+                        </svg>
+                        Generating...
+                      </>
+                    ) : (
+                      "Download Report"
+                    )}
                   </button>
                 </div>
+              </div>
+
+              {/* Real-time update indicator */}
+              <div className="mb-4 flex items-center">
+                <div
+                  className={`h-2 w-2 rounded-full mr-2 ${
+                    autoRefresh ? "bg-green-500 animate-pulse" : "bg-gray-300"
+                  }`}
+                ></div>
+                <span className="text-xs text-gray-500">
+                  {autoRefresh
+                    ? `Real-time updates active. Last updated: ${new Date().toLocaleTimeString()}`
+                    : "Real-time updates disabled"}
+                </span>
+                <button
+                  onClick={fetchAnalyticsData}
+                  className="ml-2 text-xs text-blue-600 hover:underline"
+                  disabled={isLoadingAnalytics}
+                >
+                  Refresh now
+                </button>
               </div>
 
               {/* Analytics Cards */}
@@ -550,12 +745,26 @@ const AdminDashboard = () => {
                         Daily Sales
                       </p>
                       <p className="text-2xl font-bold text-gray-900">
-                        {salesData.today}
+                        {analyticsData.sales.today}
                       </p>
                       <div className="flex items-center mt-1">
-                        <span className="text-sm text-green-600 flex items-center">
-                          <TrendingUp className="w-4 h-4 mr-1" />
-                          {salesData.growth}
+                        <span
+                          className={`text-sm flex items-center ${
+                            analyticsData.sales.growth.startsWith("+")
+                              ? "text-green-600"
+                              : analyticsData.sales.growth === "0%"
+                              ? "text-gray-600"
+                              : "text-red-600"
+                          }`}
+                        >
+                          {analyticsData.sales.growth.startsWith("+") ? (
+                            <TrendingUp className="w-4 h-4 mr-1" />
+                          ) : analyticsData.sales.growth === "0%" ? (
+                            <span className="w-4 h-4 mr-1">→</span>
+                          ) : (
+                            <ChevronDown className="w-4 h-4 mr-1" />
+                          )}
+                          {analyticsData.sales.growth}
                         </span>
                         <span className="text-xs text-gray-500 ml-2">
                           vs yesterday
@@ -575,12 +784,26 @@ const AdminDashboard = () => {
                         Daily Orders
                       </p>
                       <p className="text-2xl font-bold text-gray-900">
-                        {ordersData.today}
+                        {analyticsData.orders.today}
                       </p>
                       <div className="flex items-center mt-1">
-                        <span className="text-sm text-green-600 flex items-center">
-                          <TrendingUp className="w-4 h-4 mr-1" />
-                          {ordersData.growth}
+                        <span
+                          className={`text-sm flex items-center ${
+                            analyticsData.orders.growth.startsWith("+")
+                              ? "text-green-600"
+                              : analyticsData.orders.growth === "0%"
+                              ? "text-gray-600"
+                              : "text-red-600"
+                          }`}
+                        >
+                          {analyticsData.orders.growth.startsWith("+") ? (
+                            <TrendingUp className="w-4 h-4 mr-1" />
+                          ) : analyticsData.orders.growth === "0%" ? (
+                            <span className="w-4 h-4 mr-1">→</span>
+                          ) : (
+                            <ChevronDown className="w-4 h-4 mr-1" />
+                          )}
+                          {analyticsData.orders.growth}
                         </span>
                         <span className="text-xs text-gray-500 ml-2">
                           vs yesterday
@@ -600,12 +823,26 @@ const AdminDashboard = () => {
                         New Customers
                       </p>
                       <p className="text-2xl font-bold text-gray-900">
-                        {customersData.today}
+                        {analyticsData.customers.today}
                       </p>
                       <div className="flex items-center mt-1">
-                        <span className="text-sm text-green-600 flex items-center">
-                          <TrendingUp className="w-4 h-4 mr-1" />
-                          {customersData.growth}
+                        <span
+                          className={`text-sm flex items-center ${
+                            analyticsData.customers.growth.startsWith("+")
+                              ? "text-green-600"
+                              : analyticsData.customers.growth === "0%"
+                              ? "text-gray-600"
+                              : "text-red-600"
+                          }`}
+                        >
+                          {analyticsData.customers.growth.startsWith("+") ? (
+                            <TrendingUp className="w-4 h-4 mr-1" />
+                          ) : analyticsData.customers.growth === "0%" ? (
+                            <span className="w-4 h-4 mr-1">→</span>
+                          ) : (
+                            <ChevronDown className="w-4 h-4 mr-1" />
+                          )}
+                          {analyticsData.customers.growth}
                         </span>
                         <span className="text-xs text-gray-500 ml-2">
                           vs yesterday
@@ -618,123 +855,94 @@ const AdminDashboard = () => {
                   </div>
                 </div>
 
-                {/* Alert Cards */}
-                <div className="flex flex-col gap-10 mb-6">
-                  <div className="p-4 bg-yellow-100 border border-yellow-300 rounded-lg flex items-center">
-                    <div className="p-2 bg-yellow-100 rounded-full mr-4">
-                      <AlertCircle className="w-5 h-5 text-yellow-600" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-yellow-800">
-                        Low Stock Alert
-                      </p>
-                      <p className="text-sm text-yellow-600">
-                        {lowStockItems} items need reordering
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg flex items-center">
-                    <div className="p-2 bg-blue-100 rounded-full mr-4">
-                      <Truck className="w-5 h-5 text-blue-600" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-blue-800">
-                        Shipping Update
-                      </p>
-                      <p className="text-sm text-blue-600">
-                        All orders are being processed on time
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="p-4 bg-purple-50 border border-purple-200 rounded-lg flex items-center">
-                    <div className="p-2 bg-purple-100 rounded-full mr-4">
-                      <Package className="w-5 h-5 text-purple-600" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-purple-800">Returns</p>
-                      <p className="text-sm text-purple-600">
-                        {pendingReturns} pending return requests
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
                 {/* Recent Orders */}
                 <div className="bg-white rounded-lg shadow mb-6">
                   <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
                     <h2 className="text-lg font-medium text-gray-900">
                       Recent Orders
                     </h2>
-                    <button className="text-sm text-blue-600 hover:text-blue-800">
+                    <button
+                      onClick={() => setActiveTab("orders")}
+                      className="text-sm text-blue-600 hover:text-blue-800"
+                    >
                       View All
                     </button>
                   </div>
                   <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200">
-                      <thead className="bg-gray-50">
-                        <tr>
-                          <th
-                            scope="col"
-                            className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                          >
-                            Order ID
-                          </th>
-                          <th
-                            scope="col"
-                            className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                          >
-                            Customer
-                          </th>
-                          <th
-                            scope="col"
-                            className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                          >
-                            Date
-                          </th>
-                          <th
-                            scope="col"
-                            className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                          >
-                            Status
-                          </th>
-                          <th
-                            scope="col"
-                            className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                          >
-                            Total
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="bg-white divide-y divide-gray-200">
-                        {recentOrders.map((order) => (
-                          <tr key={order.id}>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                              {order.id}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                              {order.customer}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                              {order.date}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <span
-                                className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(
-                                  order.status
-                                )}`}
-                              >
-                                {order.status}
-                              </span>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                              {order.total}
-                            </td>
+                    {isLoadingAnalytics ? (
+                      <div className="p-8 text-center">
+                        <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500 mb-2"></div>
+                        <p className="text-gray-500">Loading orders...</p>
+                      </div>
+                    ) : recentOrders.length > 0 ? (
+                      <table className="min-w-full divide-y divide-gray-200">
+                        <thead className="bg-gray-50">
+                          <tr>
+                            <th
+                              scope="col"
+                              className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                            >
+                              Order ID
+                            </th>
+                            <th
+                              scope="col"
+                              className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                            >
+                              Customer
+                            </th>
+                            <th
+                              scope="col"
+                              className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                            >
+                              Date
+                            </th>
+                            <th
+                              scope="col"
+                              className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                            >
+                              Status
+                            </th>
+                            <th
+                              scope="col"
+                              className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                            >
+                              Total
+                            </th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                          {recentOrders.map((order, index) => (
+                            <tr key={index}>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                {order.id}
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                                {order.customer}
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                                {order.date}
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <span
+                                  className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(
+                                    order.status
+                                  )}`}
+                                >
+                                  {order.status}
+                                </span>
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                                {order.total}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    ) : (
+                      <div className="p-8 text-center">
+                        <p className="text-gray-500">No recent orders found</p>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -744,67 +952,81 @@ const AdminDashboard = () => {
                     <h2 className="text-lg font-medium text-gray-900">
                       Top Selling Products
                     </h2>
-                    <button className="text-sm text-blue-600 hover:text-blue-800">
+                    <button
+                      onClick={() => setActiveTab("products")}
+                      className="text-sm text-blue-600 hover:text-blue-800"
+                    >
                       View All
                     </button>
                   </div>
                   <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200">
-                      <thead className="bg-gray-50">
-                        <tr>
-                          <th
-                            scope="col"
-                            className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                          >
-                            Product
-                          </th>
-                          <th
-                            scope="col"
-                            className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                          >
-                            Units Sold
-                          </th>
-                          <th
-                            scope="col"
-                            className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                          >
-                            In Stock
-                          </th>
-                          <th
-                            scope="col"
-                            className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                          >
-                            Price
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="bg-white divide-y divide-gray-200">
-                        {topProducts.map((product) => (
-                          <tr key={product.name}>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                              {product.name}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                              {product.sold}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                              <span
-                                className={
-                                  product.stock < 50
-                                    ? "text-red-600 font-medium"
-                                    : "text-gray-700"
-                                }
-                              >
-                                {product.stock}
-                              </span>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                              {product.price}
-                            </td>
+                    {isLoadingAnalytics ? (
+                      <div className="p-8 text-center">
+                        <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500 mb-2"></div>
+                        <p className="text-gray-500">Loading products...</p>
+                      </div>
+                    ) : topProducts.length > 0 ? (
+                      <table className="min-w-full divide-y divide-gray-200">
+                        <thead className="bg-gray-50">
+                          <tr>
+                            <th
+                              scope="col"
+                              className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                            >
+                              Product
+                            </th>
+                            <th
+                              scope="col"
+                              className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                            >
+                              Units Sold
+                            </th>
+                            <th
+                              scope="col"
+                              className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                            >
+                              In Stock
+                            </th>
+                            <th
+                              scope="col"
+                              className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                            >
+                              Price
+                            </th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                          {topProducts.map((product, index) => (
+                            <tr key={index}>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                {product.name}
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                                {product.sold}
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                                <span
+                                  className={
+                                    product.stock < 50
+                                      ? "text-red-600 font-medium"
+                                      : "text-gray-700"
+                                  }
+                                >
+                                  {product.stock}
+                                </span>
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                                {product.price}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    ) : (
+                      <div className="p-8 text-center">
+                        <p className="text-gray-500">No top products found</p>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
