@@ -155,7 +155,7 @@ const adminController = {
   saveProduct: async (req, res) => {
     try {
       // Updated to use new product structure with variants
-      const { name, description, category, variants } = req.body;
+      const { name, description, category, variants , weight} = req.body;
       console.log(req.body);
 
       const product = new Product({

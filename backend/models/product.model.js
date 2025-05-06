@@ -38,6 +38,10 @@ const ProductSchema = new mongoose.Schema({
       ref: "Review",
     },
   ],
+  weight:{
+    type: Number,
+    required: true,
+  }
 }, {
   timestamps: {
     currentTime: () => new Date().toLocaleString('en-US', {

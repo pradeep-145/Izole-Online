@@ -4,18 +4,28 @@ const {
   deleteOrderScheduler,
 } = require("../utils/scheduler.js");
 require("dotenv").config();
+const {
+  createOrder,
+  getAuthToken,
+  cancelOrder,
+  generateAWB,
+  trackOrder,
+  getShiprocketOrders,
+  getShiprocketOrderById,
+  updateShiprocketOrder,
+} = require("../services/shiprocket.service.js");
 const productModel = require("../models/product.model.js");
 const axios = require("axios");
 exports.OrderController = {
   createOrder: async (req, res) => {
-    const { totalAmount, products, address } = req.body;
+    const { totalAmount, products, address , billingAddress} = req.body;
     if (
       !process.env.CASHFREE_CLIENT_ID ||
       !process.env.CASHFREE_CLIENT_SECRET
     ) {
       throw new Error("Cashfree credentials not configured");
     }
-
+    console.log(address);
     try {
       // Validate that products is an array
       if (!Array.isArray(products) || products.length === 0) {
@@ -85,6 +95,66 @@ exports.OrderController = {
 
       const orderId = `order_${order._id}`;
       createScheduler(order._id);
+
+      let paymentSessionId = null;
+      let paymentLink = null;
+
+      // Create Shiprocket order first
+      try {
+        const { data, token } = createOrder(req.shiprocketToken, {
+          order_id: orderId,
+          order_date: new Date().toISOString(),
+          pickup_location: {
+            name: "izole clothing company",
+            address: "60, Kombai Thottam, Kangayam road, 4, Tiruppur",
+            city: "Tiruppur",
+            pincode: "641604",
+            state: "Tamil Nadu",
+            country: "India",
+            phone: "9385352051",
+          },
+          billing_customer_name: req.user.name || "Customer",
+          billing_last_name: req.user.name.split(" ")[1] || " ",
+          billing_address: billingAdress.address || "Default Address",
+          billing_city: billingAddress.city || "Default City",
+          billing_pincode: billingAddress.zipcode || "000000",
+          billing_state: address.state || "",
+          billing_country: address.country || "India",
+          billing_email: req.user.email || "",
+          billing_phone: req.user.phoneNumber || "9999999999",
+          shipping_is_billing: true,
+          order_items: validatedProducts.map((product) => ({
+            name: product.name,
+            sku: product.id,
+            units: product.quantity,
+            selling_price: product.price.toString(),
+            discount: "0",
+            tax: "0",
+            hsn: "0000",
+          })),
+          payment_method: "Prepaid",
+          sub_total: totalAmount.toString(),
+          length: "10",
+          breadth: "10",
+          height: "10",
+          weight: "0.5",
+        });
+        console.log("Shiprocket order response:", data);
+        // Save Shiprocket data to order if needed
+        order.shiprocketOrderId = data?.order_id || null;
+
+        // Update token if needed
+        if (token !== req.shiprocketToken) {
+          res.setHeader("Set-Cookie", [
+            `shiprocket=${token}; HttpOnly; Path=/; SameSite=Lax; Max-Age=${10};`,
+          ]);
+        }
+      } catch (shiprocketError) {
+        console.error("Shiprocket order creation error:", shiprocketError);
+        // Continue with order creation even if Shiprocket fails
+      }
+
+      // Now create payment session with Cashfree
       try {
         const cashfree = await axios.post(
           "https://sandbox.cashfree.com/pg/orders",
@@ -119,40 +189,31 @@ exports.OrderController = {
         );
 
         // Save payment information
-        order.paymentSessionId = cashfree.data.payment_session_id;
-        // Create a direct payment link for the order
-        order.paymentLink = `https://sandbox.cashfree.com/pg/view/order/${orderId}/${cashfree.data.payment_session_id}`;
-        await order.save();
-
-        // Return response
-        res.status(201).json({
-          success: true,
-          order: {
-            _id: order._id,
-            totalAmount: order.totalAmount,
-            address: order.address,
-            products: order.products,
-            paymentLink: order.paymentLink,
-          },
-          paymentSessionId: cashfree.data.payment_session_id,
-          message: "Order created successfully",
-        });
+        paymentSessionId = cashfree.data.payment_session_id;
+        paymentLink = `https://sandbox.cashfree.com/pg/view/order/${orderId}/${cashfree.data.payment_session_id}`;
+        order.paymentSessionId = paymentSessionId;
+        order.paymentLink = paymentLink;
       } catch (paymentError) {
         console.error("Payment gateway error:", paymentError);
-
-        // Return order even if payment gateway fails
-        res.status(201).json({
-          success: true,
-          order: {
-            _id: order._id,
-            totalAmount: order.totalAmount,
-            address: order.address,
-            products: order.products,
-            paymentLink: null,
-          },
-          message: "Order created successfully but payment setup failed",
-        });
+        // Continue with order creation even if payment setup fails
       }
+
+      // Save all changes to the order
+      await order.save();
+
+      // Finally send the response
+      res.status(201).json({
+        success: true,
+        order: {
+          _id: order._id,
+          totalAmount: order.totalAmount,
+          address: order.address,
+          products: order.products,
+          paymentLink: order.paymentLink,
+        },
+        paymentSessionId: order.paymentSessionId,
+        message: "Order created successfully",
+      });
     } catch (error) {
       console.error("Error in creating order:", error);
       res.status(500).json({
@@ -179,7 +240,6 @@ exports.OrderController = {
         }
       );
 
-      console.log("Payment response:", response.data);
       if (response.data[0].payment_status !== "SUCCESS") {
         return res.status(400).json({
           success: false,
@@ -223,7 +283,6 @@ exports.OrderController = {
     const user = req.user;
     try {
       const response = await orderModel.find({ customerId: user._id });
-      console.log(response);
       res.status(200).json({
         success: true,
         order: response,

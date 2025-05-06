@@ -1,6 +1,6 @@
 import { load } from "@cashfreepayments/cashfree-js";
 import axios from "axios";
-import { ArrowLeft, Clock, Lock, MapPin, Package } from "lucide-react";
+import { ArrowLeft, Clock, Lock, MapPin, Package, Truck, RefreshCw } from "lucide-react";
 import React, { useCallback, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useCart } from "../../zustand/useCart";
@@ -75,8 +75,18 @@ const CheckoutPage = () => {
     email: "",
     address: "",
     city: "",
+    state: "", // Added state field for Shiprocket
     zipCode: "",
+    country: "India", // Default to India
+    phone: "", // Added phone for Shiprocket
   });
+
+  // New states for Shiprocket serviceability
+  const [serviceability, setServiceability] = useState([]);
+  const [checkingServiceability, setCheckingServiceability] = useState(false);
+  const [serviceabilityError, setServiceabilityError] = useState("");
+  const [selectedCourier, setSelectedCourier] = useState(null);
+  const [showServiceOptions, setShowServiceOptions] = useState(false);
 
   const [paymentSessionId, setPaymentSessionId] = useState("");
   const [orderId, setOrderId] = useState("");
@@ -85,9 +95,9 @@ const CheckoutPage = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [cashfreeInstance, setCashfreeInstance] = useState(null);
 
-  // Calculate totals
+  // Calculate totals with dynamic shipping based on selection
   const subtotal = orderTotal;
-  const shipping = orderTotal > 500 ? 0 : 50;
+  const shipping = selectedCourier ? selectedCourier.rate : (orderTotal > 500 ? 0 : 50);
   const tax = orderTotal * 0.18;
   const total = subtotal + shipping + tax;
 
@@ -119,8 +129,7 @@ const CheckoutPage = () => {
           name: singleProduct.name || "Unnamed Product",
           price: sizeOption?.price || variant.sizeOptions[0]?.price || 0,
           quantity: location.state?.quantity || 1,
-          image:
-            location.state?.images[0],
+          image: location.state?.images[0],
           color: location.state?.color || variant.color || "N/A",
           size: location.state?.size || sizeOption?.size || "N/A",
         };
@@ -194,6 +203,52 @@ const CheckoutPage = () => {
     }
   };
 
+  const checkServiceability = async () => {
+    if (!formData.zipCode || !formData.state) {
+      setServiceabilityError("Please enter both PIN code and state to check serviceability");
+      return;
+    }
+
+    setCheckingServiceability(true);
+    setServiceabilityError("");
+    setShowServiceOptions(false);
+    try {
+      const response = await axios.post("/api/shiprocket/check-serviceability", {
+        pickup_postcode: "641604", // Your business pincode (should be from env or config)
+        delivery_postcode: formData.zipCode,
+        weight: calculateTotalWeight(),
+        cod: 0, // Assuming all orders are prepaid based on your implementation
+      });
+
+      if (response.data.success && response.data.couriers && response.data.couriers.length > 0) {
+        setServiceability(response.data.couriers);
+        setShowServiceOptions(true);
+        // Auto-select cheapest option
+        const cheapestOption = [...response.data.couriers].sort((a, b) => a.rate - b.rate)[0];
+        setSelectedCourier(cheapestOption);
+      } else {
+        setServiceabilityError("No delivery options available for your location");
+      }
+    } catch (error) {
+      console.error("Error checking serviceability:", error);
+      setServiceabilityError(
+        error.response?.data?.message || "Failed to check delivery options"
+      );
+    } finally {
+      setCheckingServiceability(false);
+    }
+  };
+
+  const calculateTotalWeight = () => {
+    // Each item is assumed to be 0.5kg, adjust as needed
+    const totalItems = products.reduce((sum, item) => sum + item.quantity, 0);
+    return Math.max(0.5, totalItems * 0.5); // Minimum 0.5kg
+  };
+
+  const selectCourier = (courier) => {
+    setSelectedCourier(courier);
+  };
+
   const proceedToPayment = async (e) => {
     e.preventDefault();
     setIsProcessing(true);
@@ -205,21 +260,42 @@ const CheckoutPage = () => {
       !formData.email ||
       !formData.address ||
       !formData.city ||
-      !formData.zipCode
+      !formData.state ||
+      !formData.zipCode ||
+      !formData.phone
     ) {
       setPaymentError("Please fill in all required fields");
       setIsProcessing(false);
       return;
     }
 
-    const fullAddress = `${formData.address}, ${formData.city}, ${formData.zipCode}`;
+    // Validate if serviceability was checked and courier selected
+    if (!selectedCourier) {
+      setPaymentError("Please check and select a shipping method");
+      setIsProcessing(false);
+      return;
+    }
 
     try {
-      // Create order on backend
+      // Create order on backend with Shiprocket data
       const response = await axios.post("/api/orders/create-order", {
         products,
         totalAmount: total,
-        address: fullAddress,
+        address: {
+          address: formData.address,
+          city: formData.city,
+          state: formData.state,
+          pincode: formData.zipCode,
+          country: formData.country || "India"
+        },
+        billingAddress: formData,
+        shippingInfo: {
+          courier_company_id: selectedCourier.courier_company_id,
+          courier_name: selectedCourier.courier_name,
+          rate: selectedCourier.rate,
+          estimated_delivery_days: selectedCourier.estimated_delivery_days,
+          weight: calculateTotalWeight()
+        }
       });
 
       // Stop the timer when proceeding to payment
@@ -252,7 +328,6 @@ const CheckoutPage = () => {
           });
           console.log(payment.data);
 
-  
           setPaymentStatus("completed");
 
           // Clear cart if it's not a Buy Now purchase
@@ -376,7 +451,7 @@ const CheckoutPage = () => {
                     <div className="grid md:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
-                          First Name
+                          First Name*
                         </label>
                         <input
                           type="text"
@@ -389,7 +464,7 @@ const CheckoutPage = () => {
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Last Name
+                          Last Name*
                         </label>
                         <input
                           type="text"
@@ -402,23 +477,38 @@ const CheckoutPage = () => {
                       </div>
                     </div>
 
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Email Address
-                      </label>
-                      <input
-                        type="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleInputChange}
-                        className="w-full px-4 py-2 border border-gray-300 bg-transparent text-wineRed rounded-md focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                        required
-                      />
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Email Address*
+                        </label>
+                        <input
+                          type="email"
+                          name="email"
+                          value={formData.email}
+                          onChange={handleInputChange}
+                          className="w-full px-4 py-2 border border-gray-300 bg-transparent text-wineRed rounded-md focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Phone Number*
+                        </label>
+                        <input
+                          type="tel"
+                          name="phone"
+                          value={formData.phone}
+                          onChange={handleInputChange}
+                          className="w-full px-4 py-2 border border-gray-300 bg-transparent text-wineRed rounded-md focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                          required
+                        />
+                      </div>
                     </div>
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Address
+                        Address*
                       </label>
                       <input
                         type="text"
@@ -433,7 +523,7 @@ const CheckoutPage = () => {
                     <div className="grid md:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
-                          City
+                          City*
                         </label>
                         <input
                           type="text"
@@ -446,7 +536,23 @@ const CheckoutPage = () => {
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
-                          ZIP Code
+                          State*
+                        </label>
+                        <input
+                          type="text"
+                          name="state"
+                          value={formData.state}
+                          onChange={handleInputChange}
+                          className="w-full px-4 py-2 border border-gray-300 bg-transparent text-wineRed rounded-md focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          ZIP Code*
                         </label>
                         <input
                           type="text"
@@ -457,6 +563,100 @@ const CheckoutPage = () => {
                           required
                         />
                       </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Country
+                        </label>
+                        <input
+                          type="text"
+                          name="country"
+                          value={formData.country}
+                          onChange={handleInputChange}
+                          className="w-full px-4 py-2 border bg-transparent text-wineRed border-gray-300 rounded-md focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                          disabled
+                        />
+                      </div>
+                    </div>
+
+                    {/* Shipping Methods Section */}
+                    <div className="mt-6">
+                      <h3 className="text-lg font-semibold mb-3 flex items-center text-gray-800">
+                        <Truck className="mr-2 text-amber-500" /> Shipping Methods
+                      </h3>
+                      
+                      <div className="flex items-center space-x-2 mb-4">
+                        <button
+                          type="button"
+                          onClick={checkServiceability}
+                          disabled={checkingServiceability || !formData.zipCode || !formData.state}
+                          className={`px-4 py-2 rounded-md flex items-center ${
+                            checkingServiceability || !formData.zipCode || !formData.state
+                              ? "bg-gray-300 cursor-not-allowed"
+                              : "bg-amber-500 hover:bg-amber-600 text-white"
+                          }`}
+                        >
+                          {checkingServiceability ? (
+                            <>
+                              <RefreshCw className="animate-spin mr-2 h-4 w-4" />
+                              Checking...
+                            </>
+                          ) : (
+                            <>
+                              <Truck className="mr-2 h-4 w-4" />
+                              Check Delivery Options
+                            </>
+                          )}
+                        </button>
+                        
+                        {!formData.zipCode || !formData.state && (
+                          <span className="text-sm text-amber-600">
+                            Enter PIN code and state to check shipping options
+                          </span>
+                        )}
+                      </div>
+
+                      {serviceabilityError && (
+                        <div className="bg-red-50 border border-red-200 text-red-600 p-3 rounded-md mb-4">
+                          {serviceabilityError}
+                        </div>
+                      )}
+
+                      {showServiceOptions && serviceability.length > 0 && (
+                        <div className="border rounded-md overflow-hidden">
+                          <div className="bg-gray-50 px-4 py-2 border-b">
+                            <h4 className="font-medium text-wineRed">Select a shipping partner</h4>
+                          </div>
+                          <div className="max-h-60 overflow-y-auto">
+                            {serviceability.map((courier) => (
+                              <div
+                                key={courier.courier_company_id}
+                                onClick={() => selectCourier(courier)}
+                                className={`flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-gray-50 border-b last:border-b-0 ${
+                                  selectedCourier?.courier_company_id === courier.courier_company_id
+                                    ? "bg-amber-50 border-l-4 border-l-amber-500"
+                                    : ""
+                                }`}
+                              >
+                                <div className="flex items-center">
+                                  <div className={`w-4 h-4 rounded-full border ${
+                                    selectedCourier?.courier_company_id === courier.courier_company_id
+                                      ? "border-4 border-amber-500"
+                                      : "border-gray-300"
+                                  }`}></div>
+                                  <div className="ml-3">
+                                    <p className="font-medium">{courier.courier_name}</p>
+                                    <p className="text-sm text-gray-600">
+                                      Estimated delivery: {courier.estimated_delivery_days} days
+                                    </p>
+                                  </div>
+                                </div>
+                                <div className="font-semibold text-wineRed">₹{courier.rate.toFixed(2)}</div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
                     </div>
 
                     {paymentError && (
@@ -467,11 +667,17 @@ const CheckoutPage = () => {
 
                     <button
                       type="submit"
-                      disabled={isProcessing}
-                      className="bg-wineRed text-white px-6 py-2 rounded-md font-semibold hover:bg-wineRed/90 transition-colors"
+                      disabled={isProcessing || !selectedCourier}
+                      className={`${
+                        isProcessing || !selectedCourier
+                          ? "bg-gray-400"
+                          : "bg-wineRed hover:bg-wineRed/90"
+                      } text-white px-6 py-2 rounded-md font-semibold transition-colors w-full mt-4`}
                     >
                       {isProcessing
                         ? "Processing..."
+                        : !selectedCourier
+                        ? "Please Select Shipping Method"
                         : `Pay ₹${total.toFixed(2)}`}
                     </button>
                   </form>
@@ -527,11 +733,14 @@ const CheckoutPage = () => {
                         </div>
                         <div className="flex justify-between">
                           <span>Shipping</span>
-                          <span>
-                            {shipping === 0
-                              ? "Free"
-                              : `₹${shipping.toFixed(2)}`}
-                          </span>
+                          {selectedCourier ? (
+                            <div className="text-right">
+                              <span className="font-medium">₹{shipping.toFixed(2)}</span>
+                              <p className="text-xs text-gray-500">{selectedCourier.courier_name}</p>
+                            </div>
+                          ) : (
+                            <span>Select shipping method</span>
+                          )}
                         </div>
 
                         <div className="flex justify-between">

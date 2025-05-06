@@ -60,6 +60,11 @@ const orderSchema = new mongoose.Schema(
     paymentSessionId: String,
     paymentLink: String,
     schedulerName: String,
+    shippingDetails:{
+      courier:String,
+      trackingId:String,
+      trackingUrl:String,
+    },
     expiresAt: {
       type: Date,
       default: new Date(Date.now()),

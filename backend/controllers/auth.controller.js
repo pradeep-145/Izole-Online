@@ -10,9 +10,7 @@ const AuthController = {
     console.log("Sign-up request received:", { username, email, phoneNumber });
 
     try {
-      const avatar = `https://avatar.iran.liara.run/public/${
-        gender == "Male" ? "boy" : "girl"
-      }?username=${username}`;
+      const avatar = `https://avatar.iran.liara.run/public/boy?username=${username}`;
       const response = await customerModel.create({
         username,
         password,
