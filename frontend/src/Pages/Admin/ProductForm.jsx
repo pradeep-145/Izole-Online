@@ -3,11 +3,18 @@ import { Plus, Save, Trash2, Upload, X } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 import { useAdmin } from "../../zustand/useAdmin";
+// Import image compression library
+import imageCompression from "browser-image-compression";
 
 const ProductForm = ({ productId = null, onSuccess, onCancel }) => {
   const { getProductById, createProduct, updateProduct, isLoading } =
     useAdmin();
   const [isUploading, setIsUploading] = useState(false);
+  const [compressionProgress, setCompressionProgress] = useState({
+    show: false,
+    file: "",
+    progress: 0,
+  });
 
   const [formData, setFormData] = useState({
     name: "",
@@ -133,6 +140,54 @@ const ProductForm = ({ productId = null, onSuccess, onCancel }) => {
     setFormData((prev) => ({ ...prev, variants: updatedVariants }));
   };
 
+  // Image compression function
+  const compressImage = async (imageFile) => {
+    // If image is less than 1MB, return it as is
+    if (imageFile.size <= 1024 * 1024) {
+      return imageFile;
+    }
+
+    setCompressionProgress({
+      show: true,
+      file: imageFile.name,
+      progress: 0,
+    });
+
+    const options = {
+      maxSizeMB: 3,
+      maxWidthOrHeight: 1920,
+      useWebWorker: true,
+      onProgress: (percent) => {
+        setCompressionProgress((prev) => ({
+          ...prev,
+          progress: percent,
+        }));
+      },
+    };
+
+    try {
+      const compressedFile = await imageCompression(imageFile, options);
+
+      // Create a new file with the original name but compressed data
+      const compressedBlob = new File([compressedFile], imageFile.name, {
+        type: imageFile.type,
+      });
+
+      console.log(
+        `Original size: ${(imageFile.size / 1024 / 1024).toFixed(
+          2
+        )}MB, Compressed: ${(compressedBlob.size / 1024 / 1024).toFixed(2)}MB`
+      );
+
+      setCompressionProgress({ show: false, file: "", progress: 0 });
+      return compressedBlob;
+    } catch (error) {
+      console.error("Error compressing image:", error);
+      setCompressionProgress({ show: false, file: "", progress: 0 });
+      return imageFile; // Return original if compression fails
+    }
+  };
+
   // Handle image upload
   const handleImageUpload = async (variantIndex, e) => {
     const files = Array.from(e.target.files);
@@ -142,31 +197,113 @@ const ProductForm = ({ productId = null, onSuccess, onCancel }) => {
 
     try {
       const uploadPromises = files.map(async (file) => {
+        // First compress the image
+        const processedImage = await compressImage(file);
+
+        // Check compressed file size - Cloudinary has limits
+        if (processedImage.size > 10 * 1024 * 1024) {
+          // 10MB limit after compression
+          console.error(
+            "Image still too large after compression:",
+            processedImage.name,
+            processedImage.size
+          );
+          toast.error(
+            `Image ${processedImage.name} is too large. Maximum size is 10MB.`
+          );
+          return null;
+        }
+
         const formData = new FormData();
-        formData.append("file", file);
-        formData.append("upload_preset", "izole_uploads");
+        formData.append("file", processedImage);
+        formData.append("upload_preset", "preset1"); // Make sure this preset exists in your Cloudinary account
+        formData.append("cloud_name", "dxuywp3zi");
 
-        const response = await axios.post(
-          "https://api.cloudinary.com/v1_1/dxuywp3zi/image/upload",
-          formData
-        );
+        // Implement retry logic
+        let attempts = 0;
+        const maxAttempts = 3;
 
-        return response.data.secure_url;
+        while (attempts < maxAttempts) {
+          try {
+            console.log(
+              `Uploading image ${processedImage.name}, attempt ${attempts + 1}`
+            );
+            const response = await axios.post(
+              "https://api.cloudinary.com/v1_1/dxuywp3zi/image/upload",
+              formData,
+              {
+                headers: {
+                  "Content-Type": "multipart/form-data",
+                },
+              }
+            );
+            console.log(
+              "Image uploaded successfully:",
+              response.data.secure_url
+            );
+            return response.data.secure_url;
+          } catch (error) {
+            attempts++;
+            console.error(
+              `Upload attempt ${attempts} failed:`,
+              error.response?.data || error.message
+            );
+
+            if (attempts >= maxAttempts) {
+              console.error(
+                "Max attempts reached for image:",
+                processedImage.name
+              );
+              toast.error(
+                `Failed to upload ${processedImage.name} after multiple attempts.`
+              );
+              return null;
+            }
+
+            // Wait before retrying (exponential backoff)
+            await new Promise((resolve) =>
+              setTimeout(resolve, 1000 * attempts)
+            );
+          }
+        }
+
+        return null;
       });
 
       const uploadedUrls = await Promise.all(uploadPromises);
 
+      // Filter out any failed uploads (null values)
+      const successfulUrls = uploadedUrls.filter((url) => url !== null);
+
+      if (successfulUrls.length === 0) {
+        throw new Error("All image uploads failed. Please try again.");
+      }
+
       const updatedVariants = [...formData.variants];
       updatedVariants[variantIndex].images = [
         ...updatedVariants[variantIndex].images,
-        ...uploadedUrls,
+        ...successfulUrls,
       ];
 
       setFormData((prev) => ({ ...prev, variants: updatedVariants }));
-      toast.success(`${uploadedUrls.length} images uploaded`);
+      toast.success(`${successfulUrls.length} images uploaded successfully`);
+
+      if (uploadedUrls.length !== successfulUrls.length) {
+        toast.error(
+          `${
+            uploadedUrls.length - successfulUrls.length
+          } images failed to upload.`
+        );
+      }
     } catch (error) {
       console.error("Error uploading images:", error);
-      toast.error("Failed to upload images");
+      toast.error(
+        `Upload failed: ${
+          error.response?.data?.error?.message ||
+          error.message ||
+          "Unknown error"
+        }`
+      );
     } finally {
       setIsUploading(false);
     }
@@ -560,6 +697,21 @@ const ProductForm = ({ productId = null, onSuccess, onCancel }) => {
               </div>
             ))}
           </div>
+
+          {/* Add compression progress indicator */}
+          {compressionProgress.show && (
+            <div className="mb-4 p-3 rounded-md bg-blue-100 text-blue-800">
+              <div className="flex items-center mb-1">
+                <span>Compressing image: {compressionProgress.file}</span>
+              </div>
+              <div className="w-full bg-blue-200 rounded-full h-2">
+                <div
+                  className="bg-blue-600 h-2 rounded-full"
+                  style={{ width: `${compressionProgress.progress}%` }}
+                ></div>
+              </div>
+            </div>
+          )}
 
           {/* Form Actions */}
           <div className="flex justify-end space-x-3">
