@@ -13,6 +13,7 @@ const ProductForm = ({ productId = null, onSuccess, onCancel }) => {
     name: "",
     description: "",
     category: "",
+    weight: "", // Added weight field for the entire product
     variants: [
       {
         color: "",
@@ -28,7 +29,12 @@ const ProductForm = ({ productId = null, onSuccess, onCancel }) => {
       if (productId) {
         const response = await getProductById(productId);
         if (response.product) {
-          setFormData(response.product);
+          // Ensure weight field exists when loading existing product
+          const product = {
+            ...response.product,
+            weight: response.product.weight || "",
+          };
+          setFormData(product);
         }
       }
     };
@@ -141,7 +147,7 @@ const ProductForm = ({ productId = null, onSuccess, onCancel }) => {
         formData.append("upload_preset", "izole_uploads");
 
         const response = await axios.post(
-          "https://api.cloudinary.com/v1_1/your-cloud-name/image/upload",
+          "https://api.cloudinary.com/v1_1/dxuywp3zi/image/upload",
           formData
         );
 
@@ -183,6 +189,11 @@ const ProductForm = ({ productId = null, onSuccess, onCancel }) => {
     // Basic validation
     if (!formData.name.trim()) {
       toast.error("Product name is required");
+      return;
+    }
+
+    if (!formData.category.trim()) {
+      toast.error("Product category is required");
       return;
     }
 
@@ -260,7 +271,7 @@ const ProductForm = ({ productId = null, onSuccess, onCancel }) => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Product Name
+                  Product Name <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -268,12 +279,16 @@ const ProductForm = ({ productId = null, onSuccess, onCancel }) => {
                   value={formData.name}
                   onChange={handleChange}
                   className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  placeholder="Enter product name"
                 />
+                <p className="text-xs text-gray-500 mt-1">
+                  The full name of the product as it will appear to customers
+                </p>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Category
+                  Category <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -281,7 +296,30 @@ const ProductForm = ({ productId = null, onSuccess, onCancel }) => {
                   value={formData.category}
                   onChange={handleChange}
                   className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  placeholder="e.g., T-shirts, Shoes, Accessories"
                 />
+                <p className="text-xs text-gray-500 mt-1">
+                  The product category helps with navigation and filtering
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Product Weight (g)
+                </label>
+                <input
+                  type="number"
+                  name="weight"
+                  value={formData.weight}
+                  onChange={handleChange}
+                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  placeholder="Enter product weight in grams"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Common weight for all product variants (in grams)
+                </p>
               </div>
             </div>
 
@@ -295,7 +333,12 @@ const ProductForm = ({ productId = null, onSuccess, onCancel }) => {
                 onChange={handleChange}
                 rows={4}
                 className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                placeholder="Detailed product description"
               />
+              <p className="text-xs text-gray-500 mt-1">
+                Provide a detailed description of the product including
+                materials, features, and care instructions
+              </p>
             </div>
           </div>
 
@@ -335,7 +378,7 @@ const ProductForm = ({ productId = null, onSuccess, onCancel }) => {
                 {/* Color */}
                 <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700">
-                    Color
+                    Color <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -344,14 +387,22 @@ const ProductForm = ({ productId = null, onSuccess, onCancel }) => {
                       handleVariantChange(variantIndex, "color", e.target.value)
                     }
                     className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    placeholder="e.g., Red, Blue, Black"
                   />
+                  <p className="text-xs text-gray-500 mt-1">
+                    The color name for this product variant
+                  </p>
                 </div>
 
                 {/* Images */}
                 <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Images
+                    Images <span className="text-red-500">*</span>
                   </label>
+                  <p className="text-xs text-gray-500 mb-2">
+                    Upload at least one image for this color variant. Images
+                    should clearly show the product from different angles.
+                  </p>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-2">
                     {variant.images.map((image, imageIndex) => (
                       <div key={imageIndex} className="relative">
@@ -397,7 +448,7 @@ const ProductForm = ({ productId = null, onSuccess, onCancel }) => {
                 <div>
                   <div className="flex justify-between items-center mb-2">
                     <label className="block text-sm font-medium text-gray-700">
-                      Size Options
+                      Size Options <span className="text-red-500">*</span>
                     </label>
                     <button
                       type="button"
@@ -409,6 +460,23 @@ const ProductForm = ({ productId = null, onSuccess, onCancel }) => {
                     </button>
                   </div>
 
+                  {/* Column Headers */}
+                  <div className="grid grid-cols-5 gap-2 mb-2">
+                    <div className="text-xs font-medium text-gray-600">
+                      Size
+                    </div>
+                    <div className="text-xs font-medium text-gray-600">
+                      Quantity
+                    </div>
+                    <div className="text-xs font-medium text-gray-600">
+                      Sale Price (₹)
+                    </div>
+                    <div className="text-xs font-medium text-gray-600">
+                      Original Price (₹)
+                    </div>
+                    <div></div>
+                  </div>
+
                   <div className="space-y-2">
                     {variant.sizeOptions.map((sizeOption, sizeIndex) => (
                       <div
@@ -417,7 +485,7 @@ const ProductForm = ({ productId = null, onSuccess, onCancel }) => {
                       >
                         <input
                           type="text"
-                          placeholder="Size"
+                          placeholder="e.g., S, M, L, XL"
                           value={sizeOption.size}
                           onChange={(e) =>
                             handleSizeOptionChange(
@@ -431,7 +499,7 @@ const ProductForm = ({ productId = null, onSuccess, onCancel }) => {
                         />
                         <input
                           type="number"
-                          placeholder="Quantity"
+                          placeholder="Stock quantity"
                           value={sizeOption.quantity}
                           onChange={(e) =>
                             handleSizeOptionChange(
@@ -445,7 +513,7 @@ const ProductForm = ({ productId = null, onSuccess, onCancel }) => {
                         />
                         <input
                           type="number"
-                          placeholder="Price"
+                          placeholder="Current selling price"
                           value={sizeOption.price}
                           onChange={(e) =>
                             handleSizeOptionChange(
@@ -459,7 +527,7 @@ const ProductForm = ({ productId = null, onSuccess, onCancel }) => {
                         />
                         <input
                           type="number"
-                          placeholder="Original Price"
+                          placeholder="MRP/list price"
                           value={sizeOption.originalPrice}
                           onChange={(e) =>
                             handleSizeOptionChange(
@@ -477,12 +545,17 @@ const ProductForm = ({ productId = null, onSuccess, onCancel }) => {
                             removeSizeOption(variantIndex, sizeIndex)
                           }
                           className="inline-flex items-center justify-center text-red-500 hover:text-red-700"
+                          title="Remove size option"
                         >
                           <Trash2 className="h-4 w-4" />
                         </button>
                       </div>
                     ))}
                   </div>
+                  <p className="text-xs text-gray-500 mt-2">
+                    For each size, specify the available stock quantity, current
+                    selling price, and the original/list price (MRP)
+                  </p>
                 </div>
               </div>
             ))}

@@ -35,7 +35,7 @@ const CashfreeRedirect = () => {
               },
             }
           );
-
+          
           // Navigate to order confirmation page
           navigate(
             `/customer/order-confirmation?orderDetails=${orderId}&status=success`

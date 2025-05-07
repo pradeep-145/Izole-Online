@@ -242,7 +242,7 @@ const CheckoutPage = () => {
   const calculateTotalWeight = () => {
     // Each item is assumed to be 0.5kg, adjust as needed
     const totalItems = products.reduce((sum, item) => sum + item.quantity, 0);
-    return Math.max(0.5, totalItems * 0.5); // Minimum 0.5kg
+    return Math.max(0.5, totalItems * 0.15); // Minimum 0.5kg
   };
 
   const selectCourier = (courier) => {
@@ -277,17 +277,12 @@ const CheckoutPage = () => {
     }
 
     try {
+      const fullAddress = `${formData.address}, ${formData.city}, ${formData.state}, ${formData.zipCode}`;
       // Create order on backend with Shiprocket data
       const response = await axios.post("/api/orders/create-order", {
         products,
         totalAmount: total,
-        address: {
-          address: formData.address,
-          city: formData.city,
-          state: formData.state,
-          pincode: formData.zipCode,
-          country: formData.country || "India"
-        },
+        address: fullAddress,
         billingAddress: formData,
         shippingInfo: {
           courier_company_id: selectedCourier.courier_company_id,
