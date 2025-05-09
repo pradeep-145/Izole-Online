@@ -288,29 +288,29 @@ exports.OrderController = {
         courier_id: JSON.parse(order.shippingInfo).courier_company_id,
       }
       console.log(awb)
-      const { data, token } = await generateAWB(req.shiprocketToken, awb);
-      if (token != req.shiprocketToken || !req.shiprocketToken) {
-        const maxAge = 10 * 24 * 60 * 60;
-        console.log("token setting cookie");
-        res.setHeader("Set-Cookie", [
-          `shiprocket=${token}; HttpOnly; Path=/; SameSite=Lax; Max-Age=${maxAge};`,
-        ]);
-      }
-      if(!data.pickup_scheduled){
-        const {data,token} = await shcedulePickup(req.shiprocketToken, order.shipmentId)
-        if (token != req.shiprocketToken || !req.shiprocketToken) {
-          const maxAge = 10 * 24 * 60 * 60;
-          console.log("token setting cookie");
-          res.setHeader("Set-Cookie", [
-            `shiprocket=${token}; HttpOnly; Path=/; SameSite=Lax; Max-Age=${maxAge};`,
-          ]);
-        }
-        order.pickupDate = data.pickup_scheduled_date;
-        order.estimatedDeliveryDate = data.est;
-        order.trackingUrl = data.tracking_url;
-        order.shippingCharge = data.shipping_charges; 
-      }
-      order.awb=data.awb
+      // const { data, token } = await generateAWB(req.shiprocketToken, awb);
+      // if (token != req.shiprocketToken || !req.shiprocketToken) {
+      //   const maxAge = 10 * 24 * 60 * 60;
+      //   console.log("token setting cookie");
+      //   res.setHeader("Set-Cookie", [
+      //     `shiprocket=${token}; HttpOnly; Path=/; SameSite=Lax; Max-Age=${maxAge};`,
+      //   ]);
+      // }
+      // if(!data.pickup_scheduled){
+      //   const {data,token} = await shcedulePickup(req.shiprocketToken, order.shipmentId)
+      //   if (token != req.shiprocketToken || !req.shiprocketToken) {
+      //     const maxAge = 10 * 24 * 60 * 60;
+      //     console.log("token setting cookie");
+      //     res.setHeader("Set-Cookie", [
+      //       `shiprocket=${token}; HttpOnly; Path=/; SameSite=Lax; Max-Age=${maxAge};`,
+      //     ]);
+      //   }
+      //   order.pickupDate = data.pickup_scheduled_date;
+      //   order.estimatedDeliveryDate = data.est;
+      //   order.trackingUrl = data.tracking_url;
+      //   order.shippingCharge = data.shipping_charges; 
+      // }
+      // order.awb=data.awb
       if (!order) {
         return res.status(404).json({
           success: false,
