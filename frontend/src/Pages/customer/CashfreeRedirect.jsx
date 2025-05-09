@@ -2,11 +2,12 @@ import axios from "axios";
 import { Loader2 } from "lucide-react";
 import React, { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { useCart } from "../../zustand/useCart";
 
 const CashfreeRedirect = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-
+const {clearCart}= useCart()
   // Extract payment information from URL parameters
   const orderId = searchParams.get("order_id");
   const status = searchParams.get("txStatus") || searchParams.get("status");
@@ -35,6 +36,7 @@ const CashfreeRedirect = () => {
               },
             }
           );
+          clearCart();
           
           // Navigate to order confirmation page
           navigate(

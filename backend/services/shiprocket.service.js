@@ -27,11 +27,17 @@ const getAuthToken = async () => {
   }
 };
 
-const makeAuthenticatedRequest = async (token, endpoint, method, data) => {
+const makeAuthenticatedRequest = async (
+  token,
+  endpoint,
+  method,
+  data,
+  queryParams
+) => {
   if (!token) {
     token = await getAuthToken();
   }
-  console.log(data);
+  // console.log(token)
   try {
     const config = {
       url: `https://apiv2.shiprocket.in/v1/external/${endpoint}`,
@@ -47,6 +53,10 @@ const makeAuthenticatedRequest = async (token, endpoint, method, data) => {
       config.data = data;
     }
 
+    if (queryParams) {
+      config.params = queryParams;
+    }
+
     const response = await axios(config);
 
     console.log("Response from Shiprocket:", response.data);
@@ -56,9 +66,15 @@ const makeAuthenticatedRequest = async (token, endpoint, method, data) => {
     // Check for token expiration
     if ((error.response && error.response.status === 401) || !token) {
       const newToken = await getAuthToken();
-      return makeAuthenticatedRequest(newToken, endpoint, method, data);
+      return makeAuthenticatedRequest(
+        newToken,
+        endpoint,
+        method,
+        data,
+        queryParams
+      );
     }
-
+    console.log(error)
     // Get detailed error information from the response if available
     const errorDetails =
       error.response && error.response.data
@@ -96,9 +112,10 @@ module.exports = {
   cancelOrder: (token, orderId) => {
     return makeAuthenticatedRequest(token, `orders/cancel/${orderId}`, "POST");
   },
-  generateAWB: (token, shipmentId) => {
+  generateAWB: (token, data) => {
     return makeAuthenticatedRequest(token, `courier/assign/awb`, "POST", {
-      shipment_id: shipmentId,
+      shipment_id: data.shipment_id,
+      courier_id: data.courier_id
     });
   },
   getAWB: (token, awb) => {
@@ -121,7 +138,17 @@ module.exports = {
   getCouriers: (token) => {
     return makeAuthenticatedRequest(token, `courier`, "GET");
   },
+  checkServiceability: (token, params) => {
+    return makeAuthenticatedRequest(
+      token,
+      "courier/serviceability",
+      "GET",
+      null,
+      params
+    );
+  },
   getAuthToken: () => {
     return getAuthToken();
   },
+  makeAuthenticatedRequest, // Export this for custom requests
 };

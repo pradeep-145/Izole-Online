@@ -1,6 +1,9 @@
 const axios = require("axios");
 require("dotenv").config();
-const { getAuthToken } = require("../services/shiprocket.service");
+const {
+  getAuthToken,
+  makeAuthenticatedRequest,
+} = require("../services/shiprocket.service.js");
 
 exports.ShiprocketController = {
   checkServiceability: async (req, res) => {
@@ -18,21 +21,25 @@ exports.ShiprocketController = {
       const token = req.shiprocketToken || (await getAuthToken());
 
       // Make request to Shiprocket API
-      const response = await axios.get(
-        `https://apiv2.shiprocket.in/v1/external/courier/serviceability`,
+      const response = await makeAuthenticatedRequest(
+        token,
+        "courier/serviceability",
+        "GET",
+        null,
         {
-          params: {
-            pickup_postcode: pickup_postcode,
-            delivery_postcode: delivery_postcode,
-            weight: weight,
-            cod: cod || 0,
-          },
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
+          pickup_postcode,
+          delivery_postcode,
+          weight,
+          cod: cod || 0,
         }
       );
+
+      if (response.error) {
+        return res.status(response.status || 400).json({
+          success: false,
+          message: response.message || "Error checking serviceability",
+        });
+      }
 
       // Return the couriers data
       res.status(200).json({

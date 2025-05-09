@@ -109,8 +109,8 @@ const CheckoutPage = () => {
         console.error("Cashfree SDK load error:", err);
         setPaymentError("Failed to load payment SDK");
       });
-  }, []);
-
+    }, []);
+    
   useEffect(() => {
     if (isBuyNow && singleProduct) {
       try {
@@ -204,6 +204,7 @@ const CheckoutPage = () => {
   };
 
   const checkServiceability = async () => {
+    console.log(calculateTotalWeight());
     if (!formData.zipCode || !formData.state) {
       setServiceabilityError("Please enter both PIN code and state to check serviceability");
       return;
@@ -219,12 +220,14 @@ const CheckoutPage = () => {
         weight: calculateTotalWeight(),
         cod: 0, // Assuming all orders are prepaid based on your implementation
       });
+      console.log("Serviceability response:", response.data);
 
       if (response.data.success && response.data.couriers && response.data.couriers.length > 0) {
         setServiceability(response.data.couriers);
         setShowServiceOptions(true);
         // Auto-select cheapest option
         const cheapestOption = [...response.data.couriers].sort((a, b) => a.rate - b.rate)[0];
+        console.log("Cheapest option:", cheapestOption);
         setSelectedCourier(cheapestOption);
       } else {
         setServiceabilityError("No delivery options available for your location");
@@ -242,7 +245,7 @@ const CheckoutPage = () => {
   const calculateTotalWeight = () => {
     // Each item is assumed to be 0.5kg, adjust as needed
     const totalItems = products.reduce((sum, item) => sum + item.quantity, 0);
-    return Math.max(0.5, totalItems * 0.15); // Minimum 0.5kg
+    return Math.max(0.25, totalItems * 0.15); 
   };
 
   const selectCourier = (courier) => {
@@ -290,9 +293,9 @@ const CheckoutPage = () => {
           rate: selectedCourier.rate,
           estimated_delivery_days: selectedCourier.estimated_delivery_days,
           weight: calculateTotalWeight()
-        }
+        } 
       });
-
+      
       // Stop the timer when proceeding to payment
       setTimerActive(false);
 

@@ -32,43 +32,9 @@ const OrderConfirmation = () => {
   const [showOrderInfo, setShowOrderInfo] = useState(false);
 
   useEffect(() => {
-    const confirmPayment = async () => {
-      try {
-        // Confirm payment with the backend
-        const response = await axios.post(
-          "/api/orders/confirm-payment",
-          { orderId },
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          }
-        );
-
-        if (!response.data.success) {
-          throw new Error(
-            response.data.message || "Payment confirmation failed"
-          );
-        }
-
-        return response.data;
-      } catch (error) {
-        console.error("Error confirming payment:", error);
-        setError(
-          "Failed to confirm your payment. Please contact customer support."
-        );
-        return null;
-      }
-    };
-
     const loadOrderDetails = async () => {
       setLoading(true);
       try {
-        // First check if payment was successful
-        if (params.get("status") === "success") {
-          await confirmPayment();
-        }
-
         // Then load order details
         const { success, order, error } = await fetchOrderDetails(orderId);
 

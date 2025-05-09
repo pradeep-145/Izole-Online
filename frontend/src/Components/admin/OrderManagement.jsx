@@ -5,6 +5,7 @@ import {
   ChevronDown,
   ChevronUp,
   Download,
+  ExternalLink,
   Filter,
   Package,
   Printer,
@@ -129,6 +130,7 @@ const OrderManagement = () => {
 
   // Format date
   const formatDate = (dateString) => {
+    if (!dateString) return "Not specified";
     const options = {
       year: "numeric",
       month: "short",
@@ -137,6 +139,46 @@ const OrderManagement = () => {
       minute: "2-digit",
     };
     return new Date(dateString).toLocaleDateString(undefined, options);
+  };
+
+  // Format address from the structured address object
+  const formatAddress = (address) => {
+    if (!address) return "No address provided";
+
+    // Check if address is a string (old format) or an object (new format)
+    if (typeof address === "string") {
+      return address;
+    }
+
+    // Format structured address
+    const parts = [];
+    if (address.firstName)
+      parts.push(`${address.firstName} ${address.lastName || ""}`);
+    if (address.addressLine1) parts.push(address.addressLine1);
+    if (address.addressLine2) parts.push(address.addressLine2);
+    if (address.city)
+      parts.push(
+        `${address.city}, ${address.state || ""} ${address.postalCode || ""}`
+      );
+    if (address.country) parts.push(address.country);
+
+    return parts.join(", ") || "No address details";
+  };
+
+  // Open tracking link in new tab
+  const openTrackingLink = (url) => {
+    if (url) window.open(url, "_blank", "noopener,noreferrer");
+  };
+
+  // Parse shipping info if stored as JSON string
+  const parseShippingInfo = (info) => {
+    if (!info) return null;
+    try {
+      return typeof info === "string" ? JSON.parse(info) : info;
+    } catch (e) {
+      console.error("Error parsing shipping info:", e);
+      return null;
+    }
   };
 
   return (
@@ -267,25 +309,45 @@ const OrderManagement = () => {
 
                     <div className="mb-4">
                       <p className="text-sm font-medium text-gray-700">Items</p>
-                      {order.orderItems?.map((item, index) => (
-                        <div
-                          key={index}
-                          className="flex justify-between text-sm py-1"
-                        >
-                          <p>
-                            {item.productName} ({item.variantName}) x{" "}
-                            {item.quantity}
-                          </p>
-                          <p className="font-medium">
-                            ₹{item.price * item.quantity}
-                          </p>
-                        </div>
-                      ))}
+                      {order.products &&
+                        order.products.map((item, index) => (
+                          <div
+                            key={index}
+                            className="flex justify-between text-sm py-1"
+                          >
+                            <p>
+                              {item.name} ({item.color}, {item.size}) x{" "}
+                              {item.quantity}
+                            </p>
+                            <p className="font-medium">
+                              ₹{(item.price * item.quantity).toFixed(2)}
+                            </p>
+                          </div>
+                        ))}
                       <div className="flex justify-between text-sm font-bold pt-2 border-t border-gray-100 mt-2">
                         <p>Total</p>
                         <p>₹{order.totalAmount?.toFixed(2)}</p>
                       </div>
                     </div>
+
+                    {/* Shipping info for mobile */}
+                    {order.awb && (
+                      <div className="mb-4">
+                        <p className="text-sm font-medium text-gray-700">
+                          Shipping Details
+                        </p>
+                        <p className="text-sm">AWB: {order.awb}</p>
+                        {order.trackingUrl && (
+                          <button
+                            onClick={() => openTrackingLink(order.trackingUrl)}
+                            className="text-blue-600 text-sm flex items-center hover:underline"
+                          >
+                            Track Package{" "}
+                            <ExternalLink size={14} className="ml-1" />
+                          </button>
+                        )}
+                      </div>
+                    )}
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -424,6 +486,20 @@ const OrderManagement = () => {
                     <option value="CANCELLED">Cancelled</option>
                   </select>
                 </div>
+                <div className="mt-2 text-sm">
+                  <p className="text-gray-500">
+                    Payment:{" "}
+                    <span
+                      className={
+                        selectedOrder.paymentStatus === "COMPLETED"
+                          ? "text-green-600 font-medium"
+                          : "text-amber-600 font-medium"
+                      }
+                    >
+                      {selectedOrder.paymentStatus}
+                    </span>
+                  </p>
+                </div>
               </div>
 
               <div className="mb-6">
@@ -437,7 +513,7 @@ const OrderManagement = () => {
                   {selectedOrder.customerId?.email || "No email"}
                 </p>
                 <p className="text-sm text-gray-500 mt-1">
-                  {selectedOrder.customerId?.phone || "No phone"}
+                  {selectedOrder.customerId?.phoneNumber || "No phone"}
                 </p>
               </div>
 
@@ -445,40 +521,135 @@ const OrderManagement = () => {
                 <p className="text-sm font-medium text-gray-500">
                   Shipping Address
                 </p>
-                {selectedOrder.shippingAddress ? (
-                  <div className="text-sm text-gray-700 mt-1">
-                    <p>{selectedOrder.shippingAddress.street}</p>
-                    <p>
-                      {selectedOrder.shippingAddress.city},{" "}
-                      {selectedOrder.shippingAddress.state}
-                    </p>
-                    <p>{selectedOrder.shippingAddress.postalCode}</p>
-                    <p>{selectedOrder.shippingAddress.country}</p>
-                  </div>
-                ) : (
-                  <p className="text-sm text-gray-500 mt-1">
-                    No shipping address provided
-                  </p>
-                )}
+                <div className="text-sm text-gray-700 mt-1">
+                  {formatAddress(selectedOrder.address)}
+                </div>
               </div>
+
+              {/* Shipping Details Section */}
+              {(selectedOrder.shipmentId ||
+                selectedOrder.awb ||
+                selectedOrder.trackingUrl) && (
+                <div className="mb-6">
+                  <p className="text-sm font-medium text-gray-500">
+                    Shipping Details
+                  </p>
+                  <div className="mt-2 p-3 bg-gray-50 rounded-md">
+                    {selectedOrder.awb && (
+                      <p className="text-sm mb-1">
+                        <span className="font-medium">AWB:</span>{" "}
+                        {selectedOrder.awb}
+                      </p>
+                    )}
+
+                    {selectedOrder.shipmentId && (
+                      <p className="text-sm mb-1">
+                        <span className="font-medium">Shipment ID:</span>{" "}
+                        {selectedOrder.shipmentId}
+                      </p>
+                    )}
+
+                    {selectedOrder.pickupDate && (
+                      <p className="text-sm mb-1">
+                        <span className="font-medium">Pickup Date:</span>{" "}
+                        {formatDate(selectedOrder.pickupDate)}
+                      </p>
+                    )}
+
+                    {selectedOrder.estimatedDeliveryDate && (
+                      <p className="text-sm mb-1">
+                        <span className="font-medium">Est. Delivery:</span>{" "}
+                        {formatDate(selectedOrder.estimatedDeliveryDate)}
+                      </p>
+                    )}
+
+                    {selectedOrder.trackingUrl && (
+                      <button
+                        onClick={() =>
+                          openTrackingLink(selectedOrder.trackingUrl)
+                        }
+                        className="mt-2 inline-flex items-center text-blue-600 hover:text-blue-800 text-sm font-medium"
+                      >
+                        <Truck className="w-4 h-4 mr-1" />
+                        Track Package
+                        <ExternalLink size={14} className="ml-1" />
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Parse shipping info if stored as JSON string */}
+              {selectedOrder.shippingInfo && (
+                <div className="mb-6">
+                  <p className="text-sm font-medium text-gray-500">
+                    Shipping Method
+                  </p>
+                  <div className="mt-1">
+                    {(() => {
+                      const shippingInfo = parseShippingInfo(
+                        selectedOrder.shippingInfo
+                      );
+                      if (!shippingInfo)
+                        return (
+                          <p className="text-sm text-gray-500">
+                            No shipping details
+                          </p>
+                        );
+
+                      return (
+                        <div className="text-sm text-gray-700">
+                          <p>
+                            <span className="font-medium">Carrier:</span>{" "}
+                            {shippingInfo.courier_name || "Standard Shipping"}
+                          </p>
+                          {shippingInfo.rate && (
+                            <p>
+                              <span className="font-medium">Shipping Fee:</span>{" "}
+                              ₹{shippingInfo.rate.toFixed(2)}
+                            </p>
+                          )}
+                          {shippingInfo.estimated_delivery_days && (
+                            <p>
+                              <span className="font-medium">
+                                Delivery Estimate:
+                              </span>{" "}
+                              {shippingInfo.estimated_delivery_days} days
+                            </p>
+                          )}
+                        </div>
+                      );
+                    })()}
+                  </div>
+                </div>
+              )}
 
               <div className="mb-6">
                 <p className="text-sm font-medium text-gray-500">Order Items</p>
                 <div className="mt-2 space-y-2">
-                  {selectedOrder.orderItems &&
-                    selectedOrder.orderItems.map((item, index) => (
+                  {selectedOrder.products &&
+                    selectedOrder.products.map((item, index) => (
                       <div
                         key={index}
                         className="flex justify-between p-2 border-b border-gray-100"
                       >
                         <div className="flex items-center space-x-2">
-                          <div className="w-10 h-10 bg-gray-200 rounded flex-shrink-0"></div>
+                          {item.image && (
+                            <img
+                              src={item.image}
+                              alt={item.name}
+                              className="w-10 h-10 object-cover rounded"
+                            />
+                          )}
+                          {!item.image && (
+                            <div className="w-10 h-10 bg-gray-200 rounded flex-shrink-0"></div>
+                          )}
                           <div>
                             <p className="text-sm font-medium text-gray-900">
-                              {item.productName}
+                              {item.name}
                             </p>
                             <p className="text-xs text-gray-500">
-                              {item.variantName} x {item.quantity}
+                              {item.color}, {item.size} × {item.quantity}
                             </p>
                           </div>
                         </div>
@@ -497,21 +668,38 @@ const OrderManagement = () => {
                     ₹{selectedOrder.totalAmount?.toFixed(2) || "0.00"}
                   </p>
                 </div>
-                <div className="flex justify-between mt-1">
-                  <p className="text-sm font-medium text-gray-500">Shipping</p>
-                  <p className="text-sm font-medium text-gray-900">
-                    ₹{selectedOrder.shippingCost?.toFixed(2) || "0.00"}
-                  </p>
-                </div>
+
+                {/* Calculate and display shipping cost from shippingInfo or shippingCharge */}
+                {(() => {
+                  let shippingCost = selectedOrder.shippingCharge || 0;
+
+                  // Try to get shipping cost from shippingInfo if not directly available
+                  if (!shippingCost && selectedOrder.shippingInfo) {
+                    const shippingInfo = parseShippingInfo(
+                      selectedOrder.shippingInfo
+                    );
+                    if (shippingInfo && shippingInfo.rate) {
+                      shippingCost = shippingInfo.rate;
+                    }
+                  }
+
+                  return (
+                    <div className="flex justify-between mt-1">
+                      <p className="text-sm font-medium text-gray-500">
+                        Shipping
+                      </p>
+                      <p className="text-sm font-medium text-gray-900">
+                        {shippingCost > 0
+                          ? `₹${shippingCost.toFixed(2)}`
+                          : "Free"}
+                      </p>
+                    </div>
+                  );
+                })()}
+
                 <div className="flex justify-between mt-4 text-lg font-bold">
                   <p>Total</p>
-                  <p>
-                    ₹
-                    {(
-                      selectedOrder.totalAmount +
-                      (selectedOrder.shippingCost || 0)
-                    ).toFixed(2)}
-                  </p>
+                  <p>₹{selectedOrder.totalAmount.toFixed(2)}</p>
                 </div>
               </div>
             </div>

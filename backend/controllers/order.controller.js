@@ -18,7 +18,10 @@ const productModel = require("../models/product.model.js");
 const axios = require("axios");
 exports.OrderController = {
   createOrder: async (req, res) => {
-    const { totalAmount, products, address , billingAddress} = req.body;
+    const { totalAmount, products, address, billingAddress, shippingInfo } =
+      req.body;
+    console.log(billingAddress);
+
     if (
       !process.env.CASHFREE_CLIENT_ID ||
       !process.env.CASHFREE_CLIENT_SECRET
@@ -52,6 +55,7 @@ exports.OrderController = {
         products: validatedProducts,
         totalAmount,
         address,
+        shippingInfo: JSON.stringify(shippingInfo),
       });
 
       // 2. Update product quantities for each product that has a valid ID
@@ -87,66 +91,98 @@ exports.OrderController = {
               );
             } catch (updateError) {
               console.error("Error updating product quantity:", updateError);
-              // Continue with order creation even if quantity update fails
+              // Continue with de creation even if quantity update fails
             }
           }
         }
       }
 
       const orderId = `order_${order._id}`;
-      createScheduler(order._id);
-
+      const schedulerName= await createScheduler(order._id);
+      console.log("Scheduler name:", schedulerName);
       let paymentSessionId = null;
       let paymentLink = null;
 
       // Create Shiprocket order first
+      const shiprocketOrder = {
+        order_id: `order_${order._id}`,
+        order_date:
+          new Date().toISOString().split("T")[0] +
+          " " +
+          new Date().toLocaleTimeString("en-IN", { hour12: false }).slice(0, 5), // Added time
+        pickup_location: "Home",
+        comment: "", // Added empty comment field
+
+        // Billing Address (complete)
+        billing_customer_name: billingAddress.firstName || "Customer",
+        billing_last_name: billingAddress.lastName || "Customer",
+        billing_address: billingAddress.address || "Default Address",
+        billing_address_2: "", // Added missing field
+        billing_city: billingAddress.city || "Tiruppur",
+        billing_pincode: billingAddress.zipCode?.toString() || "641604",
+        billing_state: billingAddress.state || "Tamil Nadu",
+        billing_country: billingAddress.country || "India",
+        billing_email: billingAddress.email || "customer@example.com",
+        billing_phone: billingAddress.phone
+          ? billingAddress.phone.toString()
+          : "9999999999",
+
+        // Shipping Address (complete, even with shipping_is_billing=true)
+        shipping_is_billing: true,
+        shipping_customer_name: "", // Added all required shipping fields
+        shipping_last_name: "",
+        shipping_address: "",
+        shipping_address_2: "",
+        shipping_city: "",
+        shipping_pincode: "",
+        shipping_state: "",
+        shipping_country: "",
+        shipping_email: "",
+        shipping_phone: "",
+
+        // Order Items
+        order_items: validatedProducts.map((product) => ({
+          name: product.name,
+          sku: product.id,
+          units: product.quantity,
+          selling_price: product.price.toString(),
+          discount: "", // Added
+          tax: "", // Added
+          hsn: 1234, // Added with fallback
+        })),
+
+        // Payment and charges
+        payment_method: "Prepaid", // Capitalized to match sample
+        shipping_charges: 0, // Added
+        giftwrap_charges: 0, // Added
+        transaction_charges: 0, // Added
+        total_discount: 0, // Added
+
+        // Totals and dimensions
+        sub_total: totalAmount.toString(),
+        length: 10,
+        breadth: 10,
+        height: 7,
+        weight: shippingInfo.weight,
+      };
+
       try {
-        const { data, token } = createOrder(req.shiprocketToken, {
-          order_id: orderId,
-          order_date: new Date().toISOString(),
-          pickup_location: {
-            name: "izole clothing company",
-            address: "60, Kombai Thottam, Kangayam road, 4, Tiruppur",
-            city: "Tiruppur",
-            pincode: "641604",
-            state: "Tamil Nadu",
-            country: "India",
-            phone: "9385352051",
-          },
-          billing_customer_name: req.user.name || "Customer",
-          billing_last_name: req.user.name.split(" ")[1] || " ",
-          billing_address: billingAdress.address || "Default Address",
-          billing_city: billingAddress.city || "Default City",
-          billing_pincode: billingAddress.zipcode || "000000",
-          billing_state: address.state || "",
-          billing_country: address.country || "India",
-          billing_email: req.user.email || "",
-          billing_phone: req.user.phoneNumber || "9999999999",
-          shipping_is_billing: true,
-          order_items: validatedProducts.map((product) => ({
-            name: product.name,
-            sku: product.id,
-            units: product.quantity,
-            selling_price: product.price.toString(),
-            discount: "0",
-            tax: "0",
-            hsn: "0000",
-          })),
-          payment_method: "Prepaid",
-          sub_total: totalAmount.toString(),
-          length: "10",
-          breadth: "10",
-          height: "10",
-          weight: "0.5",
-        });
+        console.log(req.shiprocketToken);
+        const { data, token } = await createOrder(
+          req.shiprocketToken,
+          shiprocketOrder
+        );
         console.log("Shiprocket order response:", data);
         // Save Shiprocket data to order if needed
-        order.shiprocketOrderId = data?.order_id || null;
+        order.shipmentOrderId = data?.order_id || null;
+        order.shipmentId = data?.shipment_id || null;
 
         // Update token if needed
-        if (token !== req.shiprocketToken) {
+        if (token != req.shiprocketToken || !req.shiprocketToken) {
+          const maxAge = 10 * 24 * 60 * 60;
+          console.log("token setting cookie");
           res.setHeader("Set-Cookie", [
-            `shiprocket=${token}; HttpOnly; Path=/; SameSite=Lax; Max-Age=${10};`,
+            `shiprocket=${token}; HttpOnly; Path=/; SameSite=Lax; Max-Age=${maxAge};`,
           ]);
         }
       } catch (shiprocketError) {
@@ -193,6 +229,7 @@ exports.OrderController = {
         paymentLink = `https://sandbox.cashfree.com/pg/view/order/${orderId}/${cashfree.data.payment_session_id}`;
         order.paymentSessionId = paymentSessionId;
         order.paymentLink = paymentLink;
+        order.schedulerName = schedulerName;
       } catch (paymentError) {
         console.error("Payment gateway error:", paymentError);
         // Continue with order creation even if payment setup fails
@@ -228,7 +265,6 @@ exports.OrderController = {
     const { orderId } = req.body;
 
     try {
-      // Verify the payment intent with Strip
       const response = await axios.get(
         `https://sandbox.cashfree.com/pg/orders/order_${orderId}/payments`,
         {
@@ -247,6 +283,34 @@ exports.OrderController = {
         });
       }
       const order = await orderModel.findById(orderId);
+      const awb={
+        shipment_id: order.shipmentId,
+        courier_id: JSON.parse(order.shippingInfo).courier_company_id,
+      }
+      console.log(awb)
+      const { data, token } = await generateAWB(req.shiprocketToken, awb);
+      if (token != req.shiprocketToken || !req.shiprocketToken) {
+        const maxAge = 10 * 24 * 60 * 60;
+        console.log("token setting cookie");
+        res.setHeader("Set-Cookie", [
+          `shiprocket=${token}; HttpOnly; Path=/; SameSite=Lax; Max-Age=${maxAge};`,
+        ]);
+      }
+      if(!data.pickup_scheduled){
+        const {data,token} = await shcedulePickup(req.shiprocketToken, order.shipmentId)
+        if (token != req.shiprocketToken || !req.shiprocketToken) {
+          const maxAge = 10 * 24 * 60 * 60;
+          console.log("token setting cookie");
+          res.setHeader("Set-Cookie", [
+            `shiprocket=${token}; HttpOnly; Path=/; SameSite=Lax; Max-Age=${maxAge};`,
+          ]);
+        }
+        order.pickupDate = data.pickup_scheduled_date;
+        order.estimatedDeliveryDate = data.est;
+        order.trackingUrl = data.tracking_url;
+        order.shippingCharge = data.shipping_charges; 
+      }
+      order.awb=data.awb
       if (!order) {
         return res.status(404).json({
           success: false,
@@ -275,6 +339,76 @@ exports.OrderController = {
       res.status(500).json({
         success: false,
         message: "Error in confirming payment",
+      });
+    }
+  },
+  paymentFailed: async (req, res) => {
+    const { orderId } = req.body;
+
+    try {
+      const order = await orderModel.findByIdAndDelete(orderId);
+      if (!order) {
+        return res.status(404).json({
+          success: false,
+          message: "Order not found",
+        });
+      }
+       try {
+              const productArray = Array.isArray(order.products)
+                ? order.products
+                : [order.products];
+      
+              await Promise.all(
+                productArray.map(async (product) => {
+                  return productModel.updateOne(
+                    {
+                      _id: product.id,
+                      "variants.color": product.color,
+                      "variants.sizeOptions.size": product.size,
+                    },
+                    {
+                      $inc: {
+                        "variants.$[variant].sizeOptions.$[sizeOption].quantity":
+                          product.quantity,
+                      },
+                    },
+                    {
+                      arrayFilters: [
+                        { "variant.color": product.color },
+                        { "sizeOption.size": product.size },
+                      ],
+                    }
+                  );
+                })
+              );
+      
+              console.log(
+                `Successfully restored inventory for all products in order: ${orderId}`
+              );
+            } catch (inventoryError) {
+              console.error(
+                `Error restoring product quantities: ${inventoryError.message}`
+              );
+              // Continue with order deletion even if inventory update fails
+            }
+      if (order.schedulerName) {
+        await deleteOrderScheduler(order.schedulerName);
+      }
+
+      order.paymentStatus = "FAILED";
+      order.expiresAt = undefined;
+      await order.save();
+
+      res.status(200).json({
+        success: true,
+        order,
+        message: "Payment failed",
+      });
+    } catch (error) {
+      console.log("Error in payment failure", error);
+      res.status(500).json({
+        success: false,
+        message: "Error in payment failure",
       });
     }
   },
@@ -351,7 +485,14 @@ exports.OrderController = {
           // Continue with cancellation even if refund has issues
         }
       }
-
+      const {data, token} = await cancelOrder(req.shiprocketToken, order.shipmentOrderId)
+      if (token != req.shiprocketToken || !req.shiprocketToken) {
+        const maxAge = 10 * 24 * 60 * 60;
+        console.log("token setting cookie");
+        res.setHeader("Set-Cookie", [
+          `shiprocket=${token}; HttpOnly; Path=/; SameSite=Lax; Max-Age=${maxAge};`,
+        ]);
+      }
       // Delete the scheduler if exists
       if (order.schedulerName) {
         await deleteOrderScheduler(order.schedulerName);
@@ -498,3 +639,34 @@ exports.OrderController = {
     }
   },
 };
+
+
+// Response from Shiprocket: {
+//   awb_assign_status: 1,
+//   response: {
+//     data: {
+//       courier_company_id: 217,
+//       awb_code: 'JH020263933IN',
+//       cod: 0,
+//       order_id: 829847468,
+//       shipment_id: 826214621,
+//       awb_code_status: 1,
+//       assigned_date_time: [Object],
+//       applied_weight: 0.15,
+//       company_id: 6268306,
+//       courier_name: 'India Post-Speed Post Air Prepaid',
+//       child_courier_name: null,
+//       freight_charges: 29.5,
+//       pickup_scheduled_date: '2025-05-09 09:00:00',
+//       pickup_scheduled: '2025-05-09 09:00:00',
+//       routing_code: '',
+//       rto_routing_code: null,
+//       invoice_no: 'Retail00005',
+//       transporter_id: '',
+//       transporter_name: '',
+//       shipped_by: [Object]
+//     }
+//   },
+//   no_pickup_popup: 0,
+//   quick_pick: 0
+// }

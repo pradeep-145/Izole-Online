@@ -1,6 +1,5 @@
 import axios from "axios";
 import {
-  AlertCircle,
   BarChart3,
   Bell,
   ChevronDown,
@@ -16,11 +15,12 @@ import {
   Truck,
   Users,
 } from "lucide-react";
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import CustomerManagement from "../../Components/admin/CustomerManagement";
 import InventoryManagement from "../../Components/admin/InventoryManagement";
 import OrderManagement from "../../Components/admin/OrderManagement";
 import ProductTable from "../../Components/admin/ProductTable";
+import ShippingManagement from "../../Components/admin/ShippingManagement";
 import { useProduct } from "../../zustand/useProducts.jsx";
 import AdminProductForm from "./ProductForm";
 
@@ -135,23 +135,23 @@ const AdminDashboard = () => {
         sales: {
           today: `₹${data.sales.today.toFixed(2)}`,
           yesterday: `₹${data.sales.yesterday.toFixed(2)}`,
-          growth: `${data.sales.growth > 0 ? "+" : ""}${data.sales.growth.toFixed(
-            1
-          )}%`,
+          growth: `${
+            data.sales.growth > 0 ? "+" : ""
+          }${data.sales.growth.toFixed(1)}%`,
         },
         orders: {
           today: data.orders.today,
           yesterday: data.orders.yesterday,
-          growth: `${data.orders.growth > 0 ? "+" : ""}${data.orders.growth.toFixed(
-            1
-          )}%`,
+          growth: `${
+            data.orders.growth > 0 ? "+" : ""
+          }${data.orders.growth.toFixed(1)}%`,
         },
         customers: {
           today: data.customers.today,
           yesterday: data.customers.yesterday,
-          growth: `${data.customers.growth > 0 ? "+" : ""}${data.customers.growth.toFixed(
-            1
-          )}%`,
+          growth: `${
+            data.customers.growth > 0 ? "+" : ""
+          }${data.customers.growth.toFixed(1)}%`,
         },
         lowStockCount: data.lowStockCount || 0,
         pendingReturns: data.pendingReturns || 0,
@@ -207,7 +207,9 @@ const AdminDashboard = () => {
         params: {
           format: "csv", // or "pdf" depending on what your backend supports
           type: "sales",
-          startDate: new Date(new Date().setDate(new Date().getDate() - 30)).toISOString(), // Last 30 days
+          startDate: new Date(
+            new Date().setDate(new Date().getDate() - 30)
+          ).toISOString(), // Last 30 days
           endDate: new Date().toISOString(),
         },
         responseType: "blob", // Important for handling file downloads
@@ -250,10 +252,16 @@ const AdminDashboard = () => {
     let csvContent = "data:text/csv;charset=utf-8,";
 
     // Add headers
-    csvContent += "Report Date,Generated On," + new Date().toLocaleString() + "\r\n\r\n";
+    csvContent +=
+      "Report Date,Generated On," + new Date().toLocaleString() + "\r\n\r\n";
     csvContent += "SALES SUMMARY\r\n";
     csvContent += "Today,Yesterday,Growth\r\n";
-    csvContent += `${analyticsData.sales.today.replace("₹", "")},${analyticsData.sales.yesterday.replace("₹", "")},${analyticsData.sales.growth}\r\n\r\n`;
+    csvContent += `${analyticsData.sales.today.replace(
+      "₹",
+      ""
+    )},${analyticsData.sales.yesterday.replace("₹", "")},${
+      analyticsData.sales.growth
+    }\r\n\r\n`;
 
     // Add orders data
     csvContent += "ORDERS SUMMARY\r\n";
@@ -266,7 +274,9 @@ const AdminDashboard = () => {
       csvContent += "Product Name,Units Sold,In Stock,Price\r\n";
 
       topProducts.forEach((product) => {
-        csvContent += `${product.name},${product.sold},${product.stock},${product.price.replace("₹", "")}\r\n`;
+        csvContent += `${product.name},${product.sold},${
+          product.stock
+        },${product.price.replace("₹", "")}\r\n`;
       });
     }
 
@@ -274,7 +284,10 @@ const AdminDashboard = () => {
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `izole-sales-report-${new Date().toISOString().split("T")[0]}.csv`);
+    link.setAttribute(
+      "download",
+      `izole-sales-report-${new Date().toISOString().split("T")[0]}.csv`
+    );
     document.body.appendChild(link);
     link.click();
     link.remove();
@@ -331,7 +344,11 @@ const AdminDashboard = () => {
   // Listen for visibility changes to pause refresh when tab is not visible
   useEffect(() => {
     const handleVisibilityChange = () => {
-      if (document.visibilityState === "visible" && autoRefresh && activeTab === "dashboard") {
+      if (
+        document.visibilityState === "visible" &&
+        autoRefresh &&
+        activeTab === "dashboard"
+      ) {
         fetchAnalyticsData(); // Refresh immediately when tab becomes visible
       }
     };
@@ -1090,16 +1107,7 @@ const AdminDashboard = () => {
 
           {activeTab === "shipping" && (
             <div>
-              <h1 className="text-2xl font-bold text-gray-900 mb-6">
-                Shipping Management
-              </h1>
-              {/* Shipping tab content */}
-              <div className="bg-white rounded-lg shadow">
-                {/* Shipping content would go here */}
-                <div className="p-10 text-center text-gray-500">
-                  Shipping content would be displayed here
-                </div>
-              </div>
+              <ShippingManagement />
             </div>
           )}
         </main>

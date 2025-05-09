@@ -17,16 +17,17 @@ import CustomerLayout from "./Pages/customer/CustomerLayout";
 import CustomerLogin from "./Pages/customer/CustomerLogin";
 import CustomerSignUp from "./Pages/customer/CustomerSignUp";
 import LandingPage from "./Pages/customer/LandingPage";
+import Notifications from "./Pages/customer/Notifications";
 import OrderConfirmation from "./Pages/customer/OrderConfirmation";
+import OrderDetailsPage from "./Pages/customer/OrderDetailsPage";
 import OrderHistoryPage from "./Pages/customer/OrderHistoryPage";
 import OtpVerification from "./Pages/customer/otpVerification";
 import PaymentFailed from "./Pages/customer/PaymentFailed";
 import Product from "./Pages/customer/Product";
 import ProductList from "./Pages/customer/ProductList";
+import Profile from "./Pages/customer/Profile";
 import ShippingStatus from "./Pages/customer/ShippingStatus";
 import Wishlist from "./Pages/customer/Wishlist";
-import Notifications from "./Pages/customer/Notifications";
-import Profile from "./Pages/customer/Profile";
 
 function App() {
   return (
@@ -49,8 +50,9 @@ function App() {
           <Route path="wishlist" element={<Wishlist />} />
           <Route path="shipping-status" element={<ShippingStatus />} />
           <Route path="orders" element={<OrderHistoryPage />} />
+          <Route path="orders/:id" element={<OrderDetailsPage />} />
           <Route path="order-confirmation" element={<OrderConfirmation />} />
-      
+
           <Route path="payment/redirect" element={<CashfreeRedirect />} />
           <Route path="payment-failed" element={<PaymentFailed />} />
           <Route path="notifications" element={<Notifications />} />

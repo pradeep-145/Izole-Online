@@ -27,7 +27,6 @@ const orderSchema = new mongoose.Schema(
         },
         image: {
           type: String,
-          default: "https://via.placeholder.com/150",
         },
         color: {
           type: String,
@@ -43,9 +42,48 @@ const orderSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+  
     address: {
-      type: String,
-      required: true,
+      firstName: {
+        type: String,
+        required: true,
+      },
+      lastName: {
+        type: String,
+        required: true,
+      },
+      addressLine1: {
+        type: String,
+        required: true,
+      },
+      addressLine2: {
+        type: String,
+      },
+      city: {
+        type: String,
+        required: true,
+      },
+      state: {
+        type: String,
+        required: true,
+      },
+      country: {
+        type: String,
+        required: true,
+      },
+      postalCode: {
+        type: String,
+        required: true,
+      },
+      phone: {
+        type: String,
+        required: true,
+      },
+      email: {
+        type: String,
+        required: true,
+      }
+
     },
     status: {
       type: String,
@@ -54,16 +92,36 @@ const orderSchema = new mongoose.Schema(
     },
     paymentStatus: {
       type: String,
-      enum: ["Pending", "COMPLETED", "Failed", "Refunded"],
+      enum: ["Pending", "COMPLETED", "Refunded"],
       default: "Pending",
     },
     paymentSessionId: String,
     paymentLink: String,
     schedulerName: String,
-    shippingDetails:{
-      courier:String,
-      trackingId:String,
-      trackingUrl:String,
+    shipmentId:{
+      type:Number,
+    },
+    awb:{
+      type:Number,
+    },
+    shippingCharge:{
+      type:Number,
+    },
+    shipmentOrderId:{
+      type:String,
+    },
+    shippingInfo:{
+      type:String,
+      required:true
+    },
+    pickupDate:{
+      type:Date,
+    },
+    estimatedDeliveryDate:{
+      type:Date,
+    },
+    trackingUrl:{
+      type:String,
     },
     expiresAt: {
       type: Date,

@@ -1,3 +1,4 @@
+const { min } = require("moment-timezone");
 const mongoose = require("mongoose");
 
 const ProductSchema = new mongoose.Schema({
@@ -20,7 +21,9 @@ const ProductSchema = new mongoose.Schema({
       sizeOptions: [
         {
           size: { type: String, required: true },
-          quantity: { type: Number, required: true, default: 0 },
+          quantity: { type: Number, required: true, default: 0,
+            min: 0
+           },
           price: { type: Number, required: true },
           originalPrice: { type: Number, required: true },
         }
