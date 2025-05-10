@@ -54,7 +54,17 @@ exports.OrderController = {
         customerId: req.user._id,
         products: validatedProducts,
         totalAmount,
-        address,
+        address: {
+          firstName: billingAddress.firstName,
+          lastName: billingAddress.lastName,
+          address:  billingAddress.address,
+          email: billingAddress.email,
+          phone: billingAddress.phone,
+          postalCode: billingAddress.zipCode,
+          city: billingAddress.city,
+          state: billingAddress.state,
+          country: billingAddress.country,
+        },
         shippingInfo: JSON.stringify(shippingInfo),
       });
 

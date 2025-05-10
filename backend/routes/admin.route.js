@@ -1,28 +1,28 @@
-const router = require("express").Router();
+const express = require("express");
+const router = express.Router();
 const adminController = require("../controllers/admin.controller.js");
 
-// Dashboard and general routes
-router.get("/get", adminController.get);
-router.get("/dashboard-analytics", adminController.getDashboardAnalytics);
 
-// Product management routes
-router.post("/create-product", adminController.saveProduct);
-router.put("/update-product", adminController.updateProduct);
-router.delete("/remove-product", adminController.removeProduct);
-
-// Inventory management routes
+// Admin routes
+router.get("/", adminController.get);
 router.get("/inventory", adminController.getInventory);
-router.put("/inventory/update", adminController.updateInventory);
-
-// Order management routes
+router.get("/inventory/stats", adminController.getInventoryStats);
 router.get("/orders", adminController.getOrders);
-router.put("/orders/update", adminController.updateOrders);
-
-// Customer management routes
 router.get("/customers", adminController.getCustomers);
 router.get("/customers/:customerId", adminController.getCustomerDetails);
+router.get("/analytics", adminController.getDashboardAnalytics);
+router.get("/report", adminController.generateReport);
 
-// Notification routes
-router.post("/notifications/send", adminController.sendNotification);
+router.post("/add-product", adminController.saveProduct);
+router.post("/inventory/fix-issues", adminController.fixInventoryIssues);
+
+// Fix the route that was causing the error
+router.post("/inventory/update", adminController.updateInventoryItem);
+
+router.put("/orders/update", adminController.updateOrders);
+router.put("/update-product", adminController.updateProduct);
+router.put("/inventory/bulk-update", adminController.bulkUpdateInventory);
+
+router.delete("/remove-product", adminController.removeProduct);
 
 module.exports = router;

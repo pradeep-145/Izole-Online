@@ -1,4 +1,3 @@
-import React from "react";
 import {
   Navigate,
   Route,
@@ -44,15 +43,14 @@ function App() {
           <Route path="otp-verification" element={<OtpVerification />} />
           <Route path="products" element={<ProductList />} />
           <Route path="product/:id" element={<Product />} />
-
           <Route path="cart" element={<Cart />} />
           <Route path="checkout" element={<Checkout />} />
           <Route path="wishlist" element={<Wishlist />} />
           <Route path="shipping-status" element={<ShippingStatus />} />
           <Route path="orders" element={<OrderHistoryPage />} />
-          <Route path="orders/:id" element={<OrderDetailsPage />} />
+          <Route path="order/:orderId" element={<OrderDetailsPage />} />{" "}
+          {/* New route for order details */}
           <Route path="order-confirmation" element={<OrderConfirmation />} />
-
           <Route path="payment/redirect" element={<CashfreeRedirect />} />
           <Route path="payment-failed" element={<PaymentFailed />} />
           <Route path="notifications" element={<Notifications />} />

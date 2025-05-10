@@ -12,7 +12,7 @@ import {
   Search,
   Truck,
 } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { toast } from "react-hot-toast";
@@ -59,11 +59,16 @@ const ShippingManagement = () => {
             shippingDetails = {};
           }
 
+          // Format address object as a string
+          const formattedAddress = order.address
+            ? formatAddress(order.address)
+            : "N/A";
+
           return {
             id: order._id,
             orderNumber: `#${order._id.substring(0, 8)}`,
             customerName: order.customerId?.name || "Guest Customer",
-            customerAddress: order.address || "N/A",
+            customerAddress: formattedAddress,
             status: order.status,
             paymentStatus: order.paymentStatus,
             createdAt: new Date(order.createdAt),
@@ -92,6 +97,29 @@ const ShippingManagement = () => {
       toast.error("Failed to load shipment data");
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Helper function to format address object as a string
+  const formatAddress = (address) => {
+    if (!address) return "No address";
+    if (typeof address === "string") return address;
+
+    try {
+      const parts = [
+        address.firstName,
+        address.lastName,
+        address.address,
+        address.city,
+        address.state,
+        address.postalCode,
+        address.country,
+      ].filter(Boolean);
+
+      return parts.join(", ");
+    } catch (error) {
+      console.error("Error formatting address:", error);
+      return "Invalid address format";
     }
   };
 

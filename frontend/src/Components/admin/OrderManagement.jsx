@@ -23,6 +23,7 @@ const OrderManagement = () => {
   const [isUpdating, setIsUpdating] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [expandedOrders, setExpandedOrders] = useState({});
+  const [isExporting, setIsExporting] = useState(false);
 
   // Get status color and icon
   const getStatusDetails = (status) => {
@@ -181,6 +182,246 @@ const OrderManagement = () => {
     }
   };
 
+  // Print order details
+  const handlePrint = () => {
+    const printContent = document.createElement("div");
+    printContent.className = "p-8";
+
+    const header = document.createElement("div");
+    header.innerHTML = `
+      <h1 class="text-2xl font-bold mb-4">Orders Report</h1>
+      <p class="mb-4">Generated: ${new Date().toLocaleString()}</p>
+      <p class="mb-6">Filtered by: ${filter === "all" ? "All Orders" : filter}</p>
+      <hr class="mb-6">
+    `;
+    printContent.appendChild(header);
+
+    const ordersTable = document.createElement("table");
+    ordersTable.className = "w-full border-collapse";
+    ordersTable.innerHTML = `
+      <thead>
+        <tr>
+          <th class="border border-gray-300 p-2 text-left">Order ID</th>
+          <th class="border border-gray-300 p-2 text-left">Customer</th>
+          <th class="border border-gray-300 p-2 text-left">Date</th>
+          <th class="border border-gray-300 p-2 text-left">Status</th>
+          <th class="border border-gray-300 p-2 text-left">Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${filteredOrders.map(order => `
+          <tr>
+            <td class="border border-gray-300 p-2">#${order._id.slice(-6)}</td>
+            <td class="border border-gray-300 p-2">${order.customerId?.name || "Unknown"}</td>
+            <td class="border border-gray-300 p-2">${formatDate(order.createdAt)}</td>
+            <td class="border border-gray-300 p-2">${order.status}</td>
+            <td class="border border-gray-300 p-2">₹${order.totalAmount?.toFixed(2) || "0.00"}</td>
+          </tr>
+        `).join("")}
+      </tbody>
+    `;
+    printContent.appendChild(ordersTable);
+
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Order Report - ${new Date().toLocaleDateString()}</title>
+          <style>
+            body { font-family: Arial, sans-serif; }
+            table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+            th { background-color: #f2f2f2; }
+            h1 { margin-bottom: 10px; }
+          </style>
+        </head>
+        <body>
+          ${printContent.outerHTML}
+        </body>
+      </html>
+    `);
+
+    printWindow.document.close();
+    printWindow.focus();
+
+    setTimeout(() => {
+      printWindow.print();
+    }, 500);
+  };
+
+  // Export orders as CSV
+  const exportOrdersCSV = () => {
+    setIsExporting(true);
+
+    try {
+      const csvData = [
+        ["Order ID", "Customer Name", "Customer Email", "Date", "Status", "Payment Status", "Address", "Items", "Total Amount"]
+      ];
+
+      filteredOrders.forEach(order => {
+        const itemsSummary = order.products ? 
+          order.products.map(p => `${p.name}(${p.color},${p.size}) x${p.quantity}`).join("; ") : 
+          "No items";
+
+        csvData.push([
+          `#${order._id.slice(-6)}`,
+          order.customerId?.name || "Unknown",
+          order.customerId?.email || "No email",
+          formatDate(order.createdAt),
+          order.status,
+          order.paymentStatus || "Unknown",
+          formatAddress(order.address).replace(/,/g, ";"),
+          itemsSummary,
+          `₹${order.totalAmount?.toFixed(2) || "0.00"}`
+        ]);
+      });
+
+      const csvString = csvData.map(row => 
+        row.map(cell => 
+          `"${String(cell).replace(/"/g, '""')}"`
+        ).join(',')
+      ).join('\n');
+
+      const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.setAttribute('href', url);
+      link.setAttribute('download', `orders-export-${new Date().toISOString().slice(0,10)}.csv`);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error("Error exporting orders:", error);
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  // Print a single order detail
+  const printOrderDetail = (order) => {
+    if (!order) return;
+
+    const printWindow = window.open('', '_blank');
+    const shippingInfo = parseShippingInfo(order.shippingInfo);
+    const shippingCost = order.shippingCharge || (shippingInfo?.rate || 0);
+
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Order #${order._id.slice(-6)}</title>
+          <style>
+            body { font-family: Arial, sans-serif; padding: 20px; max-width: 800px; margin: 0 auto; }
+            .header { display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 20px; margin-bottom: 20px; }
+            .order-id { font-size: 24px; font-weight: bold; color: #2563eb; }
+            .section { margin-bottom: 25px; }
+            .section-title { font-size: 16px; color: #666; margin-bottom: 5px; }
+            .items-table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+            .items-table th, .items-table td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+            .items-table th { background-color: #f9fafb; }
+            .total-row { font-weight: bold; }
+            .address { line-height: 1.5; }
+            .status-badge { display: inline-block; padding: 5px 10px; border-radius: 9999px; font-size: 14px; font-weight: 600; }
+            .status-pending { background-color: #fef3c7; color: #92400e; }
+            .status-processing { background-color: #dbeafe; color: #1e40af; }
+            .status-shipped { background-color: #ede9fe; color: #5b21b6; }
+            .status-delivered { background-color: #d1fae5; color: #065f46; }
+            .status-cancelled { background-color: #fee2e2; color: #b91c1c; }
+            .footer { margin-top: 40px; font-size: 12px; color: #666; text-align: center; border-top: 1px solid #eee; padding-top: 20px; }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <div>
+              <div class="order-id">Order #${order._id.slice(-6)}</div>
+              <div>${formatDate(order.createdAt)}</div>
+            </div>
+            <div>
+              <span class="status-badge status-${order.status.toLowerCase()}">${order.status}</span>
+            </div>
+          </div>
+          
+          <div class="section">
+            <div class="section-title">Customer Information</div>
+            <div>${order.customerId?.name || "Unknown Customer"}</div>
+            <div>${order.customerId?.email || "No email"}</div>
+            <div>${order.customerId?.phoneNumber || ""}</div>
+          </div>
+          
+          <div class="section">
+            <div class="section-title">Shipping Address</div>
+            <div class="address">${formatAddress(order.address)}</div>
+          </div>
+          
+          ${order.awb ? `
+            <div class="section">
+              <div class="section-title">Shipping Details</div>
+              <div>AWB: ${order.awb}</div>
+              ${order.shipmentId ? `<div>Shipment ID: ${order.shipmentId}</div>` : ''}
+              ${order.pickupDate ? `<div>Pickup Date: ${formatDate(order.pickupDate)}</div>` : ''}
+              ${order.estimatedDeliveryDate ? `<div>Estimated Delivery: ${formatDate(order.estimatedDeliveryDate)}</div>` : ''}
+              ${shippingInfo ? `<div>Courier: ${shippingInfo.courier_name || "Standard Shipping"}</div>` : ''}
+            </div>
+          ` : ''}
+          
+          <div class="section">
+            <div class="section-title">Order Items</div>
+            <table class="items-table">
+              <thead>
+                <tr>
+                  <th>Item</th>
+                  <th>Variant</th>
+                  <th>Quantity</th>
+                  <th>Price</th>
+                  <th>Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${order.products ? 
+                  order.products.map(item => `
+                    <tr>
+                      <td>${item.name}</td>
+                      <td>${item.color}, ${item.size}</td>
+                      <td>${item.quantity}</td>
+                      <td>₹${item.price?.toFixed(2)}</td>
+                      <td>₹${(item.price * item.quantity).toFixed(2)}</td>
+                    </tr>
+                  `).join('') : 
+                  '<tr><td colspan="5">No items</td></tr>'
+                }
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td colspan="4" style="text-align: right;">Subtotal</td>
+                  <td>₹${order.totalAmount?.toFixed(2) || "0.00"}</td>
+                </tr>
+                <tr>
+                  <td colspan="4" style="text-align: right;">Shipping</td>
+                  <td>${shippingCost > 0 ? `₹${shippingCost.toFixed(2)}` : "Free"}</td>
+                </tr>
+                <tr class="total-row">
+                  <td colspan="4" style="text-align: right;">Total</td>
+                  <td>₹${order.totalAmount?.toFixed(2) || "0.00"}</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+          
+          <div class="footer">
+            This is a computer-generated document and requires no signature. Generated on ${new Date().toLocaleString()}.
+          </div>
+        </body>
+      </html>
+    `);
+
+    printWindow.document.close();
+    printWindow.focus();
+
+    setTimeout(() => {
+      printWindow.print();
+    }, 500);
+  };
+
   return (
     <div className="bg-white rounded-lg shadow-md">
       <div className="p-6 border-b border-gray-200 flex justify-between items-center">
@@ -193,13 +434,20 @@ const OrderManagement = () => {
           </p>
         </div>
         <div className="flex gap-2">
-          <button className="px-3 py-2 bg-white border border-gray-300 rounded-md text-sm flex items-center hover:bg-gray-50 transition-colors">
+          <button 
+            className="px-3 py-2 bg-white border border-gray-300 rounded-md text-sm flex items-center hover:bg-gray-50 transition-colors"
+            onClick={handlePrint}
+          >
             <Printer className="w-4 h-4 mr-2" />
             Print
           </button>
-          <button className="px-3 py-2 bg-white border border-gray-300 rounded-md text-sm flex items-center hover:bg-gray-50 transition-colors">
+          <button 
+            className="px-3 py-2 bg-white border border-gray-300 rounded-md text-sm flex items-center hover:bg-gray-50 transition-colors"
+            onClick={exportOrdersCSV}
+            disabled={isExporting}
+          >
             <Download className="w-4 h-4 mr-2" />
-            Export
+            {isExporting ? "Exporting..." : "Export"}
           </button>
         </div>
       </div>
@@ -457,6 +705,19 @@ const OrderManagement = () => {
         <div className="w-full md:w-1/3 border-l border-gray-200">
           {selectedOrder ? (
             <div className="p-6">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-medium text-gray-900">
+                  Order Details
+                </h3>
+                <button 
+                  className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full"
+                  onClick={() => printOrderDetail(selectedOrder)}
+                  title="Print order details"
+                >
+                  <Printer className="w-4 h-4" />
+                </button>
+              </div>
+
               <h3 className="text-lg font-medium text-gray-900 mb-4">
                 Order Details
               </h3>
