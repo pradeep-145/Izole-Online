@@ -349,7 +349,6 @@ exports.OrderController = {
       res.status(200).json({
         success: true,
         order,
-        shiprocketToken: token,
         message: "Payment confirmed successfully",
       });
     } catch (error) {
@@ -357,6 +356,7 @@ exports.OrderController = {
       res.status(500).json({
         success: false,
         message: "Error in confirming payment",
+        error:error
       });
     }
   },
