@@ -8,7 +8,7 @@ export default defineConfig({
     proxy: {
       // Proxy API requests to the backend server during development
       "/api": {
-        target: "http://localhost:1220", // Your backend API address
+        target: "https://6wceq59nse.execute-api.ap-south-1.amazonaws.com", // Your backend API address
         changeOrigin: true,
         secure: false,
       },

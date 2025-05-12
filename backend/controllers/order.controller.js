@@ -202,6 +202,8 @@ exports.OrderController = {
 
       // Now create payment session with Cashfree
       try {
+        console.log(process.env.CASHFREE_CLIENT_ID);
+        console.log(process.env.CASHFREE_CLIENT_SECRET);
         const cashfree = await axios.post(
           "https://sandbox.cashfree.com/pg/orders",
           {
