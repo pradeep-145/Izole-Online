@@ -16,7 +16,7 @@ router.post("/add-product", adminController.saveProduct);
 router.post("/inventory/fix-issues", adminController.fixInventoryIssues);
 
 // Fix the route that was causing the error
-router.post("/inventory/update", adminController.updateInventoryItem);
+router.put("/inventory/update", adminController.updateInventoryItem);
 
 router.put("/orders/update", adminController.updateOrders);
 router.put("/update-product", adminController.updateProduct);

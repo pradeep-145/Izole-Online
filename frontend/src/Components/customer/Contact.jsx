@@ -12,7 +12,7 @@ const Contact = () => {
     message: "",
   });
   const [loading, setLoading] = useState(false);
-
+  const [error, setError] = useState(null);
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -29,18 +29,11 @@ const Contact = () => {
       );
 
       if (response.status === 200) {
-        toast.success(
-          "Message sent successfully! We'll get back to you soon.",
-          {
-            position: "top-right",
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-          }
-        );
+        setError(false)
 
+        setTimeout(() => {
+          setError(null)
+        }, 3000);
         // Reset form after successful submission
         setFormData({
           name: "",
@@ -51,18 +44,7 @@ const Contact = () => {
       }
     } catch (error) {
       console.error("Error sending message:", error);
-      toast.error(
-        error.response?.data?.message ||
-          "Failed to send message. Please try again later.",
-        {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-        }
-      );
+      setError(true)
     } finally {
       setLoading(false);
     }
@@ -226,7 +208,14 @@ const Contact = () => {
                     </>
                   ) : (
                     <>
-                      Send Message <Send className="h-5 w-5" />
+                      {error==null ? (
+                        <span>Send Message</span>
+                      ) : error ? (
+                        <span className="text-red-500">Error Sending</span>
+                      ) : (
+                        <span className="text-green-500">Message Sent</span>
+                      )}
+                      <Send className="h-5 w-5" />
                     </>
                   )}
                 </button>
