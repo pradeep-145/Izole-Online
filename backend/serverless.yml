@@ -6,7 +6,7 @@ provider:
   region: ap-south-1  # Change to your preferred region
   memorySize: 512
   timeout: 30
-  stage: dev  # Define the stage (e.g., dev, prod)
+  stage: prod
   environment:
     MONGO_URI: ${env:MONGO_URI}
     SECRET_KEY: ${env:SECRET_KEY}
