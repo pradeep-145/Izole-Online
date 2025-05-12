@@ -131,6 +131,7 @@ export const useOrders = create(
           const response = await axios.post("https://6wceq59nse.execute-api.ap-south-1.amazonaws.com/api/orders", orderData, {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
+              'shiprocketToken': localStorage.getItem('shiprocketToken'),
               "Content-Type": "application/json",
             },
           });
@@ -166,6 +167,7 @@ export const useOrders = create(
               headers: {
                 Authorization: `Bearer ${localStorage.getItem("token")}`,
                 "Content-Type": "application/json",
+                'shiprocketToken': localStorage.getItem('shiprocketToken')
               },
             }
           );

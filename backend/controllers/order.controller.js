@@ -260,6 +260,7 @@ exports.OrderController = {
           products: order.products,
           paymentLink: order.paymentLink,
         },
+        shiprocketToken:token,
         paymentSessionId: order.paymentSessionId,
         message: "Order created successfully",
       });
@@ -347,6 +348,7 @@ exports.OrderController = {
       res.status(200).json({
         success: true,
         order,
+        shiprocketToken: token,
         message: "Payment confirmed successfully",
       });
     } catch (error) {
@@ -523,6 +525,7 @@ exports.OrderController = {
       res.status(200).json({
         success: true,
         order: order,
+        shiprocketToken: token,
         message: "Order cancelled successfully",
       });
     } catch (error) {

@@ -33,6 +33,8 @@ const {clearCart}= useCart()
             {
               headers: {
                 Authorization: `Bearer ${localStorage.getItem("token")}`,
+                'shiprocketToken': localStorage.getItem('shiprocketToken'),
+                "Content-Type": "application/json",
               },
             }
           );

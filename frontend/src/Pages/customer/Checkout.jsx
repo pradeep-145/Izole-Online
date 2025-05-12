@@ -219,6 +219,12 @@ const CheckoutPage = () => {
         delivery_postcode: formData.zipCode,
         weight: calculateTotalWeight(),
         cod: 0, // Assuming all orders are prepaid based on your implementation
+      },{
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          'shiprocketToken': localStorage.getItem("shiprocketToken"),
+          "Content-Type": "application/json",
+        },
       });
       console.log("Serviceability response:", response.data);
 
@@ -294,6 +300,12 @@ const CheckoutPage = () => {
           estimated_delivery_days: selectedCourier.estimated_delivery_days,
           weight: calculateTotalWeight()
         } 
+      },{
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          'shiprocketToken':`Bearer ${localStorage.getItem("shiprocketToken")}`, 
+          "Content-Type": "application/json",
+        },
       });
       
       // Stop the timer when proceeding to payment
@@ -323,6 +335,12 @@ const CheckoutPage = () => {
         } else if (result.success) {
           const payment = await axios.post("https://6wceq59nse.execute-api.ap-south-1.amazonaws.com/api/orders/confirm-order", {
             orderId: response.data.order._id,
+          },{
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+              "Content-Type": "application/json",
+              'shiprocketToken': localStorage.getItem("shiprocketToken"),
+            },
           });
           console.log(payment.data);
 

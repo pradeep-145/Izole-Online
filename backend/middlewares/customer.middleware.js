@@ -3,26 +3,20 @@ const customerModel = require("../models/customer.model.js");
 
 const authenticateJWT = async (req, res, next) => {
   try {
-    const cookies = req.headers["cookie"];
-    if (!cookies) {
-      throw new Error("Cookie header is missing");
+    if (!req.headers["authorization"]) {
+      throw new Error("Authorization header is missing");
     }
 
-    // Extract the jwt token from the cookies
-    const jwtCookie = cookies
-      .split("; ")
-      .find((cookie) => cookie.startsWith("jwt="));
-    const shiprocketCookie = cookies
-      .split("; ")
-      .find((cookie) => cookie.startsWith("shiprocket="));
-    if (!jwtCookie) {
-      throw new Error("JWT token not found in cookies");
-    }
+    const token = req.headers["authorization"].split(" ")[1];
 
-    const token = jwtCookie.split("=")[1];
-    console.log(token);
     if (!token) {
       throw new Error("Token is empty");
+    }
+
+    // Check if shiprocketToken exists in headers
+    let shiprocketToken = null;
+    if (req.headers["shiprocketToken"]) {
+      shiprocketToken = req.headers["shiprocketToken"].split(" ")[1];
     }
 
     const decoded = await JwtService.verifyToken(token);
@@ -34,11 +28,9 @@ const authenticateJWT = async (req, res, next) => {
     if (!user) {
       throw new Error("User not found");
     }
-    if (shiprocketCookie) {
-      req.shiproketToken = shiprocketCookie.split("=")[1];
-    } else {
-      req.shiproketToken = null;
-    }
+
+    // Fixed variable name from shiproketToken to shiprocketToken
+    req.shiprocketToken = shiprocketToken;
     req.user = user;
     next();
   } catch (error) {
