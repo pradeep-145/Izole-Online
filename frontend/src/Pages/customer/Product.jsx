@@ -895,13 +895,13 @@ const Product = () => {
               <h2 className="card-title text-2xl text-wineRed">
                 Customer Reviews
               </h2>
-              <button
+             { authUser&& <button
                 onClick={() => setOpen(true)}
                 className="btn btn-primary bg-wineRed text-mustard border-wineRed hover:bg-mustard hover:text-wineRed transition-colors duration-300"
               >
                 Write a Review
               </button>
-            </div>
+}</div>
 
             {/* Review Summary */}
             <div className="flex flex-col md:flex-row gap-6 pb-6 border-b border-gray-200">

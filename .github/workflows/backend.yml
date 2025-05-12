@@ -52,6 +52,12 @@ jobs:
           MONGO_URI: ${{ secrets.MONGO_URI }}
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
           SCHEDULER_ROLE_ARN: ${{ secrets.SCHEDULER_ROLE_ARN }} # Add the scheduler role ARN
+          CASHFREE_CLIENT_ID: ${{ secrets.CASHFREE_CLIENT_ID }} # Add the Cashfree client ID
+          CASHFREE_CLIENT_SECRET: ${{ secrets.CASHFREE_SECRET_KEY }} # Add the Cashfree secret key
+          EMAIL: ${{ secrets.EMAIL }} # Add the email
+          PASSWORD: ${{ secrets.PASSWORD }} # Add the password
+          SHIPROCKET_EMAIL: ${{ secrets.SHIPROCKET_EMAIL }} # Add the Shiprocket email
+          SHIPROCKET_PASSWORD: ${{ secrets.SHIPROCKET_PASSWORD }} # Add the Shiprocket password
           LAMBDA_ARN: ${{ secrets.LAMBDA_ARN }} # Add the Lambda ARN
         run: |
           cd backend

@@ -139,6 +139,7 @@ const OrderHistoryPage = () => {
         status: "Order Placed",
         completed: true,
         date: order.createdAt ? formatDate(order.createdAt) : "N/A",
+        icon: <Calendar size={16} />,
       },
       {
         status: "Payment Confirmed",
@@ -147,6 +148,7 @@ const OrderHistoryPage = () => {
           order.paymentStatus === "COMPLETED"
             ? formatDate(order.updatedAt)
             : "N/A",
+        icon: <Check size={16} />,
       },
       {
         status: "Processing",
@@ -155,11 +157,13 @@ const OrderHistoryPage = () => {
         ),
         date:
           order.status === "Processing" ? formatDate(order.updatedAt) : "N/A",
+        icon: <Box size={16} />,
       },
       {
         status: "Shipped",
         completed: ["Shipped", "Delivered"].includes(order.status),
         date: order.pickupDate ? formatDate(order.pickupDate) : "N/A",
+        icon: <Truck size={16} />,
       },
       {
         status: "Delivered",
@@ -170,6 +174,7 @@ const OrderHistoryPage = () => {
             : order.estimatedDeliveryDate
             ? `Est. ${formatDate(order.estimatedDeliveryDate)}`
             : "N/A",
+        icon: <Check size={16} />,
       },
     ];
     return statusSteps;
@@ -383,32 +388,61 @@ const OrderHistoryPage = () => {
                             className="flex mb-4 items-start transition-all duration-300 hover:translate-x-1"
                           >
                             <div
-                              className={`rounded-full h-6 w-6 flex items-center justify-center mr-3 transition-colors duration-300 ${
+                              className={`rounded-full h-6 w-6 flex items-center justify-center mr-3 transition-colors duration-300 shadow-sm z-10 ${
                                 step.completed
                                   ? "bg-wineRed text-white"
-                                  : "bg-gray-200"
+                                  : "bg-gray-200 text-gray-500"
                               }`}
                             >
-                              {getStatusIcon(step.status)}
+                              {step.icon}
                             </div>
                             <div className="flex-1">
                               <p
                                 className={`font-medium ${
                                   step.completed
                                     ? "text-gray-800"
-                                    : "text-gray-300"
+                                    : "text-gray-400"
                                 }`}
                               >
                                 {step.status}
                               </p>
-                              <p className="text-sm text-gray-500">
+                              <p
+                                className={`text-sm ${
+                                  step.completed
+                                    ? "text-green-600"
+                                    : "text-gray-500"
+                                }`}
+                              >
+                                {step.completed && step.date !== "N/A"
+                                  ? "✓ "
+                                  : ""}
                                 {step.date}
                               </p>
                             </div>
                           </div>
                         )
                       )}
+
+                      {/* Progress line connecting all steps */}
                       <div className="absolute top-0 left-3 w-px bg-gray-300 h-full -z-10 transform -translate-x-1/2"></div>
+
+                      {/* Colored progress based on order status */}
+                      <div
+                        className="absolute top-0 left-3 w-px bg-wineRed h-0 -z-10 transform -translate-x-1/2 transition-all duration-700"
+                        style={{
+                          height: `${
+                            selectedOrder.status === "Delivered"
+                              ? "100%"
+                              : selectedOrder.status === "Shipped"
+                              ? "75%"
+                              : selectedOrder.status === "Processing"
+                              ? "50%"
+                              : selectedOrder.paymentStatus === "COMPLETED"
+                              ? "25%"
+                              : "10%"
+                          }`,
+                        }}
+                      ></div>
                     </div>
                   </div>
 

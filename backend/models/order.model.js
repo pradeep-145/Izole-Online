@@ -96,6 +96,7 @@ const orderSchema = new mongoose.Schema(
     paymentSessionId: String,
     paymentLink: String,
     schedulerName: String,
+    transactionId: String,
     shipmentId:{
       type:Number,
     },

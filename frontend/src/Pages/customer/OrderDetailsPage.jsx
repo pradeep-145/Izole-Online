@@ -375,11 +375,11 @@ const OrderDetailsPage = () => {
                 <p className="font-medium">{currentOrder.shipmentId}</p>
               </div>
             )}
-            {currentOrder.paymentSessionId && (
+            {currentOrder.transactionId && (
               <div className="text-sm mt-2">
                 <p className="text-gray-500">Payment Reference:</p>
                 <p className="font-medium text-xs break-words">
-                  {currentOrder.paymentSessionId}
+                  {currentOrder.transactionId}
                 </p>
               </div>
             )}
@@ -431,32 +431,80 @@ const OrderDetailsPage = () => {
               </h3>
 
               <div className="relative">
-                {generateOrderTimeline(currentOrder).map((step, index) => (
-                  <div
-                    key={`status-${index}`}
-                    className={`flex mb-6 items-start ${
-                      !step.completed && "opacity-60"
-                    }`}
-                  >
+                {generateOrderTimeline(currentOrder).map(
+                  (step, index, array) => (
                     <div
-                      className={`rounded-full h-8 w-8 flex items-center justify-center mr-4 ${
-                        step.completed
-                          ? "bg-wineRed text-white"
-                          : "bg-gray-200 text-gray-400"
+                      key={`status-${index}`}
+                      className={`flex mb-6 items-start transition-all duration-300 ${
+                        !step.completed && "opacity-60"
                       }`}
                     >
-                      {step.icon}
+                      <div
+                        className={`rounded-full h-8 w-8 flex items-center justify-center mr-4 
+                        ${
+                          step.completed
+                            ? "bg-wineRed text-white"
+                            : "bg-gray-200 text-gray-400"
+                        } shadow-sm z-10`}
+                      >
+                        {step.icon}
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-medium text-gray-800">
+                          {step.status}
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          {step.description}
+                        </p>
+                        <p
+                          className={`text-xs mt-1 ${
+                            step.completed
+                              ? "text-green-600 font-medium"
+                              : "text-gray-500"
+                          }`}
+                        >
+                          {step.completed && step.date !== "Completed"
+                            ? "✓ "
+                            : ""}
+                          {step.date}
+                        </p>
+                      </div>
+
+                      {/* Show estimated time remaining for pending steps */}
+                      {!step.completed &&
+                        step.status === "Delivered" &&
+                        currentOrder.estimatedDeliveryDate && (
+                          <div className="text-xs bg-blue-50 text-blue-700 px-2 py-1 rounded-full">
+                            Est.{" "}
+                            {formatDate(currentOrder.estimatedDeliveryDate)}
+                          </div>
+                        )}
                     </div>
-                    <div className="flex-1">
-                      <p className="font-medium text-gray-800">{step.status}</p>
-                      <p className="text-sm text-gray-600">
-                        {step.description}
-                      </p>
-                      <p className="text-xs text-gray-500 mt-1">{step.date}</p>
-                    </div>
-                  </div>
-                ))}
-                <div className="absolute top-0 left-4 w-px bg-gray-300 h-[calc(100%-2rem)] -z-10 transform -translate-x-1/2"></div>
+                  )
+                )}
+
+                {/* Progress line connecting all steps */}
+                <div className="absolute top-0 left-4 w-1 bg-gray-200 h-[calc(100%-2rem)] -z-10 transform -translate-x-1/2"></div>
+
+                {/* Colored progress line based on order progress */}
+                <div
+                  className="absolute top-0 left-4 w-1 bg-wineRed h-[calc(100%-2rem)] -z-10 transform -translate-x-1/2 transition-all duration-500"
+                  style={{
+                    height: `${
+                      currentOrder.status === "Delivered"
+                        ? "100%"
+                        : currentOrder.status === "Out for Delivery"
+                        ? "80%"
+                        : currentOrder.status === "Shipped"
+                        ? "60%"
+                        : currentOrder.status === "Processing"
+                        ? "40%"
+                        : currentOrder.paymentStatus === "COMPLETED"
+                        ? "20%"
+                        : "10%"
+                    }`,
+                  }}
+                ></div>
               </div>
             </div>
 

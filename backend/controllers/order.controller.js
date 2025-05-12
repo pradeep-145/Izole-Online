@@ -233,10 +233,10 @@ exports.OrderController = {
             },
           }
         );
-
+        console.log(cashfree);
         // Save payment information
         paymentSessionId = cashfree.data.payment_session_id;
-        paymentLink = `https://sandbox.cashfree.com/pg/view/order/${orderId}/${cashfree.data.payment_session_id}`;
+        paymentLink = `https://sandbox.cashfree.com/pg/order/${orderId}/${cashfree.data.payment_session_id}`;
         order.paymentSessionId = paymentSessionId;
         order.paymentLink = paymentLink;
         order.schedulerName = schedulerName;
@@ -285,6 +285,7 @@ exports.OrderController = {
           },
         }
       );
+      console.log(response);
 
       if (response.data[0].payment_status !== "SUCCESS") {
         return res.status(400).json({
@@ -293,6 +294,8 @@ exports.OrderController = {
         });
       }
       const order = await orderModel.findById(orderId);
+      order.transactionId =
+        response.data[0].cf_payment_id;
       const awb={
         shipment_id: order.shipmentId,
         courier_id: JSON.parse(order.shippingInfo).courier_company_id,
