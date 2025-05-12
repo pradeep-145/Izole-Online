@@ -175,13 +175,14 @@ exports.OrderController = {
         height: 7,
         weight: shippingInfo.weight,
       };
-
+      var shiprocketToken;
       try {
         console.log(req.shiprocketToken);
         const { data, token } = await createOrder(
           req.shiprocketToken,
           shiprocketOrder
         );
+        shiprocketToken = token;
         console.log("Shiprocket order response:", data);
         // Save Shiprocket data to order if needed
         order.shipmentOrderId = data?.order_id || null;
@@ -260,7 +261,7 @@ exports.OrderController = {
           products: order.products,
           paymentLink: order.paymentLink,
         },
-        shiprocketToken:token,
+        shiprocketToken:shiprocketToken,
         paymentSessionId: order.paymentSessionId,
         message: "Order created successfully",
       });
