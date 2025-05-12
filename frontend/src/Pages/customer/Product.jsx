@@ -53,7 +53,7 @@ const Product = () => {
         const cleanProductId = id?.split("?")[0]; // Remove any query params from ID
 
         // Call the API to fetch product data
-        const response = await axios.get(`https://6wceq59nse.execute-api.ap-south-1.amazonaws.com/api/products/get/${cleanProductId}`);
+        const response = await axios.get(`https://uzlmegb12i.execute-api.ap-south-1.amazonaws.com/api/products/get/${cleanProductId}`);
         console.log("Product response:", response.data);
 
         // Check if response has data and adapt to various response formats
@@ -1089,7 +1089,7 @@ const Product = () => {
         productName={product?.name}
         onSubmit={async (reviewData) => {
           try {
-            await axios.post("https://6wceq59nse.execute-api.ap-south-1.amazonaws.com/api/products/add-review", {
+            await axios.post("https://uzlmegb12i.execute-api.ap-south-1.amazonaws.com/api/products/add-review", {
               productId: product._id,
               review: reviewData.review,
               rating: reviewData.rating,

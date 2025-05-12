@@ -20,7 +20,7 @@ export const useWishlist = create(
         set({ isLoading: true, error: null });
         try {
           const response = await axios.post(
-            "https://6wceq59nse.execute-api.ap-south-1.amazonaws.com/api/wishlist/add",
+            "https://uzlmegb12i.execute-api.ap-south-1.amazonaws.com/api/wishlist/add",
             { productId: product._id },
             {
               headers: {
@@ -58,7 +58,7 @@ export const useWishlist = create(
       removeFromWishlist: async (productId) => {
         set({ isLoading: true, error: null });
         try {
-          await axios.delete("https://6wceq59nse.execute-api.ap-south-1.amazonaws.com/api/wishlist/remove", {
+          await axios.delete("https://uzlmegb12i.execute-api.ap-south-1.amazonaws.com/api/wishlist/remove", {
             data: { productId },
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -127,7 +127,7 @@ export const useWishlist = create(
         fetchPromise = new Promise(async (resolve) => {
           try {
             console.log("Fetching wishlist from backend...");
-            const response = await axios.get("https://6wceq59nse.execute-api.ap-south-1.amazonaws.com/api/wishlist/get", {
+            const response = await axios.get("https://uzlmegb12i.execute-api.ap-south-1.amazonaws.com/api/wishlist/get", {
               headers: {
                 Authorization: `Bearer ${localStorage.getItem("token")}`,
                 "Content-Type": "application/json",
@@ -167,7 +167,7 @@ export const useWishlist = create(
       clearWishlist: async () => {
         set({ isLoading: true, error: null });
         try {
-          await axios.delete("https://6wceq59nse.execute-api.ap-south-1.amazonaws.com/api/wishlist/clear", {
+          await axios.delete("https://uzlmegb12i.execute-api.ap-south-1.amazonaws.com/api/wishlist/clear", {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
               "Content-Type": "application/json",

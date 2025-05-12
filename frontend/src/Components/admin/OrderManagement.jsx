@@ -65,7 +65,7 @@ const OrderManagement = () => {
   const fetchOrders = async () => {
     setLoading(true);
     try {
-      const response = await axios.get("https://6wceq59nse.execute-api.ap-south-1.amazonaws.com/api/admin/orders", {
+      const response = await axios.get("https://uzlmegb12i.execute-api.ap-south-1.amazonaws.com/api/admin/orders", {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
         },
@@ -83,7 +83,7 @@ const OrderManagement = () => {
     setIsUpdating(true);
     try {
       await axios.put(
-        "https://6wceq59nse.execute-api.ap-south-1.amazonaws.com/api/admin/orders/update",
+        "https://uzlmegb12i.execute-api.ap-south-1.amazonaws.com/api/admin/orders/update",
         { orderId, status },
         {
           headers: {

@@ -39,7 +39,7 @@ const ShippingManagement = () => {
     setLoading(true);
     try {
       // Fetch orders with shipment details
-      const response = await axios.get("/api/admin/orders", {
+      const response = await axios.get("https://uzlmegb12i.execute-api.ap-south-1.amazonaws.com/api/admin/orders", {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
         },
@@ -175,7 +175,7 @@ const ShippingManagement = () => {
 
       // Make API call to reschedule pickup
       await axios.put(
-        `/api/admin/shipments/reschedule/${selectedShipment.id}`,
+        `https://uzlmegb12i.execute-api.ap-south-1.amazonaws.com/api/admin/shipments/reschedule/${selectedShipment.id}`,
         {
           pickupDate: formattedDate,
           shipmentId: selectedShipment.id,
@@ -183,6 +183,7 @@ const ShippingManagement = () => {
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
+            'shiprocketToken': localStorage.getItem('shiprocketToken'),
           },
         }
       );

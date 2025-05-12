@@ -40,7 +40,7 @@ export const useOrders = create(
         set({ isLoading: true, error: null });
 
         fetchOrdersPromise = axios
-          .get("https://6wceq59nse.execute-api.ap-south-1.amazonaws.com/api/orders/get-orders", {
+          .get("https://uzlmegb12i.execute-api.ap-south-1.amazonaws.com/api/orders/get-orders", {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
               "Content-Type": "application/json",
@@ -89,7 +89,7 @@ export const useOrders = create(
         set({ isLoading: true, error: null });
 
         fetchOrderDetailsPromise[orderId] = axios
-          .get(`https://6wceq59nse.execute-api.ap-south-1.amazonaws.com/api/orders/get/${orderId}`, {
+          .get(`https://uzlmegb12i.execute-api.ap-south-1.amazonaws.com/api/orders/get/${orderId}`, {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
               "Content-Type": "application/json",
@@ -128,7 +128,7 @@ export const useOrders = create(
       placeOrder: async (orderData) => {
         set({ isLoading: true, error: null });
         try {
-          const response = await axios.post("https://6wceq59nse.execute-api.ap-south-1.amazonaws.com/api/orders", orderData, {
+          const response = await axios.post("https://uzlmegb12i.execute-api.ap-south-1.amazonaws.com/api/orders", orderData, {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
               'shiprocketToken': localStorage.getItem('shiprocketToken'),
@@ -161,7 +161,7 @@ export const useOrders = create(
         set({ isLoading: true, error: null });
         try {
           const response = await axios.post(
-            `https://6wceq59nse.execute-api.ap-south-1.amazonaws.com/api/orders/cancel-order/${orderId}`,
+            `https://uzlmegb12i.execute-api.ap-south-1.amazonaws.com/api/orders/cancel-order/${orderId}`,
             { reason },
             {
               headers: {

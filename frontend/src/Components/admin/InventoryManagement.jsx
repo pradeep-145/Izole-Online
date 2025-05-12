@@ -49,7 +49,7 @@ const InventoryManagement = () => {
   const fetchInventory = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await axios.get("https://6wceq59nse.execute-api.ap-south-1.amazonaws.com/api/admin/inventory", {
+      const response = await axios.get("https://uzlmegb12i.execute-api.ap-south-1.amazonaws.com/api/admin/inventory", {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
         },
@@ -95,7 +95,7 @@ const InventoryManagement = () => {
   ) => {
     try {
       await axios.put(
-        "https://6wceq59nse.execute-api.ap-south-1.amazonaws.com/api/admin/inventory/update",
+        "https://uzlmegb12i.execute-api.ap-south-1.amazonaws.com/api/admin/inventory/update",
         { productId, variantIndex, sizeIndex, quantity },
         {
           headers: {

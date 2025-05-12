@@ -19,7 +19,7 @@ const CustomerLogin = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     await axios
-      .post("https://6wceq59nse.execute-api.ap-south-1.amazonaws.com/api/auth/sign-in", {
+      .post("https://uzlmegb12i.execute-api.ap-south-1.amazonaws.com/api/auth/sign-in", {
         username: formData.username,
         password: formData.password,
       })
@@ -35,7 +35,7 @@ const CustomerLogin = () => {
         }
         else{
           console.log("Hello")
-          // await axios.post('https://6wceq59nse.execute-api.ap-south-1.amazonaws.com/api/auth/send-otp', {
+          // await axios.post('https://uzlmegb12i.execute-api.ap-south-1.amazonaws.com/api/auth/send-otp', {
           //   customerId: res.data.authUser._id,
           //   email: res.data.authUser.email,
           // })

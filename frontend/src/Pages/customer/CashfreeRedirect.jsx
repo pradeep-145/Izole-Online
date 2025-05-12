@@ -28,7 +28,7 @@ const {clearCart}= useCart()
 
           // Confirm payment with the backend
           await axios.post(
-            "https://6wceq59nse.execute-api.ap-south-1.amazonaws.com/api/orders/confirm-payment",
+            "https://uzlmegb12i.execute-api.ap-south-1.amazonaws.com/api/orders/confirm-payment",
             { orderId: actualOrderId },
             {
               headers: {

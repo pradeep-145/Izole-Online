@@ -117,7 +117,7 @@ const ProductTable = () => {
 
         // API call to update product with removed variant
         await axios.put(
-          `${import.meta.env.VITE_SERVER_URL}https://6wceq59nse.execute-api.ap-south-1.amazonaws.com/api/products/${productId}`,
+          `${import.meta.env.VITE_SERVER_URL}https://uzlmegb12i.execute-api.ap-south-1.amazonaws.com/api/products/${productId}`,
           updatedProduct
         );
 

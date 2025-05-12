@@ -82,7 +82,7 @@ export default function CustomerProfile() {
     try {
       setOrdersLoading(true);
       const token = localStorage.getItem("token");
-      const response = await axios.get("https://6wceq59nse.execute-api.ap-south-1.amazonaws.com/api/customer/orders", {
+      const response = await axios.get("https://uzlmegb12i.execute-api.ap-south-1.amazonaws.com/api/customer/orders", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setOrderHistory(response.data.orders || []);
@@ -136,7 +136,7 @@ export default function CustomerProfile() {
       }
 
       const response = await axios.put(
-        "https://6wceq59nse.execute-api.ap-south-1.amazonaws.com/api/customer/profile",
+        "https://uzlmegb12i.execute-api.ap-south-1.amazonaws.com/api/customer/profile",
         formDataToSend,
         {
           headers: {
@@ -173,7 +173,7 @@ export default function CustomerProfile() {
       const token = localStorage.getItem("token");
 
       await axios.post(
-        "https://6wceq59nse.execute-api.ap-south-1.amazonaws.com/api/customer/change-password",
+        "https://uzlmegb12i.execute-api.ap-south-1.amazonaws.com/api/customer/change-password",
         {
           currentPassword: passwordData.currentPassword,
           newPassword: passwordData.newPassword,

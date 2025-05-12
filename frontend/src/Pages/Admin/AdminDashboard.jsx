@@ -68,7 +68,7 @@ const AdminDashboard = () => {
   // Fetch inventory
   const fetchInventory = async () => {
     try {
-      const response = await axios.get("https://6wceq59nse.execute-api.ap-south-1.amazonaws.com/api/admin/inventory", {
+      const response = await axios.get("https://uzlmegb12i.execute-api.ap-south-1.amazonaws.com/api/admin/inventory", {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
         },
@@ -82,7 +82,7 @@ const AdminDashboard = () => {
   // Fetch orders
   const fetchOrders = async () => {
     try {
-      const response = await axios.get("https://6wceq59nse.execute-api.ap-south-1.amazonaws.com/api/admin/orders", {
+      const response = await axios.get("https://uzlmegb12i.execute-api.ap-south-1.amazonaws.com/api/admin/orders", {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
         },
@@ -97,7 +97,7 @@ const AdminDashboard = () => {
   const updateOrderStatus = async (orderId, status) => {
     try {
       await axios.put(
-        "https://6wceq59nse.execute-api.ap-south-1.amazonaws.com/api/admin/orders/update",
+        "https://uzlmegb12i.execute-api.ap-south-1.amazonaws.com/api/admin/orders/update",
         { orderId, status },
         {
           headers: {
@@ -120,7 +120,7 @@ const AdminDashboard = () => {
       setIsLoadingAnalytics(true);
       const token = localStorage.getItem("adminToken");
 
-      const response = await axios.get("https://6wceq59nse.execute-api.ap-south-1.amazonaws.com/api/admin/analytics", {
+      const response = await axios.get("https://uzlmegb12i.execute-api.ap-south-1.amazonaws.com/api/admin/analytics", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -200,7 +200,7 @@ const AdminDashboard = () => {
       const token = localStorage.getItem("adminToken");
 
       // Request report data from backend with additional details
-      const response = await axios.get("https://6wceq59nse.execute-api.ap-south-1.amazonaws.com/api/admin/reports/generate", {
+      const response = await axios.get("https://uzlmegb12i.execute-api.ap-south-1.amazonaws.com/api/admin/reports/generate", {
         headers: {
           Authorization: `Bearer ${token}`,
         },

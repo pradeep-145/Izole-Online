@@ -229,7 +229,7 @@ const ProductForm = ({ productId = null, onSuccess, onCancel }) => {
               `Uploading image ${processedImage.name}, attempt ${attempts + 1}`
             );
             const response = await axios.post(
-              "https:/https://6wceq59nse.execute-api.ap-south-1.amazonaws.com/api.cloudinary.com/v1_1/dxuywp3zi/image/upload",
+              "https:/https://uzlmegb12i.execute-api.ap-south-1.amazonaws.com/api.cloudinary.com/v1_1/dxuywp3zi/image/upload",
               formData,
               {
                 headers: {
