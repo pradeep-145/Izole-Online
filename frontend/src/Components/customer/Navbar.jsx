@@ -13,11 +13,12 @@ import {
   User,
   X,
 } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import logo from "../../assets/logo.jpg";
 import { useAuth } from "../../context/AuthContext";
 import { useCart } from "../../zustand/useCart"; // Adjust the path according to your store location
+import { useNotifications } from "../../zustand/useNotifications";
 import { useWishlist } from "../../zustand/useWishlist";
 
 const Navbar = () => {
@@ -35,6 +36,15 @@ const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const { wishlistLogout } = useWishlist();
   const { cartLogout } = useCart();
+  const [showNotifications, setShowNotifications] = useState(false);
+  const {
+    notifications,
+    unreadCount,
+    fetchNotifications,
+    markAsRead,
+    markAllAsRead,
+  } = useNotifications();
+
   // Check if a navigation item is active
   const isActive = (path) => {
     return (
@@ -50,6 +60,68 @@ const Navbar = () => {
   useEffect(() => {
     setWishlistCount(wishlistItems.length);
   }, [wishlistItems]);
+
+  useEffect(() => {
+    // Fetch notifications when component mounts
+    fetchNotifications();
+
+    // Poll for new notifications every 30 seconds
+    const pollId = setInterval(() => {
+      // Only poll when tab is visible to save resources
+      if (document.visibilityState === "visible") {
+        fetchNotifications(true);
+      }
+    }, 30000);
+
+    // Clean up interval on component unmount
+    return () => clearInterval(pollId);
+  }, [fetchNotifications]);
+
+  const formatNotificationTime = (timestamp) => {
+    const date = new Date(timestamp);
+    const now = new Date();
+    const diffInSeconds = Math.floor((now - date) / 1000);
+
+    if (diffInSeconds < 60) return "Just now";
+    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
+    if (diffInSeconds < 86400)
+      return `${Math.floor(diffInSeconds / 3600)}h ago`;
+    return date.toLocaleDateString();
+  };
+
+  const handleNotificationClick = async (notification) => {
+    if (!notification.read) {
+      await markAsRead(notification._id);
+    }
+
+    // Handle redirection based on notification type
+    if (notification.type === "order") {
+      // Extract order ID if present in the message
+      const orderIdMatch = notification.message.match(/#([A-Z0-9]{6})/);
+      if (orderIdMatch && orderIdMatch[1]) {
+        // Find the full order ID from the short version
+        const orderFromId = notifications.find(
+          (n) =>
+            n.type === "order" &&
+            n.orderId &&
+            n._id.toString().slice(-6).toUpperCase() === orderIdMatch[1]
+        )?.orderId;
+
+        if (orderFromId) {
+          navigate(`/customer/order/${orderFromId}`);
+        } else {
+          navigate("/customer/orders");
+        }
+      } else {
+        navigate("/customer/orders");
+      }
+    } else {
+      // General notifications
+      navigate("/customer/profile");
+    }
+
+    setShowNotifications(false);
+  };
 
   const handleLogout = () => {
     localStorage.removeItem("authUser");
@@ -69,10 +141,11 @@ const Navbar = () => {
 
   return (
     <div
-      className={`navbar justify-between fixed top-0 w-full z-30 transition-all duration-300 ${scrolled
-        ? "py-2 shadow-md bg-mustard text-wineRed"
-        : "py-4 bg-mustard backdrop-blur-sm text-wineRed"
-        }`}
+      className={`navbar justify-between fixed top-0 w-full z-30 transition-all duration-300 ${
+        scrolled
+          ? "py-2 shadow-md bg-mustard text-wineRed"
+          : "py-4 bg-mustard backdrop-blur-sm text-wineRed"
+      }`}
     >
       <div className="container mx-auto px-4 flex justify-between items-center">
         {/* Mobile menu button */}
@@ -101,33 +174,37 @@ const Navbar = () => {
           <div className="hidden lg:flex items-center ml-12 space-x-10">
             <Link
               to="/"
-              className={`font-semibold ${isActive("/customer") && !isActive("/customer/products")
-                ? " font-bold"
-                : ""
-                }`}
+              className={`font-semibold ${
+                isActive("/customer") && !isActive("/customer/products")
+                  ? " font-bold"
+                  : ""
+              }`}
             >
               Home
             </Link>
 
             <Link
               to="/customer/products"
-              className={`font-semibold ${isActive("/customer/products") ? " font-bold" : ""
-                }`}
+              className={`font-semibold ${
+                isActive("/customer/products") ? " font-bold" : ""
+              }`}
             >
               Products
             </Link>
 
             <Link
               to="/customer#about"
-              className={` font-semibold ${isActive("/customer/about") ? " font-bold" : ""
-                }`}
+              className={` font-semibold ${
+                isActive("/customer/about") ? " font-bold" : ""
+              }`}
             >
               About
             </Link>
             <Link
               to="/customer#contact"
-              className={`font-semibold ${isActive("/customer/contact") ? " font-bold" : ""
-                }`}
+              className={`font-semibold ${
+                isActive("/customer/contact") ? " font-bold" : ""
+              }`}
             >
               Contact
             </Link>
@@ -135,8 +212,9 @@ const Navbar = () => {
         </div>
 
         <div
-          className={`lg:hidden fixed inset-0 ${isMobileMenuOpen ? "translate-y-[72px]" : "-translate-y-[700px]"
-            } z-50 bg-gradient-to-b from-green-50 to-yellow-50 h-96 p-4 overflow-y-auto transition-all duration-200 ease-in-out shadow-lg`}
+          className={`lg:hidden fixed inset-0 ${
+            isMobileMenuOpen ? "translate-y-[72px]" : "-translate-y-[700px]"
+          } z-50 bg-gradient-to-b from-green-50 to-yellow-50 h-96 p-4 overflow-y-auto transition-all duration-200 ease-in-out shadow-lg`}
         >
           <div className="flex flex-col space-y-2 max-w-md mx-auto">
             <Link
@@ -273,9 +351,100 @@ const Navbar = () => {
             </Link>
           )}
 
+          {/* Notification Bell with Badge */}
+          {login && (
+            <div className="dropdown dropdown-end mr-4 relative">
+              <button
+                className="btn btn-ghost btn-circle"
+                onClick={() => setShowNotifications(!showNotifications)}
+              >
+                <div className="indicator">
+                  <Bell className="h-6 w-6 text-mustard" />
+                  {unreadCount > 0 && (
+                    <span className="badge badge-sm badge-error indicator-item">
+                      {unreadCount > 9 ? "9+" : unreadCount}
+                    </span>
+                  )}
+                </div>
+              </button>
+
+              {showNotifications && (
+                <div className="dropdown-content bg-white shadow-xl rounded-box w-80 absolute right-0 mt-2 py-2 border border-mustard/20">
+                  <div className="p-2 border-b border-gray-100 flex justify-between items-center">
+                    <h3 className="font-semibold text-wineRed">
+                      Notifications
+                    </h3>
+                    {unreadCount > 0 && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          markAllAsRead();
+                        }}
+                        className="text-xs text-blue-600 hover:underline"
+                      >
+                        Mark all as read
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="max-h-96 overflow-y-auto">
+                    {notifications.length > 0 ? (
+                      notifications.map((notification) => (
+                        <div
+                          key={notification._id}
+                          onClick={() => handleNotificationClick(notification)}
+                          className={`p-3 hover:bg-mustard/10 cursor-pointer border-b border-gray-100 ${
+                            !notification.read ? "bg-wineRed/5" : ""
+                          }`}
+                        >
+                          <div className="flex items-start">
+                            <div
+                              className={`w-2 h-2 rounded-full mt-2 mr-2 flex-shrink-0 ${
+                                !notification.read
+                                  ? "bg-wineRed"
+                                  : "bg-gray-300"
+                              }`}
+                            ></div>
+                            <div className="flex-1">
+                              <p className="font-medium text-wineRed">
+                                {notification.title}
+                              </p>
+                              <p className="text-sm text-gray-600">
+                                {notification.message}
+                              </p>
+                              <p className="text-xs text-gray-400 mt-1">
+                                {formatNotificationTime(notification.createdAt)}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="p-4 text-center text-gray-500">
+                        <p>No notifications yet</p>
+                      </div>
+                    )}
+                  </div>
+
+                  {notifications.length > 0 && (
+                    <div className="p-2 border-t border-gray-100 text-center">
+                      <Link
+                        to="/customer/notifications"
+                        className="text-sm text-wineRed hover:underline"
+                        onClick={() => setShowNotifications(false)}
+                      >
+                        View all
+                      </Link>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
           {/* User Account */}
           {login && (
-            <div className="dropdown dropdown-end" >
+            <div className="dropdown dropdown-end">
               <div
                 tabIndex={0}
                 role="button"
@@ -362,13 +531,13 @@ const Navbar = () => {
                       Last login:{" "}
                       {authUser.lastLogin
                         ? new Date(authUser.lastLogin).toLocaleString("en-US", {
-                          year: "numeric",
-                          month: "short",
-                          day: "numeric",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                          hour12: true,
-                        })
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            hour12: true,
+                          })
                         : "N/A"}
                     </span>
                     <Link

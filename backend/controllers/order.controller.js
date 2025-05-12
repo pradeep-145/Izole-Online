@@ -3,6 +3,7 @@ const {
   createScheduler,
   deleteOrderScheduler,
 } = require("../utils/scheduler.js");
+const Notification = require("../models/notification.model.js");
 require("dotenv").config();
 const {
   createOrder,
@@ -16,6 +17,81 @@ const {
 } = require("../services/shiprocket.service.js");
 const productModel = require("../models/product.model.js");
 const axios = require("axios");
+
+// Helper function to create notifications
+const createOrderNotification = async (customerId, order, type, status) => {
+  try {
+    let title, message;
+
+    switch (type) {
+      case "order_placed":
+        title = "Order Placed Successfully";
+        message = `Your order #${order._id
+          .toString()
+          .slice(-6)
+          .toUpperCase()} has been placed successfully. You will be notified once the order is processed.`;
+        break;
+      case "payment_complete":
+        title = "Payment Confirmed";
+        message = `Payment for order #${order._id
+          .toString()
+          .slice(-6)
+          .toUpperCase()} has been confirmed. Your order is being processed.`;
+        break;
+      case "order_shipped":
+        title = "Order Shipped";
+        message = `Your order #${order._id
+          .toString()
+          .slice(-6)
+          .toUpperCase()} has been shipped. Track your order for delivery updates.`;
+        break;
+      case "order_delivered":
+        title = "Order Delivered";
+        message = `Your order #${order._id
+          .toString()
+          .slice(-6)
+          .toUpperCase()} has been delivered. Thank you for shopping with us!`;
+        break;
+      case "order_cancelled":
+        title = "Order Cancelled";
+        message = `Your order #${order._id
+          .toString()
+          .slice(-6)
+          .toUpperCase()} has been cancelled. Reason: ${
+          order.cancelReason || "Customer request"
+        }`;
+        break;
+      case "status_update":
+        title = "Order Status Updated";
+        message = `Your order #${order._id
+          .toString()
+          .slice(-6)
+          .toUpperCase()} status has been updated to ${status}.`;
+        break;
+      default:
+        title = "Order Update";
+        message = `There is an update regarding your order #${order._id
+          .toString()
+          .slice(-6)
+          .toUpperCase()}.`;
+    }
+
+    await Notification.create({
+      customerId,
+      title,
+      message,
+      type: "order",
+    });
+
+    console.log(
+      `Notification created for user ${customerId} for order ${order._id}`
+    );
+  } catch (error) {
+    console.error("Error creating notification:", error);
+    // Don't throw - this is a non-critical operation
+  }
+};
+
 exports.OrderController = {
   createOrder: async (req, res) => {
     const { totalAmount, products, address, billingAddress, shippingInfo } =
@@ -57,7 +133,7 @@ exports.OrderController = {
         address: {
           firstName: billingAddress.firstName,
           lastName: billingAddress.lastName,
-          address:  billingAddress.address,
+          address: billingAddress.address,
           email: billingAddress.email,
           phone: billingAddress.phone,
           postalCode: billingAddress.zipCode,
@@ -108,7 +184,7 @@ exports.OrderController = {
       }
 
       const orderId = `order_${order._id}`;
-      const schedulerName= await createScheduler(order._id);
+      const schedulerName = await createScheduler(order._id);
       console.log("Scheduler name:", schedulerName);
       let paymentSessionId = null;
       let paymentLink = null;
@@ -221,7 +297,7 @@ exports.OrderController = {
             },
             order_meta: {
               payment_methods: "cc,dc,upi",
-              return_url: `https://main.ddep0n5ozmw0h.amplifyapp.com//customer/payment/redirect?order_id=${orderId}&status=success`,
+              return_url: `https://main.ddep0n5ozmw0h.amplifyapp.com/customer/payment/redirect?order_id=${orderId}&status=success`,
             },
             order_expiry_time: new Date(
               Date.now() + 30 * 60 * 1000
@@ -251,6 +327,9 @@ exports.OrderController = {
       // Save all changes to the order
       await order.save();
 
+      // Create a notification for the user
+      await createOrderNotification(req.user._id, order, "order_placed");
+
       // Finally send the response
       res.status(201).json({
         success: true,
@@ -261,7 +340,7 @@ exports.OrderController = {
           products: order.products,
           paymentLink: order.paymentLink,
         },
-        shiprocketToken:shiprocketToken,
+        shiprocketToken: shiprocketToken,
         paymentSessionId: order.paymentSessionId,
         message: "Order created successfully",
       });
@@ -298,13 +377,12 @@ exports.OrderController = {
         });
       }
       const order = await orderModel.findById(orderId);
-      order.transactionId =
-        response.data[0].cf_payment_id;
-      const awb={
+      order.transactionId = response.data[0].cf_payment_id;
+      const awb = {
         shipment_id: order.shipmentId,
         courier_id: JSON.parse(order.shippingInfo).courier_company_id,
-      }
-      console.log(awb)
+      };
+      console.log(awb);
       // const { data, token } = await generateAWB(req.shiprocketToken, awb);
       // if (token != req.shiprocketToken || !req.shiprocketToken) {
       //   const maxAge = 10 * 24 * 60 * 60;
@@ -325,7 +403,7 @@ exports.OrderController = {
       //   order.pickupDate = data.pickup_scheduled_date;
       //   order.estimatedDeliveryDate = data.est;
       //   order.trackingUrl = data.tracking_url;
-      //   order.shippingCharge = data.shipping_charges; 
+      //   order.shippingCharge = data.shipping_charges;
       // }
       // order.awb=data.awb
       if (!order) {
@@ -346,6 +424,13 @@ exports.OrderController = {
       order.expiresAt = undefined;
       await order.save();
 
+      // Create payment confirmation notification
+      await createOrderNotification(
+        order.customerId,
+        order,
+        "payment_complete"
+      );
+
       res.status(200).json({
         success: true,
         order,
@@ -356,7 +441,7 @@ exports.OrderController = {
       res.status(500).json({
         success: false,
         message: "Error in confirming payment",
-        error:error
+        error: error,
       });
     }
   },
@@ -371,44 +456,44 @@ exports.OrderController = {
           message: "Order not found",
         });
       }
-       try {
-              const productArray = Array.isArray(order.products)
-                ? order.products
-                : [order.products];
-      
-              await Promise.all(
-                productArray.map(async (product) => {
-                  return productModel.updateOne(
-                    {
-                      _id: product.id,
-                      "variants.color": product.color,
-                      "variants.sizeOptions.size": product.size,
-                    },
-                    {
-                      $inc: {
-                        "variants.$[variant].sizeOptions.$[sizeOption].quantity":
-                          product.quantity,
-                      },
-                    },
-                    {
-                      arrayFilters: [
-                        { "variant.color": product.color },
-                        { "sizeOption.size": product.size },
-                      ],
-                    }
-                  );
-                })
-              );
-      
-              console.log(
-                `Successfully restored inventory for all products in order: ${orderId}`
-              );
-            } catch (inventoryError) {
-              console.error(
-                `Error restoring product quantities: ${inventoryError.message}`
-              );
-              // Continue with order deletion even if inventory update fails
-            }
+      try {
+        const productArray = Array.isArray(order.products)
+          ? order.products
+          : [order.products];
+
+        await Promise.all(
+          productArray.map(async (product) => {
+            return productModel.updateOne(
+              {
+                _id: product.id,
+                "variants.color": product.color,
+                "variants.sizeOptions.size": product.size,
+              },
+              {
+                $inc: {
+                  "variants.$[variant].sizeOptions.$[sizeOption].quantity":
+                    product.quantity,
+                },
+              },
+              {
+                arrayFilters: [
+                  { "variant.color": product.color },
+                  { "sizeOption.size": product.size },
+                ],
+              }
+            );
+          })
+        );
+
+        console.log(
+          `Successfully restored inventory for all products in order: ${orderId}`
+        );
+      } catch (inventoryError) {
+        console.error(
+          `Error restoring product quantities: ${inventoryError.message}`
+        );
+        // Continue with order deletion even if inventory update fails
+      }
       if (order.schedulerName) {
         await deleteOrderScheduler(order.schedulerName);
       }
@@ -503,7 +588,10 @@ exports.OrderController = {
           // Continue with cancellation even if refund has issues
         }
       }
-      const {data, token} = await cancelOrder(req.shiprocketToken, order.shipmentOrderId)
+      const { data, token } = await cancelOrder(
+        req.shiprocketToken,
+        order.shipmentOrderId
+      );
       if (token != req.shiprocketToken || !req.shiprocketToken) {
         const maxAge = 10 * 24 * 60 * 60;
         console.log("token setting cookie");
@@ -522,6 +610,9 @@ exports.OrderController = {
       order.cancelledAt = new Date();
       order.expiresAt = undefined; // Remove expiration
       await order.save();
+
+      // Create cancellation notification
+      await createOrderNotification(order.customerId, order, "order_cancelled");
 
       res.status(200).json({
         success: true,
@@ -574,6 +665,16 @@ exports.OrderController = {
         { $set: updateData },
         { new: true }
       );
+
+      // If status was updated, create notification
+      if (status) {
+        await createOrderNotification(
+          order.customerId,
+          updatedOrder,
+          "status_update",
+          status
+        );
+      }
 
       res.status(200).json({
         success: true,
@@ -658,7 +759,6 @@ exports.OrderController = {
     }
   },
 };
-
 
 // Response from Shiprocket: {
 //   awb_assign_status: 1,

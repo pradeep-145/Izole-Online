@@ -5,40 +5,35 @@ const authRoute = require("./routes/auth.route.js");
 const productRoute = require("./routes/product.route.js");
 const cartRoute = require("./routes/cart.route.js");
 const OrderRoute = require("./routes/order.route.js");
-const wishlistRoutes = require('./routes/wishlist.route.js');
+const wishlistRoutes = require("./routes/wishlist.route.js");
+const { processContactForm } = require("./controllers/contact.controller.js");
 
 const app = express();
 require("dotenv").config();
 
-// app.use((req, res, next) => {
-//   res.setHeader("Access-Control-Allow-Origin", "https://main.ddep0n5ozmw0h.amplifyapp.com");
-//   res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-//   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-//   res.setHeader("Access-Control-Allow-Credentials", "true");
-//   if (req.method === "OPTIONS") {
-//     return res.sendStatus(200);
-//   }
-//   next();
-// });
-
 // Connect to DB at startup (will be invoked once per container)
-connectToDB().catch(err => console.error("Failed to connect to DB:", err));
+connectToDB().catch((err) => console.error("Failed to connect to DB:", err));
 
 // In your Express app
 app.use(cors());
 app.use(express.json());
 
 // Routes
-app.use('/api/auth', authRoute);
+app.use("/api/auth", authRoute);
 app.use("/api/products", productRoute);
-app.use('/api/cart', cartRoute);
-app.use('/api/orders', OrderRoute);
-app.use('/api/wishlist', wishlistRoutes);
-app.use('/api/admin', require('./routes/admin.route.js'));
-app.use('/api/shiprocket', require('./routes/shiprocket.routes.js'));
+app.use("/api/cart", cartRoute);
+app.use("/api/orders", OrderRoute);
+app.use("/api/wishlist", wishlistRoutes);
+app.use("/api/admin", require("./routes/admin.route.js"));
+app.use("/api/shiprocket", require("./routes/shiprocket.routes.js"));
+app.use("/api/notifications", require("./routes/notification.route.js")); // Add notification routes
+
+// Contact form endpoint
+app.post("/api/contact", processContactForm);
+
 // Health check endpoint for AWS
-app.get('/health', (req, res) => {
-  res.status(200).send('OK');
+app.get("/health", (req, res) => {
+  res.status(200).send("OK");
 });
 
 module.exports = app;
@@ -50,4 +45,3 @@ if (require.main === module) {
     console.log(`Server is running in port http://localhost:${PORT}`);
   });
 }
-

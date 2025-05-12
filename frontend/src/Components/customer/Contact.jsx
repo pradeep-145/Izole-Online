@@ -1,5 +1,8 @@
-import React, { useState } from "react";
-import { Phone, MapPin, Mail, Instagram, Clock, Send } from "lucide-react";
+import axios from "axios";
+import { Clock, Instagram, Mail, MapPin, Phone, Send } from "lucide-react";
+import { useState } from "react";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -8,33 +11,72 @@ const Contact = () => {
     subject: "",
     message: "",
   });
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Form submitted:", formData);
+    setLoading(true);
+    try {
+      console.log("Form submitted:", formData);
+      const response = await axios.post(
+        "https://uzlmegb12i.execute-api.ap-south-1.amazonaws.com/api/contact",
+        formData
+      );
 
-    // Reset form
-    setFormData({
-      name: "",
-      email: "",
-      subject: "",
-      message: "",
-    });
+      if (response.status === 200) {
+        toast.success(
+          "Message sent successfully! We'll get back to you soon.",
+          {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+          }
+        );
 
-    alert("Thank you for your message! We'll get back to you soon.");
+        // Reset form after successful submission
+        setFormData({
+          name: "",
+          email: "",
+          subject: "",
+          message: "",
+        });
+      }
+    } catch (error) {
+      console.error("Error sending message:", error);
+      toast.error(
+        error.response?.data?.message ||
+          "Failed to send message. Please try again later.",
+        {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        }
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div id="contact" className="text-wineRed bg-white py-24">
+      <ToastContainer />
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-16">
-          <h2 className="sm:text-5xl text-2xl font-bold font-serif mb-4">Contact Us</h2>
+          <h2 className="sm:text-5xl text-2xl font-bold font-serif mb-4">
+            Contact Us
+          </h2>
           <div className="w-24 h-1 bg-mustard mx-auto mb-8"></div>
           <p className="sm:text-xl text-lg max-w-3xl mx-auto">
             We'd love to hear from you. Reach out with any questions, feedback,
@@ -46,7 +88,9 @@ const Contact = () => {
           {/* Contact Information */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-lg shadow-2xl p-8 h-full">
-              <h3 className="text-2xl text-black font-bold mb-6">Get In Touch</h3>
+              <h3 className="text-2xl text-black font-bold mb-6">
+                Get In Touch
+              </h3>
 
               <div className="space-y-6">
                 {[
@@ -94,14 +138,16 @@ const Contact = () => {
           {/* Contact Form */}
           <div className="lg:col-span-2">
             <div className="bg-white rounded-lg shadow-2xl p-8">
-              <h3 className="text-2xl text-black font-bold mb-6">Send a Message</h3>
+              <h3 className="text-2xl text-black font-bold mb-6">
+                Send a Message
+              </h3>
 
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="form-control w-full">
                     <label className="label">
-                    <span className="label-text font-semibold text-lg text-wineRed">
-                      Name
+                      <span className="label-text font-semibold text-lg text-wineRed">
+                        Name
                       </span>
                     </label>
                     <input
@@ -117,7 +163,7 @@ const Contact = () => {
 
                   <div className="form-control w-full">
                     <label className="label">
-                    <span className="label-text font-semibold text-lg text-wineRed">
+                      <span className="label-text font-semibold text-lg text-wineRed">
                         Email Address
                       </span>
                     </label>
@@ -135,8 +181,8 @@ const Contact = () => {
 
                 <div className="form-control w-full">
                   <label className="label">
-                  <span className="label-text font-semibold text-lg text-wineRed">
-                  Subject
+                    <span className="label-text font-semibold text-lg text-wineRed">
+                      Subject
                     </span>
                   </label>
                   <input
@@ -168,9 +214,21 @@ const Contact = () => {
 
                 <button
                   type="submit"
-                  className="btn bg-wineRed text-mustard hover:bg-mustard hover:text-wineRed btn-lg gap-2 rounded-lg"
+                  disabled={loading}
+                  className={`btn bg-wineRed text-mustard hover:bg-mustard hover:text-wineRed btn-lg gap-2 rounded-lg ${
+                    loading ? "opacity-70 cursor-not-allowed" : ""
+                  }`}
                 >
-                  Send Message <Send className="h-5 w-5" />
+                  {loading ? (
+                    <>
+                      <span className="animate-pulse">Sending...</span>
+                      <div className="h-5 w-5 border-2 border-mustard border-t-transparent rounded-full animate-spin"></div>
+                    </>
+                  ) : (
+                    <>
+                      Send Message <Send className="h-5 w-5" />
+                    </>
+                  )}
                 </button>
               </form>
             </div>
