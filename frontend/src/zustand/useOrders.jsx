@@ -45,7 +45,6 @@ export const useOrders = create(
               Authorization: `Bearer ${localStorage.getItem("token")}`,
               "Content-Type": "application/json",
             },
-            withCredentials: true,
           })
           .then((response) => {
             set({

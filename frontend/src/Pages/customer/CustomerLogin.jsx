@@ -27,6 +27,7 @@ const CustomerLogin = () => {
         console.log(res.data.authUser);
         if(res.data.authUser.isVerified){
           await localStorage.setItem("authUser", JSON.stringify(res.data.authUser));
+          await localStorage.setItem("shiprocketToken", res.data.shiprocketToken);
           setAuthUser(res.data.authUser);
           await localStorage.setItem('token',res.data.token)
           fetchCart();

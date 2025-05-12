@@ -3,7 +3,7 @@ const customerModel = require("../models/customer.model.js");
 const { JwtService } = require("../services/jwt.service.js");
 const otpModel = require("../models/otp.model.js");
 const nodemailer = require("nodemailer");
-
+const shiprocketService = require("../services/shiprocket.service.js");
 const AuthController = {
   signUp: async (req, res) => {
     const { username, password, email, gender, phoneNumber, name } = req.body;
@@ -61,11 +61,12 @@ const AuthController = {
           res.setHeader("Set-Cookie", [
             `jwt=${token}; HttpOnly; Path=/; SameSite=None; Secure; Max-Age=${maxAge};`,
           ]);
-
+          const shiprocketToken = await shiprocketService.getAuthToken();
           res.json({
             message: "Login successful",
             authUser: userWithoutPassword,
             token: token,
+            shiprocketToken: shiprocketToken,
           });
         } else {
           res.status(400).json("Invalid Password");
