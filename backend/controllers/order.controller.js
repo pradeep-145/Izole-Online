@@ -505,7 +505,7 @@ exports.OrderController = {
         const maxAge = 10 * 24 * 60 * 60;
         console.log("token setting cookie");
         res.setHeader("Set-Cookie", [
-          `shiprocket=${token}; HttpOnly; Path=/; SameSite=Lax; Max-Age=${maxAge};`,
+          `shiprocket=${token}; HttpOnly; Path=/; SameSite=None; Secure; Max-Age=${maxAge};`,
         ]);
       }
       // Delete the scheduler if exists

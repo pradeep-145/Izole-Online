@@ -59,7 +59,7 @@ const AuthController = {
           console.log("User without password:", userWithoutPassword);
 
           res.setHeader("Set-Cookie", [
-            `jwt=${token}; HttpOnly; Path=/; SameSite=Lax; Max-Age=${maxAge};`,
+            `jwt=${token}; HttpOnly; Path=/; SameSite=None; Secure; Max-Age=${maxAge};`,
           ]);
 
           res.json({
