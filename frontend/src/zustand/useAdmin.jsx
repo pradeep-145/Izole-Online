@@ -57,7 +57,7 @@ export const useAdmin = create(
         set({ isLoading: true, error: null });
         try {
           const response = await axios.post(
-            `${import.meta.env.VITE_SERVER_URL}/api/admin/login`,
+            `${import.meta.env.VITE_SERVER_URL}https://6wceq59nse.execute-api.ap-south-1.amazonaws.com/api/admin/login`,
             {
               email,
               password,
@@ -157,7 +157,7 @@ export const useAdmin = create(
             }).toString();
 
             const response = await axios.get(
-              `${import.meta.env.VITE_SERVER_URL}/api/products?${queryParams}`,
+              `${import.meta.env.VITE_SERVER_URL}https://6wceq59nse.execute-api.ap-south-1.amazonaws.com/api/products?${queryParams}`,
               {
                 headers: {
                   Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
@@ -244,7 +244,7 @@ export const useAdmin = create(
         pendingRequests.analytics = new Promise(async (resolve) => {
           try {
             const response = await axios.get(
-              `${import.meta.env.VITE_SERVER_URL}/api/admin/analytics`,
+              `${import.meta.env.VITE_SERVER_URL}https://6wceq59nse.execute-api.ap-south-1.amazonaws.com/api/admin/analytics`,
               {
                 headers: {
                   Authorization: `Bearer ${localStorage.getItem("adminToken")}`,

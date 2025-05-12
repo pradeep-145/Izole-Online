@@ -64,7 +64,7 @@ const Cart = () => {
     try {
       // Add to wishlist API call
       await axios.post(
-        "/api/wishlist/add",
+        "https://6wceq59nse.execute-api.ap-south-1.amazonaws.com/api/wishlist/add",
         {
           productId,
           color,

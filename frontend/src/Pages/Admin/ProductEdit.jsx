@@ -141,7 +141,7 @@ const ProductEdit = () => {
 
       // Make API call to update the product
       await axios.put(
-        `${import.meta.env.VITE_SERVER_URL}/api/products/${productId}`,
+        `${import.meta.env.VITE_SERVER_URL}https://6wceq59nse.execute-api.ap-south-1.amazonaws.com/api/products/${productId}`,
         updatedProduct
       );
 

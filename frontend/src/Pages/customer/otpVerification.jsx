@@ -127,13 +127,13 @@ const OtpVerification = () => {
 
     try {
       if (isFromLogin) {
-        const res = await axios.post("/api/auth/confirm", {
+        const res = await axios.post("https://6wceq59nse.execute-api.ap-south-1.amazonaws.com/api/auth/confirm", {
           customerId: location.state.customerId,
           code: otpValue
         });
         navigate('/customer');
       } else {
-        await axios.post("/api/auth/verify-otp", {
+        await axios.post("https://6wceq59nse.execute-api.ap-south-1.amazonaws.com/api/auth/verify-otp", {
           email,
           code: otpValue
         });
@@ -166,7 +166,7 @@ const OtpVerification = () => {
     }
 
     try {
-      await axios.post("/api/auth/reset-password", {
+      await axios.post("https://6wceq59nse.execute-api.ap-south-1.amazonaws.com/api/auth/reset-password", {
         email,
         code: otp.join(''),
         password
@@ -193,11 +193,11 @@ const OtpVerification = () => {
     
     try {
       if (isFromLogin) {
-        await axios.post("/api/auth/send-otp", {
+        await axios.post("https://6wceq59nse.execute-api.ap-south-1.amazonaws.com/api/auth/send-otp", {
           customerId: JSON.parse(localStorage.getItem("authUser"))
         });
       } else {
-        await axios.post("/api/auth/send-otp", { email });
+        await axios.post("https://6wceq59nse.execute-api.ap-south-1.amazonaws.com/api/auth/send-otp", { email });
       }
       setSuccess('OTP has been resent successfully!');
       startResendTimer();

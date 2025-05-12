@@ -38,7 +38,7 @@ const CustomerSignUp = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     await axios
-      .post("/api/auth/sign-up", {
+      .post("https://6wceq59nse.execute-api.ap-south-1.amazonaws.com/api/auth/sign-up", {
         username: formData.username,
         name: formData.name,
         email: formData.email,
@@ -47,7 +47,7 @@ const CustomerSignUp = () => {
       })
       .then(async(res) => {
         console.log(res);
-        await axios.post("/api/auth/send-otp", {
+        await axios.post("https://6wceq59nse.execute-api.ap-south-1.amazonaws.com/api/auth/send-otp", {
           customerId:res.data._id,
           email: formData.email,
         });

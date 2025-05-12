@@ -19,7 +19,7 @@ const Notifications = () => {
   const fetchNotifications = async () => {
     try {
       setLoading(true);
-      const response = await axios.get("/api/customer/notifications", {
+      const response = await axios.get("https://6wceq59nse.execute-api.ap-south-1.amazonaws.com/api/customer/notifications", {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       setNotifications(response.data.notifications);
@@ -34,7 +34,7 @@ const Notifications = () => {
   const markAsRead = async (notificationId) => {
     try {
       await axios.put(
-        `/api/customer/notifications/${notificationId}/read`,
+        `https://6wceq59nse.execute-api.ap-south-1.amazonaws.com/api/customer/notifications/${notificationId}/read`,
         {},
         {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
@@ -57,7 +57,7 @@ const Notifications = () => {
   // Delete notification
   const deleteNotification = async (notificationId) => {
     try {
-      await axios.delete(`/api/customer/notifications/${notificationId}`, {
+      await axios.delete(`https://6wceq59nse.execute-api.ap-south-1.amazonaws.com/api/customer/notifications/${notificationId}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
 

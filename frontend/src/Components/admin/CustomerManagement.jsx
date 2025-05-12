@@ -28,7 +28,7 @@ const CustomerManagement = () => {
   const fetchCustomers = async () => {
     setLoading(true);
     try {
-      const response = await axios.get("/api/admin/customers", {
+      const response = await axios.get("https://6wceq59nse.execute-api.ap-south-1.amazonaws.com/api/admin/customers", {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
         },
@@ -44,7 +44,7 @@ const CustomerManagement = () => {
   // Fetch customer details
   const fetchCustomerDetails = async (customerId) => {
     try {
-      const response = await axios.get(`/api/admin/customers/${customerId}`, {
+      const response = await axios.get(`https://6wceq59nse.execute-api.ap-south-1.amazonaws.com/api/admin/customers/${customerId}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
         },
@@ -64,7 +64,7 @@ const CustomerManagement = () => {
     setIsSending(true);
     try {
       await axios.post(
-        "/api/admin/notifications/send",
+        "https://6wceq59nse.execute-api.ap-south-1.amazonaws.com/api/admin/notifications/send",
         {
           customerId: selectedCustomer._id,
           title: notification.title,

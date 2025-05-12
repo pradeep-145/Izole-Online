@@ -42,7 +42,7 @@ export const useCart = create(
             }
 
             await axios.put(
-              "/api/cart/update",
+              "https://6wceq59nse.execute-api.ap-south-1.amazonaws.com/api/cart/update",
               {
                 productId: item.product._id,
                 color: item.color,
@@ -62,7 +62,7 @@ export const useCart = create(
             set({ cartItems: updatedItems, isLoading: false });
           } else {
             // If item is new, add it via API
-            const response = await axios.post("/api/cart/add", item, {
+            const response = await axios.post("https://6wceq59nse.execute-api.ap-south-1.amazonaws.com/api/cart/add", item, {
               headers: {
                 Authorization: `Bearer ${localStorage.getItem("token")}`,
                 "Content-Type": "application/json",
@@ -89,7 +89,7 @@ export const useCart = create(
         set({ isLoading: true, error: null });
         try {
           // First remove from backend
-          await axios.delete("/api/cart/remove", {
+          await axios.delete("https://6wceq59nse.execute-api.ap-south-1.amazonaws.com/api/cart/remove", {
             data: { productId: itemId, color, size },
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -129,7 +129,7 @@ export const useCart = create(
           // First update on backend
           console.log(localStorage.getItem("token"));
           await axios.put(
-            "/api/cart/update",
+            "https://6wceq59nse.execute-api.ap-south-1.amazonaws.com/api/cart/update",
             {
               productId: itemId,
               color,
@@ -196,7 +196,7 @@ export const useCart = create(
 
         fetchPromise = new Promise((resolve) => {
           axios
-            .get("/api/cart/get", {
+            .get("https://6wceq59nse.execute-api.ap-south-1.amazonaws.com/api/cart/get", {
               headers: {
                 Authorization: `Bearer ${localStorage.getItem("token")}`,
                 "Content-Type": "application/json",
@@ -233,7 +233,7 @@ export const useCart = create(
       clearCart: async () => {
         set({ isLoading: true, error: null });
         try {
-          await axios.delete("/api/cart/clear", {
+          await axios.delete("https://6wceq59nse.execute-api.ap-south-1.amazonaws.com/api/cart/clear", {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
               "Content-Type": "application/json",

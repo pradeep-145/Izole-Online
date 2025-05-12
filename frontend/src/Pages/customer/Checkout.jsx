@@ -214,7 +214,7 @@ const CheckoutPage = () => {
     setServiceabilityError("");
     setShowServiceOptions(false);
     try {
-      const response = await axios.post("/api/shiprocket/check-serviceability", {
+      const response = await axios.post("https://6wceq59nse.execute-api.ap-south-1.amazonaws.com/api/shiprocket/check-serviceability", {
         pickup_postcode: "641604", // Your business pincode (should be from env or config)
         delivery_postcode: formData.zipCode,
         weight: calculateTotalWeight(),
@@ -282,7 +282,7 @@ const CheckoutPage = () => {
     try {
       const fullAddress = `${formData.address}, ${formData.city}, ${formData.state}, ${formData.zipCode}`;
       // Create order on backend with Shiprocket data
-      const response = await axios.post("/api/orders/create-order", {
+      const response = await axios.post("https://6wceq59nse.execute-api.ap-south-1.amazonaws.com/api/orders/create-order", {
         products,
         totalAmount: total,
         address: fullAddress,
@@ -321,7 +321,7 @@ const CheckoutPage = () => {
         if (result.error) {
           setPaymentError(result.error.message);
         } else if (result.success) {
-          const payment = await axios.post("/api/orders/confirm-order", {
+          const payment = await axios.post("https://6wceq59nse.execute-api.ap-south-1.amazonaws.com/api/orders/confirm-order", {
             orderId: response.data.order._id,
           });
           console.log(payment.data);
