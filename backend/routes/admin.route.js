@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const adminController = require("../controllers/admin.controller.js");
 
-
 // Admin routes
 router.get("/", adminController.get);
 router.get("/inventory", adminController.getInventory);
@@ -24,5 +23,8 @@ router.put("/update-product", adminController.updateProduct);
 router.put("/inventory/bulk-update", adminController.bulkUpdateInventory);
 
 router.delete("/remove-product", adminController.removeProduct);
+
+// Add notification routes
+router.use("/notifications", require("./admin.notification.route.js"));
 
 module.exports = router;

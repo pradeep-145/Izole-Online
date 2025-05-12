@@ -15,9 +15,10 @@ import {
   Truck,
   Users,
 } from "lucide-react";
-import React, { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import CustomerManagement from "../../Components/admin/CustomerManagement";
 import InventoryManagement from "../../Components/admin/InventoryManagement";
+import NotificationManagement from "../../Components/admin/NotificationManagement";
 import OrderManagement from "../../Components/admin/OrderManagement";
 import ProductTable from "../../Components/admin/ProductTable";
 import ShippingManagement from "../../Components/admin/ShippingManagement";
@@ -68,11 +69,14 @@ const AdminDashboard = () => {
   // Fetch inventory
   const fetchInventory = async () => {
     try {
-      const response = await axios.get("https://uzlmegb12i.execute-api.ap-south-1.amazonaws.com/api/admin/inventory", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
-        },
-      });
+      const response = await axios.get(
+        "https://uzlmegb12i.execute-api.ap-south-1.amazonaws.com/api/admin/inventory",
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
+          },
+        }
+      );
       setInventory(response.data.inventory);
     } catch (error) {
       console.error("Error fetching inventory:", error);
@@ -82,11 +86,14 @@ const AdminDashboard = () => {
   // Fetch orders
   const fetchOrders = async () => {
     try {
-      const response = await axios.get("https://uzlmegb12i.execute-api.ap-south-1.amazonaws.com/api/admin/orders", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
-        },
-      });
+      const response = await axios.get(
+        "https://uzlmegb12i.execute-api.ap-south-1.amazonaws.com/api/admin/orders",
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
+          },
+        }
+      );
       setOrders(response.data.orders);
     } catch (error) {
       console.error("Error fetching orders:", error);
@@ -120,14 +127,17 @@ const AdminDashboard = () => {
       setIsLoadingAnalytics(true);
       const token = localStorage.getItem("adminToken");
 
-      const response = await axios.get("https://uzlmegb12i.execute-api.ap-south-1.amazonaws.com/api/admin/analytics", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        params: {
-          timestamp: new Date().getTime(), // Add cache-busting parameter
-        },
-      });
+      const response = await axios.get(
+        "https://uzlmegb12i.execute-api.ap-south-1.amazonaws.com/api/admin/analytics",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          params: {
+            timestamp: new Date().getTime(), // Add cache-busting parameter
+          },
+        }
+      );
 
       const data = response.data;
 
@@ -200,20 +210,23 @@ const AdminDashboard = () => {
       const token = localStorage.getItem("adminToken");
 
       // Request report data from backend with additional details
-      const response = await axios.get("https://uzlmegb12i.execute-api.ap-south-1.amazonaws.com/api/admin/reports/generate", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        params: {
-          format: "csv", // or "pdf" depending on what your backend supports
-          type: "sales",
-          startDate: new Date(
-            new Date().setDate(new Date().getDate() - 30)
-          ).toISOString(), // Last 30 days
-          endDate: new Date().toISOString(),
-        },
-        responseType: "blob", // Important for handling file downloads
-      });
+      const response = await axios.get(
+        "https://uzlmegb12i.execute-api.ap-south-1.amazonaws.com/api/admin/reports/generate",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          params: {
+            format: "csv", // or "pdf" depending on what your backend supports
+            type: "sales",
+            startDate: new Date(
+              new Date().setDate(new Date().getDate() - 30)
+            ).toISOString(), // Last 30 days
+            endDate: new Date().toISOString(),
+          },
+          responseType: "blob", // Important for handling file downloads
+        }
+      );
 
       // Create a download link for the file
       const url = window.URL.createObjectURL(new Blob([response.data]));
@@ -453,6 +466,22 @@ const AdminDashboard = () => {
               {analyticsData.pendingReturns > 0 && (
                 <span className="ml-auto bg-purple-500 text-white text-xs font-bold px-2 py-1 rounded-full">
                   {analyticsData.pendingReturns}
+                </span>
+              )}
+            </button>
+            <button
+              onClick={() => setActiveTab("notifications")}
+              className={`flex items-center w-full px-4 py-2 text-sm rounded-lg ${
+                activeTab === "notifications"
+                  ? "bg-blue-100 text-blue-700"
+                  : "text-gray-700 hover:bg-gray-100"
+              }`}
+            >
+              <Bell className="w-5 h-5 mr-3" />
+              Notifications
+              {analyticsData.notifications > 0 && (
+                <span className="ml-auto bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                  {analyticsData.notifications}
                 </span>
               )}
             </button>
@@ -1108,6 +1137,17 @@ const AdminDashboard = () => {
           {activeTab === "shipping" && (
             <div>
               <ShippingManagement />
+            </div>
+          )}
+
+          {activeTab === "notifications" && (
+            <div>
+              <div className="flex items-center justify-between mb-6">
+                <h1 className="text-2xl font-bold text-gray-900">
+                  Notifications
+                </h1>
+              </div>
+              <NotificationManagement />
             </div>
           )}
         </main>
