@@ -11,7 +11,7 @@ const app = express();
 require("dotenv").config();
 
 app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "");
+  res.setHeader("Access-Control-Allow-Origin", "https://main.ddep0n5ozmw0h.amplifyapp.com");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
   res.setHeader("Access-Control-Allow-Credentials", "true");
@@ -24,7 +24,11 @@ app.use((req, res, next) => {
 // Connect to DB at startup (will be invoked once per container)
 connectToDB().catch(err => console.error("Failed to connect to DB:", err));
 
-app.use(cors());
+app.use(cors({
+  origin: "https://main.ddep0n5ozmw0h.amplifyapp.com",
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true,
+}));
 app.use(express.json());
 
 // Routes
