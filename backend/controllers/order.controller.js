@@ -221,7 +221,7 @@ exports.OrderController = {
             },
             order_meta: {
               payment_methods: "cc,dc,upi",
-              return_url: `http://localhost:5173/customer/payment/redirect?order_id=${orderId}&status=success`,
+              return_url: `https://main.ddep0n5ozmw0h.amplifyapp.com//customer/payment/redirect?order_id=${orderId}&status=success`,
             },
             order_expiry_time: new Date(
               Date.now() + 30 * 60 * 1000
