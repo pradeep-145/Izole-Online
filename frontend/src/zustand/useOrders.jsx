@@ -88,7 +88,7 @@ export const useOrders = create(
         set({ isLoading: true, error: null });
 
         fetchOrderDetailsPromise[orderId] = axios
-          .get(`https://uzlmegb12i.execute-api.ap-south-1.amazonaws.com/api/orders/get/${orderId}`, {
+          .get(`https://uzlmegb12i.execute-api.ap-south-1.amazonaws.com/api/orders/get-order/${orderId}`, {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
               "Content-Type": "application/json",
