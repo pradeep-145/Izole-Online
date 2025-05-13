@@ -34,6 +34,15 @@ export const useNotifications = create(
           return fetchPromise;
         }
 
+        // Get the token from localStorage
+        const token = localStorage.getItem("token");
+
+        // If no token is present, don't make the request
+        if (!token) {
+          set({ error: "Not authenticated" });
+          return { success: false, error: "Not authenticated" };
+        }
+
         set({ isLoading: true, error: null });
 
         fetchPromise = axios
@@ -41,7 +50,7 @@ export const useNotifications = create(
             "https://uzlmegb12i.execute-api.ap-south-1.amazonaws.com/api/notifications/get-notifications",
             {
               headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                Authorization: `Bearer ${token}`,
                 "Content-Type": "application/json",
               },
             }
@@ -60,12 +69,21 @@ export const useNotifications = create(
             };
           })
           .catch((error) => {
-            set({
-              error:
-                error.response?.data?.message ||
-                "Failed to fetch notifications",
-              isLoading: false,
-            });
+            // If unauthorized, don't keep retrying
+            if (error.response && error.response.status === 401) {
+              set({
+                error: "Authentication required",
+                isLoading: false,
+                // Don't update lastFetchTime to allow future retries when user logs in
+              });
+            } else {
+              set({
+                error:
+                  error.response?.data?.message ||
+                  "Failed to fetch notifications",
+                isLoading: false,
+              });
+            }
             return {
               success: false,
               error:
@@ -81,13 +99,18 @@ export const useNotifications = create(
       },
 
       markAsRead: async (notificationId) => {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          return { success: false, error: "Not authenticated" };
+        }
+
         try {
           await axios.patch(
             `https://uzlmegb12i.execute-api.ap-south-1.amazonaws.com/api/notifications/mark-read/${notificationId}`,
             {},
             {
               headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                Authorization: `Bearer ${token}`,
                 "Content-Type": "application/json",
               },
             }
@@ -115,13 +138,18 @@ export const useNotifications = create(
       },
 
       markAllAsRead: async () => {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          return { success: false, error: "Not authenticated" };
+        }
+
         try {
           await axios.patch(
             "https://uzlmegb12i.execute-api.ap-south-1.amazonaws.com/api/notifications/mark-all-read",
             {},
             {
               headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                Authorization: `Bearer ${token}`,
                 "Content-Type": "application/json",
               },
             }
@@ -149,12 +177,22 @@ export const useNotifications = create(
 
       // Poll for new notifications (to be used in useEffect)
       startPolling: (interval = 30000) => {
+        // Check if user is authenticated before polling
+        if (!localStorage.getItem("token")) {
+          console.log("Not polling for notifications: User not authenticated");
+          return null;
+        }
+
         const pollId = setInterval(() => {
-          // Only poll when tab is visible
-          if (document.visibilityState === "visible") {
-            get().fetchNotifications(true);
+          // Only poll when tab is visible and user is authenticated
+          if (
+            document.visibilityState === "visible" &&
+            localStorage.getItem("token")
+          ) {
+            get().fetchNotifications();
           }
         }, interval);
+
         return pollId;
       },
 

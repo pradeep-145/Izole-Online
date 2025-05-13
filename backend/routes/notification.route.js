@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const NotificationController = require("../controllers/notification.controller");
-const authenticateJWT = require("../middlewares/customer.middleware");
+const authenticateJWT = require("../middlewares/customer.middleware.js");
 
 // Routes that require authentication
 router.get(

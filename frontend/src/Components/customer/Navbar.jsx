@@ -43,6 +43,7 @@ const Navbar = () => {
     fetchNotifications,
     markAsRead,
     markAllAsRead,
+    error,
   } = useNotifications();
 
   // Check if a navigation item is active
@@ -62,19 +63,23 @@ const Navbar = () => {
   }, [wishlistItems]);
 
   useEffect(() => {
-    // Fetch notifications when component mounts
-    fetchNotifications();
+    // Only fetch notifications if user is logged in
+    const token = localStorage.getItem("token");
+    if (token) {
+      // Fetch notifications when component mounts
+      fetchNotifications();
 
-    // Poll for new notifications every 30 seconds
-    const pollId = setInterval(() => {
-      // Only poll when tab is visible to save resources
-      if (document.visibilityState === "visible") {
-        fetchNotifications(true);
-      }
-    }, 30000);
+      // Poll for new notifications every 30 seconds
+      const pollId = setInterval(() => {
+        // Only poll when tab is visible to save resources
+        if (document.visibilityState === "visible") {
+          fetchNotifications(true);
+        }
+      }, 30000);
 
-    // Clean up interval on component unmount
-    return () => clearInterval(pollId);
+      // Clean up interval on component unmount
+      return () => clearInterval(pollId);
+    }
   }, [fetchNotifications]);
 
   const formatNotificationTime = (timestamp) => {

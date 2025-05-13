@@ -1,13 +1,14 @@
 import axios from "axios";
 import { Loader2 } from "lucide-react";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useCart } from "../../zustand/useCart";
 
 const CashfreeRedirect = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-const {clearCart}= useCart()
+  const { clearCart } = useCart();
+
   // Extract payment information from URL parameters
   const orderId = searchParams.get("order_id");
   const status = searchParams.get("txStatus") || searchParams.get("status");
@@ -26,6 +27,9 @@ const {clearCart}= useCart()
             ? orderId.substring(6)
             : orderId;
 
+          // Get shiprocket token from localStorage
+          const shiprocketToken = localStorage.getItem("shiprocketToken");
+
           // Confirm payment with the backend
           await axios.post(
             "https://uzlmegb12i.execute-api.ap-south-1.amazonaws.com/api/orders/confirm-payment",
@@ -33,13 +37,14 @@ const {clearCart}= useCart()
             {
               headers: {
                 Authorization: `Bearer ${localStorage.getItem("token")}`,
-                'shiprocketToken': localStorage.getItem('shiprocketToken'),
+                "shiprocket-token": shiprocketToken || "", // Use proper header case, include empty string fallback
                 "Content-Type": "application/json",
               },
             }
           );
+
           clearCart();
-          
+
           // Navigate to order confirmation page
           navigate(
             `/customer/order-confirmation?orderDetails=${orderId}&status=success`
@@ -60,7 +65,7 @@ const {clearCart}= useCart()
     };
 
     processPaymentResult();
-  }, [orderId, status, navigate]);
+  }, [orderId, status, navigate, clearCart]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
