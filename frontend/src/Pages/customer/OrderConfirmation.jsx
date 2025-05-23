@@ -295,7 +295,7 @@ const OrderConfirmation = () => {
             </div>
 
             <h1
-              className={`text-3xl md:text-4xl font-bold text-olive-800 mb-3 drop-shadow-sm
+              className={`text-3xl md:text-4xl font-bold text-wineRed mb-3 drop-shadow-sm
               ${
                 showOrderInfo
                   ? "opacity-100 transform translate-y-0"
@@ -306,7 +306,7 @@ const OrderConfirmation = () => {
               Thank You for Your Order!
             </h1>
             <p
-              className={`text-lg text-olive-700 max-w-md mx-auto
+              className={`text-lg text-wineRed max-w-md mx-auto
               ${
                 showOrderInfo
                   ? "opacity-100 transform translate-y-0"
@@ -329,24 +329,24 @@ const OrderConfirmation = () => {
             transition-all duration-700 delay-200`}
           >
             {/* Order header with improved gradient for better contrast */}
-            <div className="bg-gradient-to-r from-olive-700 to-olive-800 text-white p-6 shadow-sm">
+            <div className="bg-gradient-to-r from-olive-700 to-olive-800 text-wineRed p-6 shadow-sm">
               <div className="flex justify-between items-center">
-                <h2 className="text-xl font-bold flex items-center text-white drop-shadow-sm">
+                <h2 className="text-xl font-bold flex items-center text-wineRed drop-shadow-sm">
                   <Package className="mr-2 filter drop-shadow" size={24} />
                   Order #{orderDetails._id.slice(-8)}
                 </h2>
-                <p className="text-white text-sm">
+                <p className="text-wineRed text-sm">
                   {formatDate(orderDetails.createdAt)}
                 </p>
               </div>
 
               <div className="mt-4 bg-white/20 backdrop-blur-sm rounded-md p-3 flex items-center">
                 <div className="mr-3 bg-white/30 rounded-full p-1.5">
-                  <Calendar size={18} className="text-white" />
+                  <Calendar size={18} className="text-wineRed" />
                 </div>
                 <div>
-                  <p className="text-xs text-white">Estimated Delivery</p>
-                  <p className="text-sm font-medium text-white">
+                  <p className="text-xs text-wineRed">Estimated Delivery</p>
+                  <p className="text-sm font-medium text-wineRed">
                     {getEstimatedDeliveryDate()}
                   </p>
                 </div>
@@ -516,8 +516,8 @@ const OrderConfirmation = () => {
                 onClick={() => navigate("/customer/products")}
                 className="px-5 py-3 bg-gradient-to-br from-olive-600 to-olive-800 text-white rounded-md hover:opacity-95 transition-colors flex items-center justify-center font-semibold shadow-md"
               >
-                <span className="drop-shadow-sm">Continue Shopping</span>
-                <ChevronRight size={16} className="ml-2 drop-shadow-sm" />
+                <span className="drop-shadow-sm text-wineRed">Continue Shopping</span>
+                <ChevronRight size={16} className="ml-2 drop-shadow-sm text-wineRed" />
               </button>
             </div>
           </div>

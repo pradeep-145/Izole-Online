@@ -336,6 +336,7 @@ const OtpVerification = () => {
       </div>
       
       {!isFromLogin && (
+        <div>
         <div className="mt-3 text-center">
           <button 
             type="button" 
@@ -345,6 +346,17 @@ const OtpVerification = () => {
             Change Email
           </button>
         </div>
+        <div className="text-center">
+          <button 
+            type="button" 
+            onClick={() => navigate('/customer/login')}
+            className="btn btn-link text-yellow-600 hover:text-yellow-700"
+          >
+            Back to Login
+          </button>
+        </div>
+        </div>
+        
       )}
     </>
   );
@@ -402,6 +414,17 @@ const OtpVerification = () => {
             'Reset Password'
           }
         </button>
+
+        <div className="text-center">
+          <button 
+            type="button" 
+            onClick={() => navigate('/customer/login')}
+            className="btn btn-link text-yellow-600 hover:text-yellow-700"
+          >
+            Back to Login
+          </button>
+        </div>
+        
       </form>
     </>
   );
