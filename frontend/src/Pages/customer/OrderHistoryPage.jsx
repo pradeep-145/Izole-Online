@@ -12,7 +12,9 @@ import {
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "../../Components/customer/Navbar";
+import Footer from "../../Components/customer/Footer";
 import { useOrders } from "../../zustand/useOrders";
+
 
 const OrderHistoryPage = () => {
   const [selectedOrder, setSelectedOrder] = useState(null);
@@ -220,7 +222,7 @@ const OrderHistoryPage = () => {
                   <Package className="mr-2 text-[#FFC107]" size={20} /> Order
                   History
                 </h2>
-                <div className="space-y-2">
+                <div className="space-y-2 h-[650px] overflow-scroll scrollbar-hide">
                   {orders.map((order) => (
                     <div
                       key={order._id}
@@ -281,7 +283,7 @@ const OrderHistoryPage = () => {
 
             <div className="md:col-span-2">
               {selectedOrder ? (
-                <div className="bg-white p-6 rounded-lg shadow-md transition-all duration-500 animate-fadeIn">
+                <div className="bg-white p-6 h-[730px] overflow-scroll scrollbar-hide rounded-lg shadow-md transition-all duration-500 animate-fadeIn">
                   <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
                     <div>
                       <h2 className="text-xl font-semibold text-wineRed">
@@ -620,6 +622,7 @@ const OrderHistoryPage = () => {
           </div>
         </div>
       )}
+      <Footer></Footer>
     </div>
   );
 };

@@ -101,10 +101,10 @@ const orderSchema = new mongoose.Schema(
       type:Number,
     },
     awb:{
-      type:Number,
+      type:String,
     },
     shippingCharge:{
-      type:Number,
+      type:String,
     },
     shipmentOrderId:{
       type:String,

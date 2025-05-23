@@ -229,7 +229,7 @@ const ProductForm = ({ productId = null, onSuccess, onCancel }) => {
               `Uploading image ${processedImage.name}, attempt ${attempts + 1}`
             );
             const response = await axios.post(
-              "https:/https://uzlmegb12i.execute-api.ap-south-1.amazonaws.com/api.cloudinary.com/v1_1/dxuywp3zi/image/upload",
+              "https://api.cloudinary.com/v1_1/dxuywp3zi/image/upload",
               formData,
               {
                 headers: {
@@ -384,6 +384,7 @@ const ProductForm = ({ productId = null, onSuccess, onCancel }) => {
           `Product ${productId ? "updated" : "created"} successfully`
         );
         if (onSuccess) onSuccess(result.product);
+        
       } else {
         toast.error(
           result.message ||
@@ -548,7 +549,7 @@ const ProductForm = ({ productId = null, onSuccess, onCancel }) => {
                           alt={`Variant ${variantIndex + 1} preview ${
                             imageIndex + 1
                           }`}
-                          className="h-24 w-24 object-cover rounded-md"
+                          className="h-24 w-auto  rounded-md"
                         />
                         <button
                           type="button"

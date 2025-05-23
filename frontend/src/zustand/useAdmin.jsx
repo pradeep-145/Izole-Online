@@ -52,6 +52,17 @@ export const useAdmin = create(
       },
       analyticsLastFetched: null,
 
+        createProduct:async(data)=>{
+          console.log(data)
+          const response= await axios.post('https://uzlmegb12i.execute-api.ap-south-1.amazonaws.com/api/admin/add-product',{
+            name:data.name,
+            description:data.description,
+            category:data.category,
+            variants:data.variants,
+            weight:data.weight
+          })
+          return response.data;
+      },
       // Authentication Methods
       login: async (email, password) => {
         set({ isLoading: true, error: null });
@@ -187,38 +198,7 @@ export const useAdmin = create(
         return pendingRequests.products[requestKey];
       },
 
-      // Order Management Methods with optimization
-      fetchOrders: async (
-        page = 1,
-        limit = 10,
-        filters = {},
-        forceRefresh = false
-      ) => {
-        const { orders, ordersLastFetched, isLoading } = get();
-        const now = Date.now();
-
-        // Skip if cached data is recent and valid
-        if (
-          isLoading ||
-          (!forceRefresh &&
-            orders.length > 0 &&
-            ordersLastFetched &&
-            now - ordersLastFetched < ORDER_DATA_TTL &&
-            page === 1 &&
-            Object.keys(filters).length === 0)
-        ) {
-          return { success: true, orders, totalCount: get().orderCount };
-        }
-
-        // Implement rest of the method similar to fetchProducts
-        set({ isLoading: true });
-        // ...existing implementation...
-
-        // Don't forget to set ordersLastFetched on success
-        set({ ordersLastFetched: Date.now() });
-        // ...existing code...
-      },
-
+     
       // Dashboard Analytics with optimization
       fetchDashboardAnalytics: async (forceRefresh = false) => {
         const { analytics, analyticsLastFetched, isLoading } = get();

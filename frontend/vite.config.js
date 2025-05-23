@@ -8,9 +8,8 @@ export default defineConfig({
     proxy: {
       // Proxy API requests to the backend server during development
       "/api": {
-        target: "https://6wceq59nse.execute-api.ap-south-1.amazonaws.com", // Your backend API address
-        changeOrigin: true,
-        secure: false,
+        target: "https://uzlmegb12i.execute-api.ap-south-1.amazonaws.com", // Your backend API address
+      
       },
     },
   },

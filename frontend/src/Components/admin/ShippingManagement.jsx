@@ -39,15 +39,17 @@ const ShippingManagement = () => {
     setLoading(true);
     try {
       // Fetch orders with shipment details
-      const response = await axios.get("https://uzlmegb12i.execute-api.ap-south-1.amazonaws.com/api/admin/orders", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
-        },
-        params: {
-          status: filterStatus !== "all" ? filterStatus : undefined,
-        },
-      });
-
+      const response = await axios.get(
+        "https://uzlmegb12i.execute-api.ap-south-1.amazonaws.com/api/admin/orders",
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
+          },
+          params: {
+            status: filterStatus !== "all" ? filterStatus : undefined,
+          },
+        }
+      );
       // Process orders to extract shipping information
       const ordersWithShipping = response.data.orders
         .filter((order) => order.shippingInfo) // Only include orders with shipping info
@@ -71,6 +73,7 @@ const ShippingManagement = () => {
             customerAddress: formattedAddress,
             status: order.status,
             paymentStatus: order.paymentStatus,
+            shipmentId: order.shipmentOrderId,
             createdAt: new Date(order.createdAt),
             pickupDate: order.pickupDate ? new Date(order.pickupDate) : null,
             estimatedDeliveryDate: order.estimatedDeliveryDate
@@ -89,7 +92,7 @@ const ShippingManagement = () => {
             isRescheduled: order.isRescheduled || false,
           };
         });
-
+      console.log(ordersWithShipping);
       setShipments(ordersWithShipping);
     } catch (err) {
       console.error("Failed to fetch shipments:", err);
@@ -126,13 +129,21 @@ const ShippingManagement = () => {
   // Apply filters and sorting to shipments
   const filteredShipments = shipments
     .filter((shipment) => {
-      // If there's a search query, filter by orderNumber, customerName, or awb
+      // If there's a search query, filter by orderNumber, customerName, awb, or shipmentId
       if (searchQuery) {
         const query = searchQuery.toLowerCase();
         return (
           shipment.orderNumber.toLowerCase().includes(query) ||
+          String(shipment.shipmentId || "")
+            .toLowerCase()
+            .includes(query) ||
           shipment.customerName.toLowerCase().includes(query) ||
-          String(shipment.awb).toLowerCase().includes(query)
+          String(shipment.id || "")
+            .toLowerCase()
+            .includes(query) ||
+          String(shipment.awb || "")
+            .toLowerCase()
+            .includes(query)
         );
       }
       return true;
@@ -173,17 +184,25 @@ const ShippingManagement = () => {
       // Format date as YYYY-MM-DD
       const formattedDate = newPickupDate.toISOString().split("T")[0];
 
-      // Make API call to reschedule pickup
-      await axios.put(
-        `https://uzlmegb12i.execute-api.ap-south-1.amazonaws.com/api/admin/shipments/reschedule/${selectedShipment.id}`,
+      // Make API call to reschedule pickup with proper format
+      await axios.post(
+        `https://uzlmegb12i.execute-api.ap-south-1.amazonaws.com/api/admin/reschedule-order`,
         {
-          pickupDate: formattedDate,
-          shipmentId: selectedShipment.id,
+          // Send the pickup date directly as a string, not in an array
+          newDate: formattedDate,
+          orderId: selectedShipment.id,
+          // Send the shipmentId directly as a string, not in an array
+          shipmentId: selectedShipment.shipmentId,
+          // Include AWB code if available
+          awb:
+            selectedShipment.awb !== "Pending"
+              ? selectedShipment.awb
+              : undefined,
         },
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
-            'shiprocketToken': localStorage.getItem('shiprocketToken'),
+            shiprocketToken: localStorage.getItem("shiprocketToken"),
           },
         }
       );

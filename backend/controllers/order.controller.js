@@ -251,36 +251,97 @@ exports.OrderController = {
         height: 7,
         weight: shippingInfo.weight,
       };
-      var shiprocketToken;
+
+      // Improved Shiprocket token handling
+      let shiprocketToken;
       try {
-        console.log(req.shiprocketToken);
+        // Validate the token before using it
+        if (
+          !req.shiprocketToken ||
+          req.shiprocketToken === "undefined" ||
+          req.shiprocketToken.split(".").length !== 3
+        ) {
+          console.log(
+            "Invalid or missing Shiprocket token, generating a new one..."
+          );
+          const newToken = await getAuthToken();
+          shiprocketToken = newToken;
+
+          // Set cookie with the new token
+          const maxAge = 10 * 24 * 60 * 60;
+          res.setHeader("Set-Cookie", [
+            `shiprocket=${newToken}; HttpOnly; Path=/; SameSite=Lax; Max-Age=${maxAge};`,
+          ]);
+        } else {
+          shiprocketToken = req.shiprocketToken;
+        }
+
+        // Now create the order with a valid token
         const { data, token } = await createOrder(
-          req.shiprocketToken,
+          shiprocketToken,
           shiprocketOrder
         );
-        shiprocketToken = token;
-        console.log("Shiprocket order response:", data);
-        // Save Shiprocket data to order if needed
-        order.shipmentOrderId = data?.order_id || null;
-        order.shipmentId = data?.shipment_id || null;
 
-        // Update token if needed
-        if (token != req.shiprocketToken || !req.shiprocketToken) {
+        // Update token if a new one was returned
+        if (token && token !== shiprocketToken) {
+          shiprocketToken = token;
           const maxAge = 10 * 24 * 60 * 60;
-          console.log("token setting cookie");
           res.setHeader("Set-Cookie", [
             `shiprocket=${token}; HttpOnly; Path=/; SameSite=Lax; Max-Age=${maxAge};`,
           ]);
         }
+
+        console.log("Shiprocket order response:", data);
+
+        // Save Shiprocket data to order
+        if (data) {
+          order.shipmentOrderId = data.order_id || null;
+          order.shipmentId = data.shipment_id || null;
+        }
       } catch (shiprocketError) {
         console.error("Shiprocket order creation error:", shiprocketError);
+
+        // Try to refresh the token and retry once if it seems like a token issue
+        if (
+          shiprocketError.message &&
+          (shiprocketError.message.includes("token") ||
+            shiprocketError.message.includes("auth") ||
+            shiprocketError.message.includes("Wrong number of segments"))
+        ) {
+          try {
+            console.log("Attempting to refresh Shiprocket token and retry...");
+            shiprocketToken = await getAuthToken();
+
+            // Set cookie with the new token
+            const maxAge = 10 * 24 * 60 * 60;
+            res.setHeader("Set-Cookie", [
+              `shiprocket=${shiprocketToken}; HttpOnly; Path=/; SameSite=Lax; Max-Age=${maxAge};`,
+            ]);
+
+            // Retry with new token
+            const { data, token } = await createOrder(
+              shiprocketToken,
+              shiprocketOrder
+            );
+
+            console.log("Retry successful with new token");
+
+            // Save Shiprocket data to order
+            if (data) {
+              order.shipmentOrderId = data.order_id || null;
+              order.shipmentId = data.shipment_id || null;
+            }
+          } catch (retryError) {
+            console.error("Failed even after token refresh:", retryError);
+          }
+        }
         // Continue with order creation even if Shiprocket fails
       }
 
       // Now create payment session with Cashfree
       try {
-        console.log(process.env.CASHFREE_CLIENT_ID);
-        console.log(process.env.CASHFREE_CLIENT_SECRET);
+        // console.log(process.env.CASHFREE_CLIENT_ID);
+        // console.log(process.env.CASHFREE_CLIENT_SECRET);
         const cashfree = await axios.post(
           "https://sandbox.cashfree.com/pg/orders",
           {
@@ -297,7 +358,7 @@ exports.OrderController = {
             },
             order_meta: {
               payment_methods: "cc,dc,upi",
-              return_url: `https://main.ddep0n5ozmw0h.amplifyapp.com/customer/payment/redirect?order_id=${orderId}&status=success`,
+              return_url: `http://localhost:5173/customer/payment/redirect?order_id=${orderId}&status=success`,
             },
             order_expiry_time: new Date(
               Date.now() + 30 * 60 * 1000
@@ -312,7 +373,7 @@ exports.OrderController = {
             },
           }
         );
-        console.log(cashfree);
+        // console.log(cashfree);
         // Save payment information
         paymentSessionId = cashfree.data.payment_session_id;
         paymentLink = `https://sandbox.cashfree.com/pg/order/${orderId}/${cashfree.data.payment_session_id}`;
@@ -368,7 +429,7 @@ exports.OrderController = {
           },
         }
       );
-      console.log(response);
+      // console.log(response);
 
       if (response.data[0].payment_status !== "SUCCESS") {
         return res.status(400).json({
@@ -383,30 +444,37 @@ exports.OrderController = {
         courier_id: JSON.parse(order.shippingInfo).courier_company_id,
       };
       console.log(awb);
-      // const { data, token } = await generateAWB(req.shiprocketToken, awb);
-      // if (token != req.shiprocketToken || !req.shiprocketToken) {
-      //   const maxAge = 10 * 24 * 60 * 60;
-      //   console.log("token setting cookie");
-      //   res.setHeader("Set-Cookie", [
-      //     `shiprocket=${token}; HttpOnly; Path=/; SameSite=Lax; Max-Age=${maxAge};`,
-      //   ]);
-      // }
-      // if(!data.pickup_scheduled){
-      //   const {data,token} = await shcedulePickup(req.shiprocketToken, order.shipmentId)
-      //   if (token != req.shiprocketToken || !req.shiprocketToken) {
-      //     const maxAge = 10 * 24 * 60 * 60;
-      //     console.log("token setting cookie");
-      //     res.setHeader("Set-Cookie", [
-      //       `shiprocket=${token}; HttpOnly; Path=/; SameSite=Lax; Max-Age=${maxAge};`,
-      //     ]);
-      //   }
-      //   order.pickupDate = data.pickup_scheduled_date;
-      //   order.estimatedDeliveryDate = data.est;
-      //   order.trackingUrl = data.tracking_url;
-      //   order.shippingCharge = data.shipping_charges;
-      // }
-      // order.awb=data.awb
+      const { data, token } = await generateAWB(req.shiprocketToken, awb);
+      if (token != req.shiprocketToken || !req.shiprocketToken) {
+        const maxAge = 10 * 24 * 60 * 60;
+        console.log("token setting cookie");
+        res.setHeader("Set-Cookie", [
+          `shiprocket=${token}; HttpOnly; Path=/; SameSite=Lax; Max-Age=${maxAge};`,
+        ]);
+      }
+      console.log("first",data.response.data);
+    
+      if (!data?.response.data.pickup_scheduled) {
+        const { data, token } = await schedulePickup(
+          req.shiprocketToken,
+          order.shipmentId
+        );
+        if (token != req.shiprocketToken || !req.shiprocketToken) {
+          const maxAge = 10 * 24 * 60 * 60;
+          // console.log("token setting cookie");
+          res.setHeader("Set-Cookie", [
+            `shiprocket=${token}; HttpOnly; Path=/; SameSite=Lax; Max-Age=${maxAge};`,
+          ]);
+        }
+      }
+      else{
+        
+        order.pickupDate = data.response.data.pickup_scheduled_date;
+        order.shippingCharge = data.data?.freight_charges;
+      }
+      order.awb = data.response.data.awb_code;
       if (!order) {
+        console.log("Error at order not found")
         return res.status(404).json({
           success: false,
           message: "Order not found",

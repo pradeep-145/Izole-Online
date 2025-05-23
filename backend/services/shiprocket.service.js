@@ -14,7 +14,9 @@ const getAuthToken = async () => {
           Accept: "application/json",
         },
       }
+
     );
+    console.log("Token response:", token.data);
     if (token.data && token.data.token) {
       return token.data.token;
     } else {
@@ -37,7 +39,9 @@ const makeAuthenticatedRequest = async (
   if (!token) {
     token = await getAuthToken();
   }
-  // console.log(token)
+  if(token.includes('Bearer'))
+    token = token.split(' ')[1]
+  console.log("AUth",token)
   try {
     const config = {
       url: `https://apiv2.shiprocket.in/v1/external/${endpoint}`,
@@ -45,14 +49,14 @@ const makeAuthenticatedRequest = async (
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${token}`, 
       },
     };
 
     if (data) {
       config.data = data;
     }
-
+    console.log(data)
     if (queryParams) {
       config.params = queryParams;
     }
@@ -74,7 +78,7 @@ const makeAuthenticatedRequest = async (
         queryParams
       );
     }
-    console.log(error)
+    // console.log(error)
     // Get detailed error information from the response if available
     const errorDetails =
       error.response && error.response.data
@@ -89,7 +93,7 @@ const makeAuthenticatedRequest = async (
       errorDetails,
     });
 
-    // Return a structured error response
+    // Return a structured error response                                                     
     return {
       error: true,
       status: error.response?.status || 500,
@@ -117,6 +121,14 @@ module.exports = {
       shipment_id: data.shipment_id,
       courier_id: data.courier_id
     });
+  },
+  rescheduleOrder: (token, data) => {
+    return makeAuthenticatedRequest(
+      token,
+      `courier/generate/pickup`,
+      "POST",
+      data
+    );
   },
   getAWB: (token, awb) => {
     return makeAuthenticatedRequest(

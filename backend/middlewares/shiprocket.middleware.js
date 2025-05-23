@@ -10,7 +10,7 @@ const extractShiprocketToken = async (req, res, next) => {
 
     // If token exists in the cookie, use that
     if (req.cookies && req.cookies.shiprocket) {
-      token = req.cookies.shiprocket;
+      token = req.cookies.shiprocket.split(" ")[1];
     }
 
     // If still no token, generate a new one

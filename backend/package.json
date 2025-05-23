@@ -33,7 +33,8 @@
     "nodemon": "^3.1.9",
     "openid-client": "^5.7.0",
     "path": "^0.12.7",
-    "serverless-http": "^3.2.0"
+    "serverless-http": "^3.2.0",
+    "pdfkit": "^0.13.0"
   },
   "devDependencies": {
     "esbuild": "^0.25.2",

@@ -80,10 +80,16 @@ const AuthController = {
     }
   },
   sendMail: async (req, res) => {
-    const { customerId, email } = req.body;
+    const { email } = req.body;
     const otp = crypto.randomInt(10 ** 5, 10 ** 6);
-
-    await otpModel.storeOTP(customerId, otp);
+    const user= await customerModel.findOne({
+      email:email
+    });
+    if(!user){
+      res.status(404).json("User Not Found");
+      return;
+    }
+    await otpModel.storeOTP(user._id, otp);
 
     const transporter = nodemailer.createTransport({
       service: "gmail",
@@ -105,7 +111,7 @@ const AuthController = {
           return res.status(500).json({ error: "Failed to send email" });
         } else {
           console.log("Email sent:", info.response);
-          return res.status(200).json({ message: `Email sent to ${email}` });
+          return res.status(200).json({ message: `Email sent to ${email}`, userId: user._id });
         }
       }
     );
@@ -131,7 +137,7 @@ const AuthController = {
   verifyOTP: async (req, res) => {
     const { customerId, code } = req.body;
     try {
-      const verified = await otpModel.passwordResetVerification(
+      const verified = await otpModel.findOne(
         customerId,
         code
       );

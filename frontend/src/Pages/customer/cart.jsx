@@ -12,6 +12,7 @@ import {
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../../Components/customer/Navbar";
+import Footer from "../../Components/customer/Footer";
 import { useCart } from "../../zustand/useCart"; // Update path as needed
 
 // IZOLE brand colors
@@ -64,7 +65,7 @@ const Cart = () => {
     try {
       // Add to wishlist API call
       await axios.post(
-        "https://6wceq59nse.execute-api.ap-south-1.amazonaws.com/api/wishlist/add",
+        "https://uzlmegb12i.execute-api.ap-south-1.amazonaws.com/api/wishlist/add",
         {
           productId,
           color,
@@ -530,6 +531,7 @@ const Cart = () => {
           </div>
         </div>
       </main>
+      <Footer></Footer>
     </div>
   );
 };

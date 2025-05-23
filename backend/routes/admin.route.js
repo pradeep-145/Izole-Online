@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const adminController = require("../controllers/admin.controller.js");
-
+const shiprocketMiddleware = require("../middlewares/shiprocket.middleware.js");
 // Admin routes
 router.get("/", adminController.get);
 router.get("/inventory", adminController.getInventory);
@@ -11,20 +11,14 @@ router.get("/customers", adminController.getCustomers);
 router.get("/customers/:customerId", adminController.getCustomerDetails);
 router.get("/analytics", adminController.getDashboardAnalytics);
 router.get("/report", adminController.generateReport);
-
+router.get("/reports/generate", adminController.generateReport);
+router.post("/reschedule-order",shiprocketMiddleware, adminController.rescheduleOrder);
 router.post("/add-product", adminController.saveProduct);
 router.post("/inventory/fix-issues", adminController.fixInventoryIssues);
-
-// Fix the route that was causing the error
 router.put("/inventory/update", adminController.updateInventoryItem);
-
 router.put("/orders/update", adminController.updateOrders);
 router.put("/update-product", adminController.updateProduct);
 router.put("/inventory/bulk-update", adminController.bulkUpdateInventory);
-
 router.delete("/remove-product", adminController.removeProduct);
-
-// Add notification routes
 router.use("/notifications", require("./admin.notification.route.js"));
-
 module.exports = router;

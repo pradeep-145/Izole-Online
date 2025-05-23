@@ -38,6 +38,7 @@ OTPSchema.statics.verifyOTP = async function (customerId, code) {
 
 OTPSchema.statics.passwordResetVerification = async function (customerId, code) {
     const otp = await this.findOne({ customerId, code });
+    console.log("OTP verification result:", otp);
     if (otp) {
         await this.deleteOne({ customerId });
         return true;

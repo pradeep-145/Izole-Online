@@ -16,8 +16,8 @@ const authenticateJWT = async (req, res, next) => {
 
     // Check if shiprocketToken exists in headers
     let shiprocketToken = null;
-    if (req.headers["shiprocketToken"]) {
-      shiprocketToken = req.headers["shiprocketToken"].split(" ")[1];
+    if (req.headers["shiprockettoken"]) {
+      shiprocketToken = req.headers["shiprockettoken"].split(" ")[1];
     }
 
     const decoded = await JwtService.verifyToken(token);

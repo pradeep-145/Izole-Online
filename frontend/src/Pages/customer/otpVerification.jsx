@@ -17,6 +17,7 @@ const OtpVerification = () => {
   const location = useLocation();
   const inputRefs = [useRef(), useRef(), useRef(), useRef(), useRef(), useRef()];
   const timerRef = useRef(null);
+  const [customerId, setCustomerId] = useState(location.state?.customerId || null);
 
   const isFromLogin = location.state?.source === 'login';
 
@@ -92,6 +93,7 @@ const OtpVerification = () => {
   };
 
   const handleEmailSubmit = async (e) => {
+    console.log("Hello")
     e.preventDefault();
     setIsLoading(true);
     setError('');
@@ -103,11 +105,17 @@ const OtpVerification = () => {
     }
 
     try {
+      const response=await axios.post('https://uzlmegb12i.execute-api.ap-south-1.amazonaws.com/api/auth/send-otp',{
+        email
+      })
+      console.log(response)
+      setCustomerId(response.data.customerId);
       setSuccess(`OTP has been sent to ${email}`);
       setStep(2);
       startResendTimer();
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to send OTP. Please try again.');
+      console.log(err)
+      setError(err.response?.data || 'Failed to send OTP. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -134,7 +142,7 @@ const OtpVerification = () => {
         navigate('/customer');
       } else {
         await axios.post("https://uzlmegb12i.execute-api.ap-south-1.amazonaws.com/api/auth/verify-otp", {
-          email,
+          customerId,
           code: otpValue
         });
         setSuccess('OTP verified successfully!');

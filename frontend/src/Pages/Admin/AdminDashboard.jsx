@@ -14,6 +14,7 @@ import {
   TrendingUp,
   Truck,
   Users,
+  X,
 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import CustomerManagement from "../../Components/admin/CustomerManagement";
@@ -48,6 +49,14 @@ const AdminDashboard = () => {
   const [autoRefresh, setAutoRefresh] = useState(true);
   const [refreshRate, setRefreshRate] = useState(60000); // 60 seconds by default
   const { products } = useProduct();
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [reportParameters, setReportParameters] = useState({
+    reportType: "sales",
+    timePeriod: "last30",
+    format: "csv", // Default to CSV only
+    startDate: "",
+    endDate: "",
+  });
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -64,6 +73,15 @@ const AdminDashboard = () => {
       default:
         return "bg-gray-100 text-gray-800";
     }
+  };
+
+  // Handle report parameter changes
+  const handleReportParameterChange = (e) => {
+    const { name, value } = e.target;
+    setReportParameters((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   // Fetch inventory
@@ -203,107 +221,56 @@ const AdminDashboard = () => {
     }
   }, []);
 
-  // Download report as CSV
+  // Updated function for generating reports with CSV format only
   const generateReport = async () => {
-    try {
-      setIsLoadingAnalytics(true);
-      const token = localStorage.getItem("adminToken");
+    setIsLoadingAnalytics(true);
 
-      // Request report data from backend with additional details
+    try {
+      // Build query parameters based on selections
+      const queryParams = new URLSearchParams();
+      queryParams.append("reportType", reportParameters.reportType);
+      queryParams.append("format", "csv"); // Hardcoded to CSV format
+
+      if (reportParameters.timePeriod === "custom") {
+        queryParams.append("startDate", reportParameters.startDate);
+        queryParams.append("endDate", reportParameters.endDate);
+      } else {
+        queryParams.append("timePeriod", reportParameters.timePeriod);
+      }
+
+      // Make API request to generate report
       const response = await axios.get(
-        "https://uzlmegb12i.execute-api.ap-south-1.amazonaws.com/api/admin/reports/generate",
+        `https://uzlmegb12i.execute-api.ap-south-1.amazonaws.com/api/admin/reports/generate?${queryParams.toString()}`,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
           },
-          params: {
-            format: "csv", // or "pdf" depending on what your backend supports
-            type: "sales",
-            startDate: new Date(
-              new Date().setDate(new Date().getDate() - 30)
-            ).toISOString(), // Last 30 days
-            endDate: new Date().toISOString(),
-          },
-          responseType: "blob", // Important for handling file downloads
+          responseType: "text", // Changed to text for CSV
         }
       );
 
-      // Create a download link for the file
-      const url = window.URL.createObjectURL(new Blob([response.data]));
+      // Create a download link for the CSV
+      const blob = new Blob([response.data], { type: "text/csv" });
+      const url = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-
-      // Get current date for filename
-      const date = new Date().toISOString().split("T")[0];
-      link.setAttribute("download", `izole-sales-report-${date}.csv`);
-
+      link.setAttribute(
+        "download",
+        `${reportParameters.reportType}-report-${
+          new Date().toISOString().split("T")[0]
+        }.csv`
+      );
       document.body.appendChild(link);
       link.click();
       link.remove();
 
-      // Clean up the URL
-      window.URL.revokeObjectURL(url);
+      // Close the modal after successful generation
+      setShowReportModal(false);
     } catch (error) {
       console.error("Error generating report:", error);
-      // Create a basic CSV if API fails
-      generateFallbackReport();
     } finally {
       setIsLoadingAnalytics(false);
     }
-  };
-
-  // Fallback report generation (client-side) if API fails
-  const generateFallbackReport = () => {
-    // Create basic CSV with current data
-    const { rawData } = analyticsData;
-
-    if (!rawData) {
-      alert("No data available to generate report");
-      return;
-    }
-
-    let csvContent = "data:text/csv;charset=utf-8,";
-
-    // Add headers
-    csvContent +=
-      "Report Date,Generated On," + new Date().toLocaleString() + "\r\n\r\n";
-    csvContent += "SALES SUMMARY\r\n";
-    csvContent += "Today,Yesterday,Growth\r\n";
-    csvContent += `${analyticsData.sales.today.replace(
-      "₹",
-      ""
-    )},${analyticsData.sales.yesterday.replace("₹", "")},${
-      analyticsData.sales.growth
-    }\r\n\r\n`;
-
-    // Add orders data
-    csvContent += "ORDERS SUMMARY\r\n";
-    csvContent += "Today,Yesterday,Growth\r\n";
-    csvContent += `${analyticsData.orders.today},${analyticsData.orders.yesterday},${analyticsData.orders.growth}\r\n\r\n`;
-
-    // Add top products if available
-    if (topProducts.length > 0) {
-      csvContent += "TOP PRODUCTS\r\n";
-      csvContent += "Product Name,Units Sold,In Stock,Price\r\n";
-
-      topProducts.forEach((product) => {
-        csvContent += `${product.name},${product.sold},${
-          product.stock
-        },${product.price.replace("₹", "")}\r\n`;
-      });
-    }
-
-    // Create download link
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute(
-      "download",
-      `izole-sales-report-${new Date().toISOString().split("T")[0]}.csv`
-    );
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
   };
 
   // Toggle auto-refresh
@@ -386,7 +353,7 @@ const AdminDashboard = () => {
         <div className="flex items-center justify-center h-16 border-b border-gray-200">
           <h1 className="text-2xl font-bold text-black">IZOLE ADMIN</h1>
         </div>
-        <div className="flex flex-col flex-1 overflow-y-auto">
+        <div className="flex flex-col flex-1 ">
           <nav className="flex-1 px-2 py-4 space-y-1">
             <button
               onClick={() => setActiveTab("dashboard")}
@@ -597,7 +564,7 @@ const AdminDashboard = () => {
                       Mark all as read
                     </button>
                   </div>
-                  <div className="max-h-72 overflow-y-auto">
+                  <div className="max-h-72 ">
                     <div className="px-4 py-3 border-b border-gray-100 bg-blue-50">
                       <div className="flex items-start">
                         <ShoppingBag className="w-5 h-5 text-blue-600 mr-3 mt-0.5" />
@@ -726,37 +693,24 @@ const AdminDashboard = () => {
                   </div>
 
                   <button
-                    onClick={generateReport}
+                    onClick={() => setShowReportModal(true)}
                     className="px-4 py-2 bg-blue-600 rounded-md text-sm font-medium text-white hover:bg-blue-700 flex items-center"
-                    disabled={isLoadingAnalytics}
                   >
-                    {isLoadingAnalytics ? (
-                      <>
-                        <svg
-                          className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                        >
-                          <circle
-                            className="opacity-25"
-                            cx="12"
-                            cy="12"
-                            r="10"
-                            stroke="currentColor"
-                            strokeWidth="4"
-                          ></circle>
-                          <path
-                            className="opacity-75"
-                            fill="currentColor"
-                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                          ></path>
-                        </svg>
-                        Generating...
-                      </>
-                    ) : (
-                      "Download Report"
-                    )}
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-4 w-4 mr-2"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"
+                      />
+                    </svg>
+                    Generate Report
                   </button>
                 </div>
               </div>
@@ -902,8 +856,8 @@ const AdminDashboard = () => {
                 </div>
 
                 {/* Recent Orders */}
-                <div className="bg-white rounded-lg shadow mb-6">
-                  <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                <div className="bg-white rounded-lg shadow mb-6 ">
+                  <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center h-20">
                     <h2 className="text-lg font-medium text-gray-900">
                       Recent Orders
                     </h2>
@@ -914,7 +868,7 @@ const AdminDashboard = () => {
                       View All
                     </button>
                   </div>
-                  <div className="overflow-x-auto">
+                  <div className="overflow-x-auto h-[500px] overflow-y-scroll scrollbar-hide">
                     {isLoadingAnalytics ? (
                       <div className="p-8 text-center">
                         <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500 mb-2"></div>
@@ -993,7 +947,7 @@ const AdminDashboard = () => {
                 </div>
 
                 {/* Top Products */}
-                <div className="bg-white rounded-lg shadow">
+                <div className="bg-white rounded-lg shadow mb-6">
                   <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
                     <h2 className="text-lg font-medium text-gray-900">
                       Top Selling Products
@@ -1110,7 +1064,9 @@ const AdminDashboard = () => {
                       </button>
                     </div>
                     <div className="p-4">
-                      <AdminProductForm />
+                      <AdminProductForm
+                        onSuccess={() => setShowProductForm(false)}
+                      />{" "}
                     </div>
                   </div>
                 </div>
@@ -1152,6 +1108,149 @@ const AdminDashboard = () => {
           )}
         </main>
       </div>
+
+      {/* Report Generation Modal */}
+      {showReportModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <h3 className="text-xl font-medium text-gray-900">
+                  Generate Report
+                </h3>
+                <button
+                  onClick={() => setShowReportModal(false)}
+                  className="text-gray-400 hover:text-gray-500"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+            <div className="p-6 space-y-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Report Type
+                </label>
+                <select
+                  name="reportType"
+                  value={reportParameters.reportType}
+                  onChange={handleReportParameterChange}
+                  className="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option value="sales">Sales Report</option>
+                  <option value="inventory">Inventory Report</option>
+                  <option value="customers">Customer Activity</option>
+                  <option value="orders">Order Summary</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Time Period
+                </label>
+                <select
+                  name="timePeriod"
+                  value={reportParameters.timePeriod}
+                  onChange={handleReportParameterChange}
+                  className="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option value="today">Today</option>
+                  <option value="yesterday">Yesterday</option>
+                  <option value="last7">Last 7 Days</option>
+                  <option value="last30">Last 30 Days</option>
+                  <option value="thisMonth">This Month</option>
+                  <option value="lastMonth">Last Month</option>
+                  <option value="custom">Custom Range</option>
+                </select>
+              </div>
+
+              {reportParameters.timePeriod === "custom" && (
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Start Date
+                    </label>
+                    <input
+                      type="date"
+                      name="startDate"
+                      value={reportParameters.startDate}
+                      onChange={handleReportParameterChange}
+                      className="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      End Date
+                    </label>
+                    <input
+                      type="date"
+                      name="endDate"
+                      value={reportParameters.endDate}
+                      onChange={handleReportParameterChange}
+                      className="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                </div>
+              )}
+
+              <div className="text-sm text-gray-500">
+                Report will be generated in CSV format
+              </div>
+            </div>
+            <div className="p-6 border-t border-gray-200 flex justify-end space-x-3">
+              <button
+                onClick={() => setShowReportModal(false)}
+                className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={generateReport}
+                disabled={
+                  isLoadingAnalytics ||
+                  (reportParameters.timePeriod === "custom" &&
+                    (!reportParameters.startDate || !reportParameters.endDate))
+                }
+                className={`px-4 py-2 rounded-md text-sm font-medium text-white flex items-center ${
+                  isLoadingAnalytics ||
+                  (reportParameters.timePeriod === "custom" &&
+                    (!reportParameters.startDate || !reportParameters.endDate))
+                    ? "bg-blue-400 cursor-not-allowed"
+                    : "bg-blue-600 hover:bg-blue-700"
+                }`}
+              >
+                {isLoadingAnalytics ? (
+                  <>
+                    <svg
+                      className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
+                    Generating...
+                  </>
+                ) : (
+                  <>Generate</>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

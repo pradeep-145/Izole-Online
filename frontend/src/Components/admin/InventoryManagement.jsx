@@ -482,15 +482,7 @@ const InventoryManagement = () => {
           >
             {viewMode === "grouped" ? "Detailed View" : "Grouped View"}
           </button>
-          <button
-            onClick={() => {
-              /* Add product functionality */
-            }}
-            className="px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm flex items-center"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Add Product
-          </button>
+          
         </div>
       </div>
 

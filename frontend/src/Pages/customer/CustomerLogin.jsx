@@ -36,10 +36,9 @@ const CustomerLogin = () => {
         }
         else{
           console.log("Hello")
-          // await axios.post('https://uzlmegb12i.execute-api.ap-south-1.amazonaws.com/api/auth/send-otp', {
-          //   customerId: res.data.authUser._id,
-          //   email: res.data.authUser.email,
-          // })
+          await axios.post('https://uzlmegb12i.execute-api.ap-south-1.amazonaws.com/api/auth/send-otp', {
+            email: res.data.authUser.email,
+          })
           navigate('/customer/otp-verification',{state:{source:'login'}});
         }
       })

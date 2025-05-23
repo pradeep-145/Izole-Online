@@ -48,7 +48,6 @@ const CustomerSignUp = () => {
       .then(async(res) => {
         console.log(res);
         await axios.post("https://uzlmegb12i.execute-api.ap-south-1.amazonaws.com/api/auth/send-otp", {
-          customerId:res.data._id,
           email: formData.email,
         });
         navigate("/customer/otp-verification",{ state:{source:'login',customerId:res.data._id}});
