@@ -21,6 +21,7 @@ const eventBridgeHandler = async (event) => {
         };
       }
 
+      
       try {
         const productArray = Array.isArray(order.products)
           ? order.products
