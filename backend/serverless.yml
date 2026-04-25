@@ -3,7 +3,7 @@ service: izole-api
 provider:
   name: aws
   runtime: nodejs18.x
-  region: ap-south-1  # Change to your preferred region
+  region: ap-south-1 # Change to your preferred region
   memorySize: 512
   timeout: 30
   stage: prod
@@ -19,12 +19,29 @@ provider:
     SCHEDULER_ROLE_ARN: ${env:SCHEDULER_ROLE_ARN}
     LAMBDA_ARN: ${env:LAMBDA_ARN}
 
+  httpApi:
+    cors:
+      allowedOrigins:
+        - https://main.ddep0n5ozmw0h.amplifyapp.com
+        - http://localhost:5173
+      allowedMethods:
+        - GET
+        - POST
+        - PUT
+        - DELETE
+        - PATCH
+        - OPTIONS
+      allowedHeaders:
+        - Content-Type
+        - Authorization
+      allowCredentials: true
+
 functions:
   api:
-    name: 'izole-api'
+    name: "izole-api"
     image: ${env:ECR_IMAGE_URI}
     events:
-      - httpApi: '*'  # API Gateway event
+      - httpApi: "*" # API Gateway event
 
 resources:
   Resources:
@@ -33,7 +50,7 @@ resources:
       Properties:
         RoleName: ${self:service}-${self:provider.stage}-scheduler-role
         AssumeRolePolicyDocument:
-          Version: '2012-10-17'
+          Version: "2012-10-17"
           Statement:
             - Effect: Allow
               Principal:
@@ -42,7 +59,7 @@ resources:
         Policies:
           - PolicyName: SchedulerInvokeLambda
             PolicyDocument:
-              Version: '2012-10-17'
+              Version: "2012-10-17"
               Statement:
                 - Effect: Allow
                   Action:
@@ -64,4 +81,3 @@ custom:
       - PASSWORD
       - SHIPROCKET_EMAIL
       - SHIPROCKET_PASSWORD
-      

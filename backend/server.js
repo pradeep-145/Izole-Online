@@ -14,7 +14,15 @@ require("dotenv").config();
 connectToDB().catch((err) => console.error("Failed to connect to DB:", err));
 
 // In your Express app
-app.use(cors());
+app.use(cors({
+  origin: [
+    "https://main.ddep0n5ozmw0h.amplifyapp.com",
+    "http://localhost:5173"
+  ],
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true
+}));
 app.use(express.json());
 
 // Routes
