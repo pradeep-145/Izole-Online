@@ -10,7 +10,6 @@ const { processContactForm } = require("./controllers/contact.controller.js");
 
 const app = express();
 require("dotenv").config();
-
 // Connect to DB at startup (will be invoked once per container)
 connectToDB().catch((err) => console.error("Failed to connect to DB:", err));
 
