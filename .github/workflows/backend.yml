@@ -2,34 +2,40 @@ name: Deploy to AWS Lambda
 
 on:
   push:
-    branches: 
+    branches:
       - main
     paths:
-      - 'backend/**'
-
+      - "backend/**"
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
-      
+          node-version: "18"
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: 'ap-south-1'
-          
+          aws-region: "ap-south-1"
+
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
-      
+
+      - name: Create ECR repository if not exists
+        env:
+          ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY_NAME }}
+        run: |
+          aws ecr describe-repositories --repository-names "$ECR_REPOSITORY" 2>/dev/null || \
+          aws ecr create-repository --repository-name "$ECR_REPOSITORY" --image-scanning-configuration scanOnPush=true
+
       - name: Build, tag, and push image to Amazon ECR
         id: build-image
         env:
@@ -41,10 +47,9 @@ jobs:
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
-      
       - name: Install Serverless Framework
         run: npm install -g serverless
-      
+
       - name: Deploy to Lambda with Serverless
         env:
           ECR_IMAGE_URI: ${{ steps.build-image.outputs.image }}
